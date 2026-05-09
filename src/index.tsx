@@ -1,7 +1,11 @@
 import { Hono } from 'hono'
 import { renderer } from './renderer'
+import api from './api'
+import type { Bindings } from './types'
 
-const app = new Hono()
+const app = new Hono<{ Bindings: Bindings }>()
+
+app.route('/api', api)
 
 app.use(renderer)
 
@@ -31,10 +35,31 @@ app.get('/', (c) => {
           <a href="#profile" class="nav-item" data-tab="profile"><i class="fas fa-user-astronaut"></i><span>道号</span></a>
         </nav>
         <div class="topbar-actions">
+          <span id="user-tag" class="user-tag hidden"><i class="fas fa-user"></i> <span id="user-name">—</span></span>
           <span id="title-badge" class="title-badge">凡胎肉身</span>
+          <button id="logout-btn" class="reset-btn hidden" title="登出"><i class="fas fa-right-from-bracket"></i></button>
           <button id="reset-btn" class="reset-btn" title="转世清档"><i class="fas fa-rotate"></i></button>
         </div>
       </header>
+
+      {/* 登录/注册弹窗 */}
+      <section id="auth-modal" class="modal hidden">
+        <div class="modal-card oracle">
+          <div class="oracle-glow"></div>
+          <h2 class="oracle-title"><span class="cn">登仙籍</span><span class="en">Sign In</span></h2>
+          <p class="oracle-sub">先入仙籍，方得开启命盘</p>
+          <div class="auth-tabs">
+            <button class="auth-tab active" data-mode="login">登录</button>
+            <button class="auth-tab" data-mode="register">注册新道号</button>
+          </div>
+          <form id="auth-form" class="oracle-form">
+            <label>道号 <input name="username" maxlength="24" placeholder="2~24 个字符" required /></label>
+            <label>密令 <input name="password" type="password" minlength="4" maxlength="64" placeholder="至少 4 位" required /></label>
+            <button type="submit" class="oracle-btn"><span id="auth-btn-text">入 · 仙 · 籍</span></button>
+            <p id="auth-err" class="auth-err"></p>
+          </form>
+        </div>
+      </section>
 
       {/* 注册测算弹窗 */}
       <section id="onboarding" class="modal hidden">

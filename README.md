@@ -1,140 +1,172 @@
 # 向天再借500年 · Borrow 500 Years
 
-> 融合「健康管理」与「RPG 模拟」的寿命延长养成 Web 应用 — 赛博朋克 × 中医古风。
+> 融合「健康管理」与「RPG 模拟」的寿命延长养成 Web 应用 — 赛博朋克 × 中医古风 — **D1 数据库后端版**。
 
 ## 项目概述
-- **名称**：向天再借500年 (Borrow 500 Years)
-- **目标**：通过将健康行为「数字化为寿命收益」，激励用户改善生活习惯，并在排行榜维度获得成就感
-- **定位**：基于真实生命数据的放置类 RPG 模拟经营应用
+- **名称**:向天再借500年 (Borrow 500 Years)
+- **目标**:通过将健康行为「数字化为寿命收益」,激励用户改善生活习惯,并在排行榜维度获得成就感
+- **定位**:基于真实生命数据的放置类 RPG 模拟经营应用
+- **架构**:Cloudflare Pages + Hono SSR + D1 (SQLite) 真后端
 
 ## 在线访问
-- **沙盒预览**：https://3000-idcdgr14gtrx8afyfy33g-8f57ffe2.sandbox.novita.ai
-- **本地开发**：http://localhost:3000
+- **沙盒预览**:https://3000-idcdgr14gtrx8afyfy33g-8f57ffe2.sandbox.novita.ai
+- **本地开发**:http://localhost:3000
 
-## ✅ 已完成功能
+## ✅ 已完成功能(D1 后端版)
 
-### 1. 数字化生命系统 (Life Kernel)
-- 注册测算：根据 **性别 / 年龄 / 身高 / 体重 (BMI) / 烟酒史 / 家族病史 / 习武 / 打坐** 生成初始预期寿命
-- 实时倒计时 (The Pulse)：纳秒级跳动 (50ms 刷新)，支持三种显示模式
-  - 岁 · 日 · 时 · 分 · 秒 · 毫秒
-  - 精确秒（带千分位）
-  - 总剩余天数
-- 动态衰减算法：基础速率 1.0x，受恶习/养生加成调整 (0.2x ~ 5.0x)
-- 八卦旋转背景、双向旋转命盘环、危机心跳动画
+### 🔐 1. 账号系统(全新)
+- 注册:道号 + 密令(SHA-256 加盐哈希存储)
+- 登录:用户名密码登录,签发 30 天有效期 token
+- 登出:服务端清空 token
+- 顶栏显示当前用户徽章
+- token 存于浏览器 localStorage,所有 API 通过 `Authorization: Bearer` 鉴权
 
-### 2. 养生修炼（任务系统）
-- **【子午流注】**：早睡打卡，+30 分钟寿命，次日衰减率 -0.2x
-- **【步步为营】**：滑杆模拟步数，1000 步=12 分钟，10000 步额外+2 小时
-- **【上善若水】**：8 杯水进度可视化，每杯 +5 分钟，圆满 +3 功德
-- **【静坐冥想】**：+15 分钟寿命，每次获得 1 个复活币碎片（5 个合成 1 枚）
-- **【早起挑战】· 七日劫数**：连续 7 天早起，奖励 1 枚复活币
-- **【清淡饮食】**：+20 分钟寿命，+1 功德
+### 🫀 2. 数字化生命系统 (Life Kernel)
+- 注册测算:根据 **性别 / 年龄 / 身高 / 体重 (BMI) / 烟酒史 / 家族病史 / 习武 / 打坐** 服务端生成初始预期寿命
+- 实时倒计时 (The Pulse):50ms 跳动,3 种显示模式
+- 服务端 + 客户端同步衰减算法,服务端兜底防作弊
+- 八卦旋转、命盘环、危机心跳红光
 
-### 3. 道具与商城系统 (Inventory / 丹房)
-- **复活币**：寿命归零进入弥留期可消耗续命
-- **复活币碎片**：5 个合成 1 枚复活币
-- **功德值**：通过自律行为获取（非氪金）
-- **延寿补剂**（6 款）：
-  - 💊 护肝片 / 🌙 褪黑素 / 🛌 深睡胶囊（持续型修正系数）
-  - 🌿 千年人参 / 🍄 九叶灵芝（瞬时寿命增量）
-  - 🟡 九转金丹（消耗复活币 +1 年寿命）
-- 我的丹炉：实时显示已激活道具及剩余生效时间
+### 🌿 3. 养生修炼(任务系统)— 服务端校验
+- 子午流注(早睡)/ 步步为营(步数)/ 上善若水(8 杯水)/ 静坐冥想 / 七日早起劫数 / 清淡饮食
+- 每日打卡状态写入 `daily_tasks` 表,任务次日自动重置
+- 重复打卡会被服务端拒绝
 
-### 4. 状态机
-- **生存状态**：正常倒计时
-- **危机状态**：寿命 < 30 天，界面变血红色 + 心跳震动 + 命悬一线遮罩
-- **死亡/弥留状态**：归零进入 24 小时弥留期，可选复活或转世清档
+### ⚗️ 4. 道具与商城系统(丹房)
+- 6 款丹药:护肝片 / 褪黑素 / 深睡胶囊 / 千年人参 / 九叶灵芝 / 九转金丹
+- 持续型丹药写入 `active_potions` 表(含过期时间戳),状态拉取时自动清理过期
+- 资源不足由服务端返回 400,前端 toast 提示
 
-### 5. 排行榜与称号 (The Pantheon)
-- **长生榜**：剩余寿命排名（含 12 名 NPC + 你）
-- **功德榜**：累积通过养生延长的总时长排名
-- 称号体系：凡胎肉身 / 寿比南山 / 地仙之姿 / 与天同寿
-- 顶部实时显示当前称号徽章
+### 🏆 5. 排行榜(真实)
+- 服务端实时计算所有用户的剩余寿命 / 累计延寿
+- 长生榜 + 功德榜双榜,Top 20 + 当前用户标注
+- 12 个 NPC 由 `seed.sql` 预置,真实玩家加入后会进入排名
+- 4 级称号:凡胎肉身 → 寿比南山 → 地仙之姿 → 与天同寿
 
-### 6. 命运卷轴 · 随机事件
-- 一键掷天骰触发，10 种随机事件
-- 包含正向（捡垃圾积德、梦中得仙人传法、拾得野生灵芝…）与负向（熬夜看球、宵夜、风寒入体…）
+### 🎲 6. 命运卷轴 · 随机事件
+- 服务端掷骰,10 种事件
+- 弥留期不可触发(防止滥用复活)
 
-### 7. 道号印鉴 (Profile)
-- 古风印鉴头像（首字 + 旋转金边）
-- BMI / 天命预测 / 命盘开启天数 / 累积修炼增量 / 资源总量
+### 💀 7. 状态机
+- 生存 → 危机(<30 天血红预警)→ 弥留(24h 服务端跟踪 `dying_start_at`)
+- 复活:消耗 1 枚复活币,服务端重置寿命到初始 50%
+- 转世:清空 profile/events/potions/daily_tasks,账号保留
+- 弥留期满:下次拉取状态时服务端自动转世
+
+### 👤 8. 道号印鉴
+- 古风印鉴头像、BMI、命盘开启天数、累积修炼增量
 - 核心寿命计算公式展示
 
-### 8. 数据持久化
-- 所有状态保存于 `localStorage`（键名：`borrow500years_v1`）
-- 页面打开时自动恢复，每 10 秒自动保存
-- 支持「转世清档」按钮一键重置
+## 🗂️ API 路由表
 
-## 功能入口路径
-
-| 路径 / 锚点         | 模块         | 主要交互                              |
-|---------------------|------------|-------------------------------------|
-| `/` `#dashboard`    | 命脉 Dashboard | 倒计时、修正系数、事件日志、随机事件骰   |
-| `#cultivation`      | 养生修炼      | 6 项每日打卡任务                       |
-| `#inventory`        | 丹房 / 商城   | 6 款丹药购买，已激活道具列表             |
-| `#leaderboard`      | 长生榜 / 功德榜 | 切换两种排序，称号体系展示                |
-| `#profile`          | 道号印鉴      | 个人面板、核心寿命公式                   |
+| 方法 | 路径 | 鉴权 | 说明 |
+|---|---|---|---|
+| POST | `/api/auth/register` | - | 注册新道号 |
+| POST | `/api/auth/login` | - | 登录,返回 token |
+| POST | `/api/auth/logout` | ✅ | 登出 |
+| POST | `/api/profile/onboard` | ✅ | 开启/重开命盘 |
+| GET  | `/api/state` | ✅ | 一次拉取完整状态(profile / 任务 / 道具 / 事件 / 衰减率) |
+| POST | `/api/task/:name` | ✅ | 完成任务:`ziwu`/`steps`/`water`/`meditate`/`earlyrise`/`diet` |
+| GET  | `/api/potions` | - | 丹药目录 |
+| POST | `/api/potion/:id` | ✅ | 炼制服用 |
+| POST | `/api/event/random` | ✅ | 掷天骰触发随机事件 |
+| POST | `/api/revive` | ✅ | 弥留期消耗复活币续命 |
+| POST | `/api/reborn` | ✅ | 转世清档(账号保留) |
+| GET  | `/api/board/:type` | (可选) | `longevity` / `merit` 排行榜 |
 
 ## 数据架构
-- **存储服务**：浏览器 `localStorage`（无后端依赖，纯前端可玩原型）
-- **核心数据模型**：
-  - `profile`：用户画像（姓名/性别/年龄/身高体重/恶习习惯）
-  - `initialLifeSec` + `bonusSec` + `startTimestamp`：寿命计算三要素
-  - `decayMods[]`：当前生效的衰减修正项（含过期时间戳）
-  - `activePotions[]`：已服用的延寿丹药
-  - `todayTasks` / `streak`：每日任务状态、连续打卡数
-  - `coin / shard / merit`：复活币 / 碎片 / 功德值
-  - `events[]`：命运卷轴事件日志（最近 100 条）
-- **核心公式**：`L_current = L_initial + Σ L_gain − (T_now − T_start) × R_decay`
+
+### 数据模型(D1 SQLite)
+```
+users           id, username, password_hash, token, token_expire_at, created_at
+profiles        user_id (PK), name, gender, age, height, weight,
+                smoke, alcohol, stayup, hereditary, exercise, meditate,
+                initial_life_sec, bonus_sec, start_timestamp, total_gained_sec,
+                coin, shard, merit, streak, dying, dying_start_at, updated_at
+daily_tasks     (user_id, task_date) PK, ziwu, steps, water, meditate, earlyrise, diet
+events          id, user_id, msg, kind, created_at  (仅保留最近 100 条/人)
+active_potions  id, user_id, potion_id, potion_name, potion_emoji,
+                mod_id, mod_label, mod_value, expire_at
+```
+
+### 核心公式(服务端)
+```
+L_current = L_initial + bonus_sec − (now − start_timestamp) × baseDecayMultiplier(profile)
+```
 
 ## 用户指南
-1. **首次进入**：弹出「天命测算」弹窗，填入根骨即生成命盘
-2. **首页 · 命脉**：观看寿命倒计时；点击「掷天骰」触发随机事件
-3. **修炼 Tab**：每日完成 6 项任务延长寿命、积累功德
-4. **丹房 Tab**：用功德值或复活币换购延寿补剂
-5. **长生榜 Tab**：在 NPC 中查看自己的全球排名
-6. **道号 Tab**：查看完整画像与寿命公式
-7. **顶部 ⟳ 按钮**：转世重修（清档）
+1. **首次访问**:弹出登仙籍弹窗 → 选「注册新道号」→ 填道号 + 密令
+2. **天命测算**:填根骨问卷,服务端生成初始命盘
+3. **首页 · 命脉**:观看寿命倒计时、点击「掷天骰」触发随机事件
+4. **修炼 Tab**:每日完成 6 项任务延长寿命、积累功德
+5. **丹房 Tab**:用功德值或复活币换购延寿补剂
+6. **长生榜 Tab**:与全部真实玩家 + NPC 比拼排名
+7. **顶部 ⟳ 按钮**:转世重修(账号保留)/ 登出按钮:退出账号
 
 ## 🔧 技术栈
-- **框架**：Hono 4.x (SSR) + Cloudflare Pages
-- **样式**：原生 CSS（赛博朋克 + 古风） + FontAwesome + Google Fonts (Ma Shan Zheng / ZCOOL XiaoWei / Orbitron / Noto Serif SC)
-- **构建**：Vite 6 + `@hono/vite-build`
-- **运行**：PM2 守护 `wrangler pages dev`
-- **持久化**：localStorage（无需数据库）
+- **框架**:Hono 4.x (SSR + API) + Cloudflare Pages
+- **数据库**:Cloudflare D1 (SQLite),本地 `--local` 模式无需账号
+- **样式**:原生 CSS(赛博朋克 + 古风)+ FontAwesome + Google Fonts
+- **构建**:Vite 6 + `@hono/vite-build`
+- **运行**:PM2 守护 `wrangler pages dev --local`
+- **加密**:Web Crypto API (SHA-256),Cloudflare Workers 兼容
 
 ## 部署 / 启动
 ```bash
-# 构建
-cd /home/user/webapp && npm run build
+# 1. 应用 D1 迁移(首次或新增 migration 后)
+npx wrangler d1 migrations apply webapp-production --local
 
-# 启动（PM2 守护）
+# 2. 灌入 NPC 种子数据(可选)
+npx wrangler d1 execute webapp-production --local --file=./seed.sql
+
+# 3. 构建
+npm run build
+
+# 4. 启动(PM2 守护)
 fuser -k 3000/tcp 2>/dev/null || true
 pm2 start ecosystem.config.cjs
 
-# 查看日志
-pm2 logs webapp --nostream
-
-# 测试
+# 5. 测试
 curl http://localhost:3000
+curl http://localhost:3000/api/potions
+
+# 6. D1 控制台
+npx wrangler d1 execute webapp-production --local --command="SELECT * FROM users LIMIT 5"
 ```
 
-## ⚠️ 暂未实现 / 简化的能力
-- 真实穿戴设备接入（Apple Watch / 华为健康 → 心率、步数）：当前用滑杆模拟步数
-- 多设备账号同步：当前仅 localStorage 单浏览器
-- GPS / 加速度传感器防作弊
-- 公会系统（养生宗门）
-- 服务端排行榜（当前 NPC 用伪随机生成）
+### 部署到生产
+```bash
+# 1. 创建生产 D1 数据库
+npx wrangler d1 create webapp-production
+# 把输出的 database_id 填入 wrangler.jsonc
 
-## 🚀 推荐下一步开发
-1. **接入 Cloudflare D1**：将用户、寿命快照、好友关系入库，做真排行榜
-2. **接入 Web 蓝牙 / Web Bluetooth API**：真实读取手环步数与心率
-3. **PWA 化**：支持离线打开，使用 Service Worker 推送危机提醒
-4. **OAuth 登录**：GitHub / 微信扫码登录，支持多端同步
-5. **AI 命理点评**：调用大模型，每周生成「命盘周报」给用户
-6. **公会 / 道场**：组队累计步数 PK，团队任务
+# 2. 应用迁移到远程
+npx wrangler d1 migrations apply webapp-production
+
+# 3. 灌入种子(可选)
+npx wrangler d1 execute webapp-production --file=./seed.sql
+
+# 4. 部署
+npm run build
+npx wrangler pages deploy dist --project-name webapp
+```
+
+## ⚠️ 暂未实现
+- 真实穿戴设备接入(Apple Watch/华为健康)
+- GPS / 加速度传感器防作弊
+- 公会系统(养生宗门)
+- 服务端定时任务(目前事件清理是写入时触发)
+
+## 🚀 推荐下一步
+1. **管理后台**:运营查看用户分布、调整丹药参数
+2. **WebSocket / SSE 推送**:好友延寿排行实时通知
+3. **PWA 化** + Service Worker 推送危机提醒
+4. **OAuth 登录**:GitHub / 微信扫码
+5. **AI 命理点评**:用大模型每周生成「命盘周报」
+6. **公会道场**:组队累计步数 PK
 
 ## 部署状态
-- **平台**：Cloudflare Pages（已就绪，未正式发布）
-- **状态**：✅ 沙盒运行中（PM2 守护）
-- **最近更新**：2026-05-09
+- **平台**:Cloudflare Pages + D1
+- **状态**:✅ 沙盒运行中(PM2 守护)
+- **数据库**:本地 D1 已迁移(包含 12 NPC 种子)
+- **最近更新**:2026-05-09(添加 D1 后端)
