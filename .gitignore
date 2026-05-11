@@ -13,8 +13,14 @@ dist/
 
 # deps
 node_modules/
-.wrangler
+.wrangler/
+.idea
 
+# local database (not used anymore)
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.mf/
 # env
 .env
 .env.production
@@ -31,3 +37,13 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+
+# temp/backup files
+*.sql.bak
+*_dump.sql
+*_sync.sql
+
+# development scripts
+dev.sh
+check-setup.sh
+test-admin.sh

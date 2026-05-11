@@ -6,11 +6,15 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "vars": {
+    "ADMIN_USERS": "wangbo,admin"
+  },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "webapp-production",
-      "database_id": "78428bf5-aa55-4119-92e9-42d42e53c120"
+      "database_id": "78428bf5-aa55-4119-92e9-42d42e53c120",
+      "preview_database_id": "78428bf5-aa55-4119-92e9-42d42e53c120"
     }
   ]
 }

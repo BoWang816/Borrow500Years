@@ -1,23 +1,39 @@
+import type { D1Database } from '@cloudflare/workers-types';
+
 export type Bindings = {
   DB: D1Database;
+  ADMIN_USERS: string;
+}
+
+export type ApiVariables = {
+  userId: number;
+  username: string;
+  profile?: Profile;
+  adminUserId?: number;
+  adminUsername?: string;
 }
 
 export type Profile = {
-  user_id: number;
-  name: string;
-  gender: 'male' | 'female';
-  age: number;
-  height: number;
-  weight: number;
+  id: number;
+  username: string;
+  password_hash: string;
+  token: string | null;
+  token_expire_at: number | null;
+  created_at: number;
+  name: string | null;
+  gender: 'male' | 'female' | null;
+  age: number | null;
+  height: number | null;
+  weight: number | null;
   smoke: number;
   alcohol: number;
   stayup: number;
   hereditary: number;
   exercise: number;
   meditate: number;
-  initial_life_sec: number;
+  initial_life_sec: number | null;
   bonus_sec: number;
-  start_timestamp: number;
+  start_timestamp: number | null;
   total_gained_sec: number;
   coin: number;
   shard: number;
@@ -25,7 +41,7 @@ export type Profile = {
   streak: number;
   dying: number;
   dying_start_at: number | null;
-  updated_at: number;
+  updated_at: number | null;
 }
 
 export type DailyTask = {

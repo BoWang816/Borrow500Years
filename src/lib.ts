@@ -91,3 +91,8 @@ export function formatLife(sec: number): string {
   if (sec >= 60) return Math.round(sec / 60) + ' 分钟';
   return Math.round(sec) + ' 秒';
 }
+
+// 获取当前时间戳（秒）- 替代 Math.floor(Date.now() / 1000)
+export function nowSeconds(): number {
+  return Math.floor(Date.now() / 1000);
+}

@@ -105,51 +105,66 @@ L_current = L_initial + bonus_sec − (now − start_timestamp) × baseDecayMult
 
 ## 🔧 技术栈
 - **框架**:Hono 4.x (SSR + API) + Cloudflare Pages
-- **数据库**:Cloudflare D1 (SQLite),本地 `--local` 模式无需账号
+- **数据库**:Cloudflare D1 (SQLite) 生产环境（通过 wrangler.jsonc 绑定）
+- **环境变量**:通过 wrangler.jsonc 配置（不使用 .dev.vars）
 - **样式**:原生 CSS(赛博朋克 + 古风)+ FontAwesome + Google Fonts
 - **构建**:Vite 6 + `@hono/vite-build`
-- **运行**:PM2 守护 `wrangler pages dev --local`
+- **运行**:Wrangler Pages Dev（自动连接配置的 D1 数据库）
 - **加密**:Web Crypto API (SHA-256),Cloudflare Workers 兼容
 
 ## 部署 / 启动
+
+### 首次设置（仅需一次）
 ```bash
-# 1. 应用 D1 迁移(首次或新增 migration 后)
-npx wrangler d1 migrations apply webapp-production --local
+# 1. 应用 D1 迁移到生产数据库
+npm run db:migrate
 
-# 2. 灌入 NPC 种子数据(可选)
-npx wrangler d1 execute webapp-production --local --file=./seed.sql
+# 2. 灌入 NPC 种子数据（可选）
+npm run db:seed
+```
 
-# 3. 构建
-npm run build
+### 日常开发
+```bash
+# 1. 构建并启动开发服务器（连接生产数据库）
+npm run dev
 
-# 4. 启动(PM2 守护)
-fuser -k 3000/tcp 2>/dev/null || true
-pm2 start ecosystem.config.cjs
+# 2. 访问
+# http://localhost:8788
+```
 
-# 5. 测试
-curl http://localhost:3000
-curl http://localhost:3000/api/potions
+### 数据库管理
+```bash
+# 查询数据库
+npm run db:console "SELECT * FROM users LIMIT 5"
 
-# 6. D1 控制台
-npx wrangler d1 execute webapp-production --local --command="SELECT * FROM users LIMIT 5"
+# 应用新的迁移
+npm run db:migrate
+
+# 重新灌入种子数据
+npm run db:seed
 ```
 
 ### 部署到生产
 ```bash
-# 1. 创建生产 D1 数据库
-npx wrangler d1 create webapp-production
-# 把输出的 database_id 填入 wrangler.jsonc
+npm run deploy
+curl http://localhost:8788/api/potions
 
-# 2. 应用迁移到远程
-npx wrangler d1 migrations apply webapp-production
-
-# 3. 灌入种子(可选)
-npx wrangler d1 execute webapp-production --file=./seed.sql
-
-# 4. 部署
-npm run build
-npx wrangler pages deploy dist --project-name webapp
+# 6. D1 控制台
+npm run db:console "SELECT * FROM users LIMIT 5"
 ```
+
+### 部署到生产
+```bash
+# 部署（会自动构建）
+npm run deploy
+```
+
+**注意**：
+- 开发环境通过 `wrangler.jsonc` 中的 D1 绑定自动连接生产数据库
+- 数据库操作命令使用 `--remote` 标志直接操作远程数据库
+- 无需本地数据库，所有数据存储在 Cloudflare D1 生产环境
+- 环境变量（如 `ADMIN_USERS`）必须在 `wrangler.jsonc` 的 `vars` 部分配置
+- `.dev.vars` 文件已弃用（仅在使用 `--local` 时生效）
 
 ## ⚠️ 暂未实现
 - 真实穿戴设备接入(Apple Watch/华为健康)
@@ -167,6 +182,6 @@ npx wrangler pages deploy dist --project-name webapp
 
 ## 部署状态
 - **平台**:Cloudflare Pages + D1
-- **状态**:✅ 沙盒运行中(PM2 守护)
-- **数据库**:本地 D1 已迁移(包含 12 NPC 种子)
-- **最近更新**:2026-05-09(添加 D1 后端)
+- **数据库**:生产 D1 数据库 (database_id: 78428bf5-aa55-4119-92e9-42d42e53c120)
+- **开发模式**:使用 `--remote` 连接生产数据库
+- **最近更新**:2026-05-11(切换到生产数据库)
