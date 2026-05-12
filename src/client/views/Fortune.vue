@@ -7,67 +7,98 @@
     
     <!-- 今日运势 -->
     <div class="card fortune-card">
-      <div class="fortune-display">
-        <div v-if="!fortune" class="fortune-loading">正在推演天机...</div>
-        <div v-else :class="['fortune-result', getFortuneCssClass(fortune.type)]">
-          <div class="fortune-title">{{ fortune.title }}</div>
-          <div class="fortune-hint">{{ fortune.description }}</div>
-          
-          <div class="fortune-details">
-            <div class="fortune-section">
-              <div class="fortune-label">📿 天机诗</div>
-              <div class="fortune-poem">{{ fortune.poem }}</div>
+      <div v-if="!fortune" class="fortune-loading">
+        <div class="loading-spinner"></div>
+        <p>正在推演天机...</p>
+      </div>
+      
+      <div v-else class="fortune-container">
+        <!-- 运势主卡片 -->
+        <div :class="['fortune-main-card', getFortuneCssClass(fortune.type)]">
+          <div class="fortune-header">
+            <div class="fortune-icon">{{ getFortuneIcon(fortune.type) }}</div>
+            <div class="fortune-title-section">
+              <h3 class="fortune-title">{{ fortune.title }}</h3>
+              <p class="fortune-description">{{ fortune.description }}</p>
             </div>
-            
-            <div class="fortune-grid">
-              <div class="fortune-item">
-                <div class="fortune-label">✨ 宜</div>
-                <div class="fortune-value good">{{ fortune.advice }}</div>
-              </div>
-              <div class="fortune-item">
-                <div class="fortune-label">⚠️ 忌</div>
-                <div class="fortune-value bad">{{ fortune.avoid }}</div>
+          </div>
+
+          <!-- 天机诗 -->
+          <div class="fortune-poem-section">
+            <div class="poem-decoration">✦</div>
+            <p class="fortune-poem">{{ fortune.poem }}</p>
+            <div class="poem-decoration">✦</div>
+          </div>
+
+          <!-- 宜忌 -->
+          <div class="fortune-advice-section">
+            <div class="advice-item advice-do">
+              <div class="advice-icon">✓</div>
+              <div class="advice-content">
+                <div class="advice-label">宜</div>
+                <div class="advice-text">{{ fortune.advice }}</div>
               </div>
             </div>
-            
-            <div class="fortune-grid">
-              <div class="fortune-item">
-                <div class="fortune-label">🧭 吉方</div>
-                <div class="fortune-value">{{ fortune.luckyDirection }}</div>
-              </div>
-              <div class="fortune-item">
-                <div class="fortune-label">⏰ 吉时</div>
-                <div class="fortune-value">{{ fortune.luckyTime }}</div>
-              </div>
-              <div class="fortune-item">
-                <div class="fortune-label">🎨 幸运色</div>
-                <div class="fortune-value">{{ fortune.luckyColor }}</div>
+            <div class="advice-item advice-dont">
+              <div class="advice-icon">✗</div>
+              <div class="advice-content">
+                <div class="advice-label">忌</div>
+                <div class="advice-text">{{ fortune.avoid }}</div>
               </div>
             </div>
           </div>
-          
-          <div class="fortune-multipliers">
-            <span class="multiplier-item">
+
+          <!-- 吉祥元素 -->
+          <div class="fortune-lucky-section">
+            <div class="lucky-item">
+              <div class="lucky-icon">🧭</div>
+              <div class="lucky-label">吉方</div>
+              <div class="lucky-value">{{ fortune.luckyDirection }}</div>
+            </div>
+            <div class="lucky-item">
+              <div class="lucky-icon">⏰</div>
+              <div class="lucky-label">吉时</div>
+              <div class="lucky-value">{{ fortune.luckyTime }}</div>
+            </div>
+            <div class="lucky-item">
+              <div class="lucky-icon">🎨</div>
+              <div class="lucky-label">幸运色</div>
+              <div class="lucky-value">{{ fortune.luckyColor }}</div>
+            </div>
+          </div>
+
+          <!-- 加成显示 -->
+          <div class="fortune-bonus-section">
+            <div class="bonus-item">
               <i class="fas fa-heart-pulse"></i>
-              寿命加成: {{ (fortune.lifeMultiplier * 100).toFixed(0) }}%
-            </span>
-            <span class="multiplier-item">
+              <span>寿命加成</span>
+              <strong>{{ (fortune.lifeMultiplier * 100).toFixed(0) }}%</strong>
+            </div>
+            <div class="bonus-divider"></div>
+            <div class="bonus-item">
               <i class="fas fa-yin-yang"></i>
-              功德加成: {{ (fortune.meritMultiplier * 100).toFixed(0) }}%
-            </span>
+              <span>功德加成</span>
+              <strong>{{ (fortune.meritMultiplier * 100).toFixed(0) }}%</strong>
+            </div>
           </div>
         </div>
-      </div>
-      <button 
-        v-if="!checkedIn" 
-        @click="checkin" 
-        class="oracle-btn"
-        :disabled="loading"
-      >
-        <i class="fas fa-gift"></i> 签到领取运势奖励
-      </button>
-      <div v-else class="checked-in-badge">
-        <i class="fas fa-check-circle"></i> 今日已签到
+
+        <!-- 签到按钮 -->
+        <div class="fortune-action">
+          <button 
+            v-if="!checkedIn" 
+            @click="checkin" 
+            class="fortune-checkin-btn"
+            :disabled="loading"
+          >
+            <i class="fas fa-gift"></i>
+            <span>签到领取运势奖励</span>
+          </button>
+          <div v-else class="fortune-checked-badge">
+            <i class="fas fa-check-circle"></i>
+            <span>今日已签到</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -259,6 +290,17 @@ async function addLog() {
   } finally {
     loading.value = false
   }
+}
+
+function getFortuneIcon(fortuneType: string): string {
+  const icons: Record<string, string> = {
+    '大吉': '☀️',
+    '吉': '✨',
+    '平': '☁️',
+    '凶': '⚡',
+    '大凶': '💀'
+  }
+  return icons[fortuneType] || '☁️'
 }
 
 function getFortuneCssClass(fortuneType: string): string {
