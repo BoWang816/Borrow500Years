@@ -4,30 +4,6 @@
       <span class="cn">丹房 · 商城</span>
       <span class="en">Apothecary</span>
     </h2>
-    
-    <div class="merit-bar">
-      <div class="merit-item">
-        <i class="fas fa-coins"></i>
-        <div>
-          <div class="merit-label">复活币</div>
-          <div class="merit-val">{{ stateStore.profile?.coin || 0 }}</div>
-        </div>
-      </div>
-      <div class="merit-item">
-        <i class="fas fa-gem"></i>
-        <div>
-          <div class="merit-label">功德值</div>
-          <div class="merit-val">{{ stateStore.profile?.merit || 0 }}</div>
-        </div>
-      </div>
-      <div class="merit-item">
-        <i class="fas fa-puzzle-piece"></i>
-        <div>
-          <div class="merit-label">复活币碎片</div>
-          <div class="merit-val">{{ stateStore.profile?.shard || 0 }} / 5</div>
-        </div>
-      </div>
-    </div>
 
     <h3 class="sub-title">— 延寿补剂 —</h3>
     <div class="potion-grid">

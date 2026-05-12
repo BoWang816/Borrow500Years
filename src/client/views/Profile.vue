@@ -5,6 +5,31 @@
       <span class="en">Profile</span>
     </h2>
     
+    <!-- 统计信息栏 -->
+    <div class="merit-bar">
+      <div class="merit-item">
+        <i class="fas fa-coins"></i>
+        <div>
+          <div class="merit-label">复活币</div>
+          <div class="merit-val">{{ stateStore.profile?.coin || 0 }}</div>
+        </div>
+      </div>
+      <div class="merit-item">
+        <i class="fas fa-gem"></i>
+        <div>
+          <div class="merit-label">功德值</div>
+          <div class="merit-val">{{ stateStore.profile?.merit || 0 }}</div>
+        </div>
+      </div>
+      <div class="merit-item">
+        <i class="fas fa-puzzle-piece"></i>
+        <div>
+          <div class="merit-label">复活币碎片</div>
+          <div class="merit-val">{{ stateStore.profile?.shard || 0 }} / 5</div>
+        </div>
+      </div>
+    </div>
+    
     <div v-if="stateStore.profile" class="profile-card">
       <div class="avatar-wrap">
         <div class="avatar">
@@ -48,18 +73,6 @@
         <div class="pi-row">
           <span class="pi-label">累计增益</span>
           <span class="pi-value" style="color: var(--jade);">+{{ formatLife(stateStore.profile.totalGainedSec) }}</span>
-        </div>
-        <div class="pi-row">
-          <span class="pi-label">功德值</span>
-          <span class="pi-value" style="color: var(--gold-soft);">{{ stateStore.profile.merit }}</span>
-        </div>
-        <div class="pi-row">
-          <span class="pi-label">复活币</span>
-          <span class="pi-value">{{ stateStore.profile.coin }}</span>
-        </div>
-        <div class="pi-row">
-          <span class="pi-label">碎片</span>
-          <span class="pi-value">{{ stateStore.profile.shard }} / 5</span>
         </div>
         <div class="pi-row">
           <span class="pi-label">连续签到</span>
