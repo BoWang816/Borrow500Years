@@ -57,4 +57,67 @@ worldEvents.post('/:id/join', authMiddleware, async (c) => {
   return c.json({ ok: true, message: `已参与${event.name}` })
 })
 
+// 触发随机全服事件（管理员功能）
+worldEvents.post('/trigger', authMiddleware, async (c) => {
+  const userId = c.get('userId') as number
+  
+  // 检查是否为管理员
+  const user = await c.env.DB.prepare('SELECT username FROM users WHERE id = ?').bind(userId).first<{ username: string }>()
+  if (!user) return c.json({ error: '用户不存在' }, 404)
+  
+  const admins = (c.env.ADMIN_USERS || '').split(',').map((s: string) => s.trim()).filter(Boolean)
+  if (!admins.includes(user.username)) {
+    return c.json({ error: '权限不足' }, 403)
+  }
+
+  const now = nowSeconds()
+  
+  // 获取所有可用的事件模板
+  const templates = await c.env.DB.prepare(`
+    SELECT * FROM world_events WHERE is_active = 0
+  `).all<any>()
+  
+  if (!templates.results || templates.results.length === 0) {
+    return c.json({ error: '没有可用的事件模板' }, 400)
+  }
+  
+  // 随机选择一个事件
+  const template = templates.results[Math.floor(Math.random() * templates.results.length)]
+  
+  // 创建新的活跃事件（持续24小时）
+  const duration = 24 * 3600 // 24小时
+  const endAt = now + duration
+  
+  await c.env.DB.prepare(`
+    INSERT INTO world_events (event_key, name, emoji, description, effect_type, effect_value, start_at, end_at, is_active)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+  `).bind(
+    template.event_key,
+    template.name,
+    template.emoji,
+    template.description,
+    template.effect_type,
+    template.effect_value,
+    now,
+    endAt
+  ).run()
+  
+  // 记录管理日志
+  await c.env.DB.prepare(`
+    INSERT INTO admin_logs (admin_username, action, target_type, target_id, details)
+    VALUES (?, 'trigger', 'world_event', ?, ?)
+  `).bind(user.username, template.id, `触发全服事件: ${template.name}`).run()
+  
+  return c.json({ 
+    ok: true, 
+    msg: `已触发全服事件：${template.name}`,
+    event: {
+      name: template.name,
+      emoji: template.emoji,
+      description: template.description,
+      endAt: endAt * 1000
+    }
+  })
+})
+
 export default worldEvents
