@@ -1,0 +1,213 @@
+/* ==========================================================
+   表单和认证样式
+   ========================================================== */
+
+/* 认证标签页 */
+.auth-tabs { 
+  display: flex; 
+  gap: 6px; 
+  margin-bottom: 16px; 
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--ink-dim);
+  transition: all .2s;
+}
+
+.auth-tab.active {
+  color: var(--jade);
+  border-color: rgba(54,255,208,0.5);
+  background: rgba(54,255,208,0.08);
+}
+
+.auth-err {
+  min-height: 18px;
+  font-size: 12px;
+  color: var(--blood);
+  text-align: center;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* Oracle 表单样式 */
+.oracle-glow {
+  position: absolute; 
+  inset: -2px;
+  background: linear-gradient(45deg, var(--gold), var(--jade), var(--neon-purple), var(--gold));
+  background-size: 300% 300%;
+  border-radius: 14px;
+  z-index: -1;
+  animation: oracleGlow 8s ease infinite;
+  opacity: 0.5;
+  filter: blur(8px);
+}
+
+@keyframes oracleGlow { 
+  0%, 100% { background-position: 0% 50%; } 
+  50% { background-position: 100% 50%; } 
+}
+
+.oracle-title {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.oracle-title .cn {
+  display: block;
+  font-family: 'Chinese-Calligraphy', serif;
+  font-size: 30px;
+  letter-spacing: 6px;
+  color: var(--gold-soft);
+  text-shadow: 0 0 12px rgba(212,175,55,0.5);
+}
+
+.oracle-title .en {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  letter-spacing: 8px;
+  color: var(--jade);
+  margin-top: 4px;
+}
+
+.oracle-sub {
+  text-align: center;
+  color: var(--ink-dim);
+  font-size: 13px;
+  margin-bottom: 24px;
+  letter-spacing: 2px;
+}
+
+.oracle-form { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px; 
+}
+
+.oracle-form label {
+  display: flex; 
+  flex-direction: column; 
+  gap: 4px;
+  font-size: 12px; 
+  letter-spacing: 2px;
+  color: var(--ink-dim);
+}
+
+.oracle-form .row { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 12px; 
+}
+
+.oracle-form input, .oracle-form select {
+  padding: 10px 12px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--gold-soft);
+  font-size: 14px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.oracle-form input:focus, .oracle-form select:focus {
+  outline: none; 
+  border-color: var(--jade);
+  box-shadow: 0 0 8px rgba(54,255,208,0.3);
+}
+
+.chk-row { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 8px; 
+  margin-top: 4px; 
+}
+
+@media (max-width: 540px) { 
+  .chk-row { 
+    grid-template-columns: 1fr 1fr; 
+  } 
+}
+
+.chk {
+  display: flex !important; 
+  flex-direction: row !important; 
+  align-items: center; 
+  gap: 6px !important;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .2s;
+  font-size: 12px;
+  color: var(--ink);
+  letter-spacing: 1px !important;
+}
+
+.chk:has(input:checked) { 
+  background: rgba(255,77,109,0.1); 
+  border-color: var(--crimson); 
+  color: var(--crimson); 
+}
+
+.chk input { 
+  width: 16px; 
+  height: 16px; 
+  accent-color: var(--crimson); 
+}
+
+.oracle-btn {
+  margin-top: 12px;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--gold), #b8902a);
+  color: #1a1208;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  font-family: 'Chinese-Calligraphy', serif;
+  transition: all .2s;
+  box-shadow: 0 0 14px rgba(212,175,55,0.4);
+}
+
+.oracle-btn:hover { 
+  transform: translateY(-2px); 
+  box-shadow: 0 6px 24px rgba(212,175,55,0.6); 
+}
+
+/* 死亡模态框 */
+.modal-card.dying {
+  text-align: center;
+  border-color: var(--blood);
+  box-shadow: 0 0 50px rgba(255,31,61,0.4);
+}
+
+.modal-card.dying h2 {
+  font-family: 'Chinese-Calligraphy', serif;
+  font-size: 32px;
+  letter-spacing: 6px;
+  color: var(--blood);
+  margin-bottom: 16px;
+}
+
+.modal-card.dying p { 
+  color: var(--ink); 
+  margin: 8px 0; 
+  line-height: 1.7; 
+}
+
+.modal-card.dying strong { 
+  color: var(--gold-soft); 
+}
+
+.dying-actions { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+  margin-top: 20px; 
+}

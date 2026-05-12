@@ -1,0 +1,144 @@
+/* ==========================================================
+   排行榜页面样式
+   ========================================================== */
+
+/* 排行榜标签页 */
+.board-tabs { 
+  display: flex; 
+  gap: 8px; 
+  margin-bottom: 18px; 
+  flex-wrap: wrap; 
+}
+
+.board-tab {
+  padding: 10px 22px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--ink-dim);
+}
+
+.board-tab.active {
+  color: var(--jade);
+  border-color: rgba(54,255,208,0.5);
+  background: rgba(54,255,208,0.08);
+  box-shadow: 0 0 10px rgba(54,255,208,0.2);
+}
+
+/* 排行榜列表 */
+.board-list { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+}
+
+.board-row {
+  display: grid;
+  grid-template-columns: 60px 1fr auto auto;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  transition: all .2s;
+}
+
+.board-row.me { 
+  border-color: var(--jade); 
+  background: rgba(54,255,208,0.08); 
+}
+
+.board-row .rank {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--ink-dim);
+  text-align: center;
+}
+
+.board-row.top1 .rank { 
+  color: var(--gold); 
+  text-shadow: 0 0 10px var(--gold); 
+}
+
+.board-row.top2 .rank { 
+  color: #c0c0c0; 
+  text-shadow: 0 0 10px #c0c0c0; 
+}
+
+.board-row.top3 .rank { 
+  color: #cd7f32; 
+  text-shadow: 0 0 10px #cd7f32; 
+}
+
+.board-row .name { 
+  font-family: 'Chinese-Sans', sans-serif; 
+  font-size: 16px; 
+  letter-spacing: 1px; 
+  color: var(--gold-soft); 
+}
+
+.board-row .name .you { 
+  font-size: 11px; 
+  color: var(--jade); 
+  margin-left: 6px; 
+  padding: 1px 6px; 
+  border: 1px solid var(--jade); 
+  border-radius: 4px; 
+}
+
+.board-row .title { 
+  font-size: 11px; 
+  color: var(--ink-dim); 
+  letter-spacing: 2px; 
+}
+
+.board-row .val { 
+  font-family: 'Orbitron', sans-serif; 
+  font-size: 16px; 
+  color: var(--jade); 
+}
+
+/* 称号系统 */
+.titles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.title-card {
+  padding: 16px;
+  text-align: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.title-card .age-range {
+  display: block;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--ink-dim);
+  margin-bottom: 6px;
+}
+
+.title-card .title-name {
+  font-family: 'Chinese-Calligraphy', serif;
+  font-size: 20px;
+  letter-spacing: 3px;
+  color: var(--gold-soft);
+}
+
+.title-card.legendary {
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(178,102,255,0.1));
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgba(212,175,55,0.25);
+}
+
+.title-card.legendary .title-name { 
+  color: var(--gold); 
+  text-shadow: 0 0 8px var(--gold); 
+}

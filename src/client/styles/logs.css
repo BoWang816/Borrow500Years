@@ -1,0 +1,157 @@
+/* ==========================================================
+   修仙日志样式
+   ========================================================== */
+
+/* 日志卡片 */
+.logs-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.logs-card h3 {
+  font-family: 'Chinese-Sans', sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: var(--jade);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 日志表单 */
+.log-form {
+  margin-bottom: 20px;
+}
+
+.log-form textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  margin-bottom: 12px;
+}
+
+.log-form textarea:focus {
+  outline: none;
+  border-color: var(--jade);
+  box-shadow: 0 0 8px rgba(54,255,208,0.3);
+}
+
+.log-form textarea::placeholder {
+  color: var(--ink-dim);
+}
+
+.log-form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.log-form-actions select {
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--gold-soft);
+  font-size: 13px;
+}
+
+.log-form-actions select:focus {
+  outline: none;
+  border-color: var(--jade);
+}
+
+/* 日志列表 */
+.cultivation-logs-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.cultivation-logs-list .empty {
+  text-align: center;
+  color: var(--ink-dim);
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+.log-item {
+  padding: 16px;
+  margin-bottom: 12px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--jade);
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.log-item:hover {
+  background: rgba(54,255,208,0.05);
+  border-color: var(--jade);
+}
+
+.log-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.log-mood {
+  padding: 2px 8px;
+  background: rgba(212,175,55,0.2);
+  color: var(--gold);
+  border-radius: 4px;
+  font-family: 'Chinese-Sans', sans-serif;
+}
+
+.log-type {
+  padding: 2px 8px;
+  background: rgba(54,255,208,0.2);
+  color: var(--jade);
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+}
+
+.log-time {
+  color: var(--ink-dim);
+  font-family: 'Orbitron', sans-serif;
+  margin-left: auto;
+}
+
+.log-content {
+  color: var(--ink);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* 滚动条样式 */
+.cultivation-logs-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cultivation-logs-list::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+.cultivation-logs-list::-webkit-scrollbar-thumb {
+  background: rgba(54,255,208,0.3);
+  border-radius: 3px;
+}
+
+.cultivation-logs-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(54,255,208,0.5);
+}

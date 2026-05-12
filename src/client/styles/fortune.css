@@ -1,0 +1,145 @@
+/* ==========================================================
+   运势相关样式
+   ========================================================== */
+
+/* 运势结果 */
+.fortune-wrap {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.fortune-result {
+  font-size: 48px;
+  font-weight: 900;
+  font-family: 'Chinese-Calligraphy', serif;
+  letter-spacing: 8px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px currentColor;
+}
+
+.fortune-result.fortune-daji {
+  color: #d946ef;
+  text-shadow: 0 0 30px #d946ef;
+}
+
+.fortune-result.fortune-ji {
+  color: var(--jade);
+  text-shadow: 0 0 30px var(--jade);
+}
+
+.fortune-result.fortune-ping {
+  color: var(--gold-soft);
+  text-shadow: 0 0 30px var(--gold);
+}
+
+.fortune-result.fortune-xiong {
+  color: #fb923c;
+  text-shadow: 0 0 30px #fb923c;
+}
+
+.fortune-result.fortune-daxiong {
+  color: var(--crimson);
+  text-shadow: 0 0 30px var(--crimson);
+}
+
+.fortune-title {
+  font-size: 18px;
+  font-family: 'Chinese-Sans', sans-serif;
+  color: var(--gold-soft);
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+}
+
+.fortune-desc {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.fortune-poem-box {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  position: relative;
+}
+
+.fortune-poem {
+  font-family: 'Chinese-Calligraphy', serif;
+  font-size: 15px;
+  color: var(--gold-soft);
+  line-height: 1.8;
+  letter-spacing: 2px;
+}
+
+.fortune-advice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.advice-good {
+  background: rgba(54,255,208,0.1);
+  border: 1px solid rgba(54,255,208,0.3);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.advice-bad {
+  background: rgba(255,77,109,0.1);
+  border: 1px solid rgba(255,77,109,0.3);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.advice-good h4 {
+  color: var(--jade);
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-family: 'Chinese-Sans', sans-serif;
+}
+
+.advice-bad h4 {
+  color: var(--crimson);
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-family: 'Chinese-Sans', sans-serif;
+}
+
+.advice-good p,
+.advice-bad p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.fortune-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+}
+
+.fortune-meta-item {
+  text-align: center;
+}
+
+.fortune-meta-label {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-bottom: 4px;
+}
+
+.fortune-meta-value {
+  font-size: 13px;
+  color: var(--gold-soft);
+  font-family: 'Chinese-Sans', sans-serif;
+}

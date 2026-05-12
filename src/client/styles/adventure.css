@@ -1,0 +1,203 @@
+/* ==========================================================
+   历练页面样式
+   ========================================================== */
+
+/* 历练英雄区域 */
+.adv-hero {
+  background: linear-gradient(135deg, var(--panel), rgba(212,175,55,0.05));
+  border: 1px solid var(--gold);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.adv-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'><path d='M0,100 Q100,50 200,100 T400,100 L400,200 L0,200 Z' fill='%23d4af37' opacity='0.1'/></svg>");
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+}
+
+.adv-hero-title {
+  font-size: 32px;
+  font-family: 'Chinese-Calligraphy', serif;
+  color: var(--gold-soft);
+  margin-bottom: 8px;
+  letter-spacing: 4px;
+}
+
+.adv-hero-desc {
+  font-size: 16px;
+  color: var(--ink);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.adv-hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.hero-stat {
+  text-align: center;
+}
+
+.hero-stat-label {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-dim);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.hero-stat-value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold-soft);
+}
+
+/* 历练区域网格 */
+.adventure-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.adventure-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.adventure-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  border-color: var(--jade);
+}
+
+.adventure-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--jade), var(--gold));
+}
+
+.adventure-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.adventure-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(54,255,208,0.2), rgba(54,255,208,0.1));
+  border: 2px solid rgba(54,255,208,0.3);
+  border-radius: 12px;
+  font-size: 28px;
+  color: var(--jade);
+}
+
+.adventure-info h3 {
+  font-family: 'Chinese-Sans', sans-serif;
+  font-size: 20px;
+  color: var(--gold-soft);
+  margin-bottom: 4px;
+  letter-spacing: 2px;
+}
+
+.adventure-difficulty {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.difficulty-easy {
+  background: rgba(54,255,208,0.2);
+  color: var(--jade);
+}
+
+.difficulty-normal {
+  background: rgba(212,175,55,0.2);
+  color: var(--gold);
+}
+
+.difficulty-hard {
+  background: rgba(255,77,109,0.2);
+  color: var(--crimson);
+}
+
+.adventure-desc {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.adventure-rewards {
+  margin-bottom: 16px;
+}
+
+.adventure-rewards h4 {
+  font-size: 14px;
+  color: var(--gold-soft);
+  margin-bottom: 8px;
+  font-family: 'Chinese-Sans', sans-serif;
+}
+
+.reward-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reward-item {
+  font-size: 12px;
+  padding: 4px 8px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink-dim);
+}
+
+.adventure-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--jade-deep), var(--jade));
+  color: #001;
+  border-radius: 8px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  transition: all 0.3s;
+  font-family: 'Chinese-Sans', sans-serif;
+}
+
+.adventure-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(54,255,208,0.4);
+}
+
+.adventure-btn:disabled {
+  background: #333;
+  color: #888;
+  cursor: not-allowed;
+}
