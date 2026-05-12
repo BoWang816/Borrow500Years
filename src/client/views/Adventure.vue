@@ -38,8 +38,8 @@
             </button>
           </div>
           <div v-if="exploreResult" class="explore-result">
-            <div :class="['result-msg', exploreResult.type]">
-              {{ exploreResult.msg }}
+            <div :class="['explore-roll', exploreResult.type]">
+              <div class="roll-msg">{{ exploreResult.msg }}</div>
             </div>
           </div>
         </div>
@@ -62,20 +62,30 @@
             <p class="trib-desc">完成3项指定修炼渡劫成功</p>
             <div class="trib-status">
               <div v-if="!tribulation" class="trib-loading">天劫推演中...</div>
-              <div v-else-if="tribulation.status === 'available'" class="trib-tasks">
+              <div v-else-if="tribulation.status === 'available'" class="trib-pending">
                 <div v-for="(task, i) in tribulation.tasks" :key="i" class="trib-task">
+                  <span class="tnum">{{ i + 1 }}</span>
                   {{ task }}
                 </div>
               </div>
-              <div v-else-if="tribulation.status === 'active'" class="trib-progress">
-                进行中：{{ tribulation.progress }}/3
+              <div v-else-if="tribulation.status === 'active'" class="trib-active">
+                <div v-for="(task, i) in tribulation.tasks" :key="i" class="trib-task">
+                  <span class="tnum">{{ i + 1 }}</span>
+                  {{ task }}
+                </div>
+                <div style="margin-top: 10px; text-align: center; color: var(--gold);">
+                  进度：{{ tribulation.progress }}/3
+                </div>
               </div>
-              <div v-else class="trib-completed">
+              <div v-else-if="tribulation.status === 'completed'" class="trib-done">
                 本周已完成
+              </div>
+              <div v-else class="trib-failed">
+                本周已失败
               </div>
             </div>
           </div>
-          <div class="trib-actions">
+          <div class="adv-card-footer">
             <button 
               v-if="tribulation?.status === 'available'" 
               @click="acceptTribulation" 
@@ -109,7 +119,7 @@
           </button>
         </div>
         <div class="achievements-list">
-          <div v-for="ach in achievements" :key="ach.id" :class="['achievement-item', { unlocked: ach.unlocked }]">
+          <div v-for="ach in achievements" :key="ach.id" :class="['ach-item', { unlocked: ach.unlocked, locked: !ach.unlocked }]">
             <div class="ach-icon">{{ ach.emoji }}</div>
             <div class="ach-info">
               <div class="ach-name">{{ ach.name }}</div>

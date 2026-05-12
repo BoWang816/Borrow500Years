@@ -13,57 +13,57 @@
         <div class="avatar-ring"></div>
       </div>
       <div class="profile-info">
-        <div class="profile-row">
-          <span class="profile-label">道号</span>
-          <span class="profile-value">{{ stateStore.profile.name }}</span>
+        <div class="pi-row">
+          <span class="pi-label">道号</span>
+          <span class="pi-value">{{ stateStore.profile.name }}</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">境界</span>
-          <span class="profile-value realm">{{ stateStore.profile.realm }}</span>
+        <div class="pi-row">
+          <span class="pi-label">境界</span>
+          <span class="pi-value">{{ stateStore.profile.realm }}</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">性别</span>
-          <span class="profile-value">{{ stateStore.profile.gender === 'male' ? '男' : '女' }}</span>
+        <div class="pi-row">
+          <span class="pi-label">性别</span>
+          <span class="pi-value">{{ stateStore.profile.gender === 'male' ? '男' : '女' }}</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">年龄</span>
-          <span class="profile-value">{{ stateStore.profile.age }} 岁</span>
+        <div class="pi-row">
+          <span class="pi-label">年龄</span>
+          <span class="pi-value">{{ stateStore.profile.age }} 岁</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">身高</span>
-          <span class="profile-value">{{ stateStore.profile.height }} cm</span>
+        <div class="pi-row">
+          <span class="pi-label">身高</span>
+          <span class="pi-value">{{ stateStore.profile.height }} cm</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">体重</span>
-          <span class="profile-value">{{ stateStore.profile.weight }} kg</span>
+        <div class="pi-row">
+          <span class="pi-label">体重</span>
+          <span class="pi-value">{{ stateStore.profile.weight }} kg</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">BMI</span>
-          <span class="profile-value">{{ stateStore.profile.bmi?.toFixed(1) }}</span>
+        <div class="pi-row">
+          <span class="pi-label">BMI</span>
+          <span class="pi-value">{{ stateStore.profile.bmi?.toFixed(1) }}</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">初始寿命</span>
-          <span class="profile-value">{{ formatLife(stateStore.profile.initialLifeSec) }}</span>
+        <div class="pi-row">
+          <span class="pi-label">初始寿命</span>
+          <span class="pi-value">{{ formatLife(stateStore.profile.initialLifeSec) }}</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">累计增益</span>
-          <span class="profile-value good">+{{ formatLife(stateStore.profile.totalGainedSec) }}</span>
+        <div class="pi-row">
+          <span class="pi-label">累计增益</span>
+          <span class="pi-value" style="color: var(--jade);">+{{ formatLife(stateStore.profile.totalGainedSec) }}</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">功德值</span>
-          <span class="profile-value gold">{{ stateStore.profile.merit }}</span>
+        <div class="pi-row">
+          <span class="pi-label">功德值</span>
+          <span class="pi-value" style="color: var(--gold-soft);">{{ stateStore.profile.merit }}</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">复活币</span>
-          <span class="profile-value coin">{{ stateStore.profile.coin }}</span>
+        <div class="pi-row">
+          <span class="pi-label">复活币</span>
+          <span class="pi-value">{{ stateStore.profile.coin }}</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">碎片</span>
-          <span class="profile-value">{{ stateStore.profile.shard }} / 5</span>
+        <div class="pi-row">
+          <span class="pi-label">碎片</span>
+          <span class="pi-value">{{ stateStore.profile.shard }} / 5</span>
         </div>
-        <div class="profile-row">
-          <span class="profile-label">连续签到</span>
-          <span class="profile-value">{{ stateStore.profile.streak }} 天</span>
+        <div class="pi-row">
+          <span class="pi-label">连续签到</span>
+          <span class="pi-value">{{ stateStore.profile.streak }} 天</span>
         </div>
       </div>
     </div>

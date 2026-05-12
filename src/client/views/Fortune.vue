@@ -9,11 +9,11 @@
     <div class="card fortune-card">
       <div class="fortune-display">
         <div v-if="!fortune" class="fortune-loading">正在推演天机...</div>
-        <div v-else class="fortune-content">
+        <div v-else :class="['fortune-result', getFortuneCssClass(fortune.title)]">
           <div class="fortune-title">{{ fortune.title }}</div>
-          <div class="fortune-text">{{ fortune.text }}</div>
-          <div class="fortune-reward" v-if="fortune.reward">
-            奖励：{{ fortune.reward }}
+          <div class="fortune-hint">{{ fortune.text }}</div>
+          <div class="fortune-multipliers" v-if="fortune.reward">
+            <span>{{ fortune.reward }}</span>
           </div>
         </div>
       </div>
@@ -33,13 +33,15 @@
       <div class="manuals-list">
         <div v-if="manuals.length === 0" class="empty">暂无功法</div>
         <div v-for="manual in manuals" :key="manual.id" class="manual-item">
-          <span class="manual-emoji">{{ manual.emoji }}</span>
-          <div class="manual-info">
-            <div class="manual-name">{{ manual.name }}</div>
+          <span class="manual-icon">{{ manual.emoji }}</span>
+          <div class="manual-body">
+            <div class="manual-name">
+              {{ manual.name }}
+              <span class="manual-lv" v-if="manual.level">Lv.{{ manual.level }}</span>
+            </div>
             <div class="manual-desc">{{ manual.description }}</div>
           </div>
-          <div class="manual-level">Lv.{{ manual.level || 0 }}</div>
-          <button @click="upgradeManual(manual.id)" class="upgrade-btn" :disabled="loading">
+          <button @click="upgradeManual(manual.id)" class="practice-btn" :disabled="loading">
             升级
           </button>
         </div>
@@ -51,13 +53,13 @@
       <h3><i class="fas fa-globe"></i> 全服事件</h3>
       <div class="world-events-list">
         <div v-if="worldEvents.length === 0" class="empty">暂无全服事件</div>
-        <div v-for="event in worldEvents" :key="event.id" class="world-event-item">
-          <div class="we-header">
-            <span class="we-emoji">{{ event.emoji }}</span>
-            <span class="we-name">{{ event.name }}</span>
+        <div v-for="event in worldEvents" :key="event.id" class="world-event">
+          <div class="we-emoji">{{ event.emoji }}</div>
+          <div class="we-body">
+            <div class="we-name">{{ event.name }}</div>
+            <div class="we-desc">{{ event.description }}</div>
+            <div class="we-timer">剩余时间：{{ formatTimeRemaining(event.end_at) }}</div>
           </div>
-          <div class="we-desc">{{ event.description }}</div>
-          <div class="we-time">剩余时间：{{ formatTimeRemaining(event.end_at) }}</div>
         </div>
       </div>
     </div>
@@ -121,7 +123,12 @@ const logType = ref('note')
 async function loadFortune() {
   try {
     const res = await api('/fortune')
-    fortune.value = res.fortune
+    fortune.value = {
+      title: res.fortune,
+      text: res.hint,
+      reward: res.lifeMultiplier > 1 ? `寿命加成 ${(res.lifeMultiplier * 100).toFixed(0)}%` : 
+              res.lifeMultiplier < 1 ? `寿命减少 ${((1 - res.lifeMultiplier) * 100).toFixed(0)}%` : '无加成'
+    }
     checkedIn.value = res.checkedIn
   } catch (err: any) {
     console.error('Failed to load fortune:', err)
@@ -201,6 +208,17 @@ async function addLog() {
   } finally {
     loading.value = false
   }
+}
+
+function getFortuneCssClass(fortuneType: string): string {
+  const map: Record<string, string> = {
+    '大吉': 'fortune-daji',
+    '吉': 'fortune-ji',
+    '平': 'fortune-ping',
+    '凶': 'fortune-xiong',
+    '大凶': 'fortune-daxiong'
+  }
+  return map[fortuneType] || 'fortune-ping'
 }
 
 function formatTimeRemaining(endAt: number): string {

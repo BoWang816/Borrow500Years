@@ -22,18 +22,18 @@
 
     <div class="board-list">
       <div v-if="users.length === 0" class="empty">暂无数据</div>
-      <div v-for="(user, index) in users" :key="user.userId" :class="['board-item', getRankClass(index)]">
-        <div class="board-rank">{{ index + 1 }}</div>
-        <div class="board-avatar">
-          <i class="fas fa-user-astronaut"></i>
+      <div v-for="(user, index) in users" :key="user.userId" :class="['board-row', getRankClass(index), { me: user.isMe }]">
+        <div class="rank">{{ index + 1 }}</div>
+        <div class="info">
+          <div class="name">
+            {{ user.name }}
+            <span v-if="user.isMe" class="you">你</span>
+          </div>
+          <div class="title">{{ user.realm }}</div>
         </div>
-        <div class="board-info">
-          <div class="board-name">{{ user.name }}</div>
-          <div class="board-realm">{{ user.realm }}</div>
-        </div>
-        <div class="board-value">
+        <div class="val">
           <span v-if="currentBoard === 'longevity'">{{ formatLife(user.lifeSec) }}</span>
-          <span v-else>{{ user.merit }} 功德</span>
+          <span v-else>{{ user.meritGained }} 功德</span>
         </div>
       </div>
     </div>
@@ -70,9 +70,9 @@ const currentBoard = ref<'longevity' | 'merit'>('longevity')
 const users = ref<any[]>([])
 
 function getRankClass(index: number): string {
-  if (index === 0) return 'rank-1'
-  if (index === 1) return 'rank-2'
-  if (index === 2) return 'rank-3'
+  if (index === 0) return 'top1'
+  if (index === 1) return 'top2'
+  if (index === 2) return 'top3'
   return ''
 }
 
@@ -80,8 +80,10 @@ async function loadBoard() {
   try {
     const endpoint = currentBoard.value === 'longevity' ? '/board/life' : '/board/merit'
     const res = await api(endpoint)
-    users.value = res.users || []
+    users.value = res.rows || []
+    console.log('Board data loaded:', res)
   } catch (err: any) {
+    console.error('Failed to load board:', err)
     toast(err.message, 'bad')
   }
 }

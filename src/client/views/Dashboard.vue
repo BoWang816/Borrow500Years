@@ -68,20 +68,23 @@
           <h3><i class="fas fa-bolt"></i> 修正系数 (Modifier)</h3>
           <ul class="modifier-list">
             <li v-if="stateStore.modifiers.length === 0" class="empty">暂无修正项</li>
-            <li v-for="mod in stateStore.modifiers" :key="mod.id" class="mod-item">
-              <span class="mod-emoji">{{ mod.potionEmoji }}</span>
-              <span class="mod-label">{{ mod.modLabel }}</span>
-              <span class="mod-val">{{ mod.modValue > 0 ? '+' : '' }}{{ mod.modValue }}</span>
-              <span class="mod-expire">{{ formatExpire(mod.expireAt) }}</span>
+            <li v-for="mod in stateStore.modifiers" :key="mod.id">
+              <span class="mod-name">{{ mod.potionEmoji }} {{ mod.modLabel }}</span>
+              <span :class="['mod-val', mod.modValue > 0 ? 'good' : 'bad']">
+                {{ mod.modValue > 0 ? '+' : '' }}{{ mod.modValue }}
+              </span>
             </li>
           </ul>
         </div>
         <div class="card event-card">
           <h3><i class="fas fa-scroll"></i> 命运卷轴 · 事件日志</h3>
           <ul class="event-log">
-            <li v-for="event in stateStore.events" :key="event.id" :class="['event-item', `event-${event.type}`]">
-              <span class="event-msg">{{ event.msg }}</span>
-              <span class="event-time">{{ formatTime(event.createdAt) }}</span>
+            <li v-if="stateStore.events.length === 0" class="empty">暂无事件</li>
+            <li v-for="event in stateStore.events" :key="event.id">
+              <time>{{ formatTime(event.createdAt) }}</time>
+              <span :class="event.type === 'good' ? 'ev-good' : event.type === 'bad' ? 'ev-bad' : ''">
+                {{ event.msg }}
+              </span>
             </li>
           </ul>
           <button @click="triggerRandomEvent" class="ghost-btn">
@@ -100,17 +103,30 @@ import { api, toast } from '../utils/api'
 
 const stateStore = useStateStore()
 const displayMode = ref<'full' | 'seconds' | 'days'>('full')
+const currentTime = ref(Date.now())
+const serverLifeSec = ref(0)
+const serverFetchTime = ref(Date.now())
 let timer: number | null = null
+let countdownTimer: number | null = null
 
 const SEC_PER_YEAR = 31536000
 const SEC_PER_DAY = 86400
 
-const timeDisplay = computed(() => {
-  if (!stateStore.profile || stateStore.profile.lifeSec === undefined) {
-    return { years: '000', days: '000', hours: '00', minutes: '00', seconds: '00' }
-  }
+// 计算当前剩余寿命（考虑时间流逝）
+const currentLifeSec = computed(() => {
+  if (!stateStore.profile) return 0
+  
+  // 计算从上次服务器同步到现在经过的秒数
+  const elapsedSinceSync = Math.floor((currentTime.value - serverFetchTime.value) / 1000)
+  
+  // 使用服务器返回的lifeSec减去本地流逝的时间
+  const lifeSec = serverLifeSec.value > 0 ? serverLifeSec.value : stateStore.profile.lifeSec
+  
+  return Math.max(0, lifeSec - elapsedSinceSync)
+})
 
-  const lifeSec = stateStore.profile.lifeSec || 0
+const timeDisplay = computed(() => {
+  const lifeSec = currentLifeSec.value
   const years = Math.floor(lifeSec / SEC_PER_YEAR)
   const remainAfterYears = lifeSec % SEC_PER_YEAR
   const days = Math.floor(remainAfterYears / SEC_PER_DAY)
@@ -129,8 +145,7 @@ const timeDisplay = computed(() => {
 })
 
 const secondsDisplay = computed(() => {
-  if (!stateStore.profile || stateStore.profile.lifeSec === undefined) return '— · — 秒'
-  const lifeSec = stateStore.profile.lifeSec || 0
+  const lifeSec = currentLifeSec.value
   
   if (displayMode.value === 'seconds') {
     return `${lifeSec.toLocaleString()} 秒`
@@ -189,13 +204,31 @@ async function triggerRandomEvent() {
 
 onMounted(async () => {
   await stateStore.fetchState(true)
-  timer = window.setInterval(() => {
-    stateStore.fetchState()
+  
+  // 保存服务器返回的lifeSec和获取时间
+  if (stateStore.profile) {
+    serverLifeSec.value = stateStore.profile.lifeSec
+    serverFetchTime.value = Date.now()
+  }
+  
+  // 每秒更新倒计时
+  countdownTimer = window.setInterval(() => {
+    currentTime.value = Date.now()
+  }, 1000)
+  
+  // 每5秒同步服务器数据
+  timer = window.setInterval(async () => {
+    await stateStore.fetchState()
+    if (stateStore.profile) {
+      serverLifeSec.value = stateStore.profile.lifeSec
+      serverFetchTime.value = Date.now()
+    }
   }, 5000)
 })
 
 onUnmounted(() => {
   if (timer) clearInterval(timer)
+  if (countdownTimer) clearInterval(countdownTimer)
 })
 </script>
 
