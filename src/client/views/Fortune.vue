@@ -79,17 +79,18 @@
       <h3><i class="fas fa-book-open"></i> 功法修炼</h3>
       <div class="manuals-list">
         <div v-if="manuals.length === 0" class="empty">暂无功法</div>
-        <div v-for="manual in manuals" :key="manual.id" class="manual-item">
+        <div v-for="manual in manuals" :key="manual.key" class="manual-item">
           <span class="manual-icon">{{ manual.emoji }}</span>
           <div class="manual-body">
             <div class="manual-name">
               {{ manual.name }}
-              <span class="manual-lv" v-if="manual.level">Lv.{{ manual.level }}</span>
+              <span class="manual-lv" v-if="manual.myLevel">Lv.{{ manual.myLevel }}</span>
             </div>
             <div class="manual-desc">{{ manual.description }}</div>
+            <div class="manual-cost">消耗: {{ manual.costMerit }} 功德</div>
           </div>
-          <button @click="upgradeManual(manual.id)" class="practice-btn" :disabled="loading">
-            升级
+          <button @click="upgradeManual(manual.key)" class="practice-btn" :disabled="loading">
+            {{ manual.myLevel === 0 ? '解锁' : '升级' }}
           </button>
         </div>
       </div>
@@ -214,11 +215,11 @@ async function loadManuals() {
   }
 }
 
-async function upgradeManual(id: number) {
+async function upgradeManual(key: string) {
   loading.value = true
   try {
-    const res = await api(`/manuals/${id}/upgrade`, { method: 'POST' })
-    toast(res.msg || '升级成功', 'good')
+    const res = await api(`/manuals/${key}/practice`, { method: 'POST' })
+    toast(res.msg || '修炼成功', 'good')
     await loadManuals()
   } catch (err: any) {
     toast(err.message, 'bad')
