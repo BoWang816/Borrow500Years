@@ -19,8 +19,22 @@ export const useStateStore = defineStore('state', () => {
     try {
       const res = await api('/state')
       profile.value = res.profile
-      modifiers.value = res.modifiers || []
-      events.value = res.events || []
+      modifiers.value = res.potions?.map((p: any) => ({
+        id: p.id,
+        potionId: p.potion_id,
+        potionName: p.potion_name,
+        potionEmoji: p.potion_emoji,
+        modId: p.mod_id,
+        modLabel: p.mod_label,
+        modValue: p.mod_value,
+        expireAt: p.expire_at
+      })) || []
+      events.value = res.events?.map((e: any) => ({
+        id: e.id || Math.random(),
+        msg: e.msg,
+        type: e.kind || 'good',
+        createdAt: e.created_at || Math.floor(Date.now() / 1000)
+      })) || []
       lastFetch.value = Date.now()
     } catch (err) {
       console.error('Failed to fetch state:', err)

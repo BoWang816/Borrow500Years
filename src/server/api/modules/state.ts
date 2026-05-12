@@ -1,7 +1,7 @@
 // 状态模块 - 获取用户完整状态
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile, ActivePotion } from '../../types'
-import { todayStr, currentDecayRate, currentLifeSec } from '../../lib'
+import { todayStr, currentDecayRate, currentLifeSec, SEC_PER_YEAR, getRealmTitle } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 const state = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
@@ -47,11 +47,22 @@ state.get('/', authMiddleware, loadProfile, async (c) => {
     profile.dying_start_at = now
     await pushEvent(c.env.DB, userId, '⚠️ 寿元已尽，进入弥留期', 'bad')
   }
+  
+  // 计算总年龄和境界
+  const elapsed = (now - profile.start_timestamp) / 1000
+  const totalAge = profile.age + elapsed / SEC_PER_YEAR + profile.bonus_sec / SEC_PER_YEAR
+  const realm = getRealmTitle(totalAge)
+  const bmi = profile.weight / Math.pow(profile.height / 100, 2)
+  
   return c.json({
     profile: {
       ...profile,
       smoke: !!profile.smoke, alcohol: !!profile.alcohol, stayup: !!profile.stayup,
       hereditary: !!profile.hereditary, exercise: !!profile.exercise, meditate: !!profile.meditate,
+      lifeSec: life,
+      totalAge,
+      realm,
+      bmi,
     },
     today,
     todayTasks: {
