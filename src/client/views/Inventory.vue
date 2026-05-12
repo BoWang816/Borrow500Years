@@ -1,5 +1,5 @@
 <template>
-  <section id="inventory" class="tab-pane">
+  <section id="inventory" class="tab-pane active">
     <h2 class="page-title">
       <span class="cn">丹房 · 商城</span>
       <span class="en">Apothecary</span>

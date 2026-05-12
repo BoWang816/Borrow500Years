@@ -1,5 +1,5 @@
 <template>
-  <section id="fortune" class="tab-pane">
+  <section id="fortune" class="tab-pane active">
     <h2 class="page-title">
       <span class="cn">运势天机</span>
       <span class="en">Daily Fortune</span>

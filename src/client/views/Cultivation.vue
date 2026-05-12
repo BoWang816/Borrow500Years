@@ -1,5 +1,5 @@
 <template>
-  <section id="cultivation" class="tab-pane">
+  <section id="cultivation" class="tab-pane active">
     <h2 class="page-title">
       <span class="cn">养生修炼</span>
       <span class="en">Daily Cultivation</span>

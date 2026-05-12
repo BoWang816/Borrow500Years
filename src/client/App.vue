@@ -64,7 +64,9 @@
 
     <!-- 主内容区 -->
     <main class="main">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <component :is="Component" />
+      </router-view>
     </main>
 
     <!-- 模态框 -->

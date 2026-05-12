@@ -1,5 +1,5 @@
 <template>
-  <section id="leaderboard" class="tab-pane">
+  <section id="leaderboard" class="tab-pane active">
     <h2 class="page-title">
       <span class="cn">天榜 · The Pantheon</span>
       <span class="en">Leaderboard</span>

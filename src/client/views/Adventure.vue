@@ -1,5 +1,5 @@
 <template>
-  <section id="adventure" class="tab-pane">
+  <section id="adventure" class="tab-pane active">
     <!-- 英雄横幅 -->
     <div class="adv-hero">
       <div class="adv-hero-bg"></div>

@@ -1,5 +1,5 @@
 <template>
-  <section id="profile" class="tab-pane">
+  <section id="profile" class="tab-pane active">
     <h2 class="page-title">
       <span class="cn">道号印鉴</span>
       <span class="en">Profile</span>
