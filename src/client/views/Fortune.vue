@@ -170,6 +170,7 @@ const logType = ref('note')
 async function loadFortune() {
   try {
     const res = await api('/fortune')
+    console.log('Fortune API response:', res)
     fortune.value = {
       type: res.fortune,
       title: res.title,
@@ -183,6 +184,7 @@ async function loadFortune() {
       lifeMultiplier: res.lifeMultiplier,
       meritMultiplier: res.meritMultiplier
     }
+    console.log('Fortune value:', fortune.value)
     checkedIn.value = res.checkedIn
   } catch (err: any) {
     console.error('Failed to load fortune:', err)
