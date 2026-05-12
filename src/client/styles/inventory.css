@@ -1,0 +1,161 @@
+/* ==========================================================
+   丹房页面样式
+   ========================================================== */
+
+/* 功德统计栏 */
+.merit-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 700px) { 
+  .merit-bar { 
+    grid-template-columns: 1fr; 
+  } 
+}
+
+.merit-item {
+  display: flex; 
+  align-items: center; 
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.merit-item i { 
+  font-size: 28px; 
+  color: var(--gold-soft); 
+}
+
+.merit-label { 
+  font-size: 11px; 
+  letter-spacing: 3px; 
+  color: var(--ink-dim); 
+}
+
+.merit-val { 
+  font-family: 'Orbitron', sans-serif; 
+  font-size: 22px; 
+  font-weight: 700; 
+  color: var(--gold-soft); 
+}
+
+/* 丹药网格 */
+.potion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.potion {
+  background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  position: relative;
+  transition: all .25s;
+}
+
+.potion:hover { 
+  transform: translateY(-3px); 
+  border-color: var(--gold); 
+  box-shadow: 0 10px 30px rgba(212,175,55,0.15); 
+}
+
+.potion-emoji { 
+  font-size: 44px; 
+  margin-bottom: 8px; 
+  filter: drop-shadow(0 0 12px rgba(212,175,55,0.5)); 
+}
+
+.potion h4 {
+  font-family: 'Chinese-Calligraphy', serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: var(--gold-soft);
+  margin-bottom: 4px;
+}
+
+.potion .potion-desc { 
+  font-size: 12px; 
+  color: var(--ink-dim); 
+  min-height: 36px; 
+  margin-bottom: 10px; 
+  line-height: 1.5; 
+}
+
+.potion .potion-cost {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 4px 10px;
+  background: rgba(178,102,255,0.1);
+  border: 1px solid rgba(178,102,255,0.3);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--neon-purple);
+  letter-spacing: 1px;
+}
+
+.potion .potion-buy {
+  display: block; 
+  width: 100%;
+  padding: 8px;
+  background: linear-gradient(135deg, var(--gold), #a17e1d);
+  color: #1a1208;
+  border-radius: 6px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  transition: all .2s;
+}
+
+.potion .potion-buy:hover { 
+  box-shadow: 0 0 16px var(--gold); 
+}
+
+.potion .potion-buy:disabled { 
+  background: #333; 
+  color: #888; 
+  cursor: not-allowed; 
+}
+
+/* 激活的丹药 */
+.active-potions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.active-potions .empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--ink-dim);
+  padding: 20px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+}
+
+.active-potion {
+  padding: 12px 14px;
+  background: rgba(54,255,208,0.06);
+  border: 1px solid rgba(54,255,208,0.3);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.active-potion .ap-name { 
+  color: var(--jade); 
+  font-family: 'Chinese-Sans', sans-serif; 
+  letter-spacing: 1px; 
+}
+
+.active-potion .ap-time { 
+  font-family: 'Orbitron', sans-serif; 
+  font-size: 11px; 
+  color: var(--ink-dim); 
+  margin-top: 2px; 
+}

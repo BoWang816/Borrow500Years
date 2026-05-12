@@ -1,0 +1,185 @@
+/* ==========================================================
+   修炼页面样式
+   ========================================================== */
+
+/* 修炼任务卡片 */
+.cultivation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.task-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex; 
+  gap: 14px;
+  position: relative;
+  transition: all .25s;
+}
+
+.task-card:hover { 
+  border-color: rgba(54,255,208,0.4); 
+  transform: translateY(-2px); 
+  box-shadow: 0 8px 30px rgba(54,255,208,0.1); 
+}
+
+.task-card.challenge { 
+  background: linear-gradient(135deg, rgba(178,102,255,0.08), var(--panel)); 
+  border-color: rgba(178,102,255,0.3); 
+}
+
+.task-card.done { 
+  opacity: 0.6; 
+}
+
+.task-card.done::after {
+  content: '已打卡'; 
+  position: absolute; 
+  top: 12px; 
+  right: 12px;
+  background: var(--jade-deep); 
+  color: #001;
+  padding: 2px 8px; 
+  border-radius: 4px; 
+  font-size: 10px; 
+  letter-spacing: 2px;
+}
+
+.task-icon {
+  width: 48px; 
+  height: 48px;
+  display: grid; 
+  place-items: center;
+  background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(54,255,208,0.1));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 22px;
+  color: var(--gold-soft);
+  flex-shrink: 0;
+}
+
+.task-card.challenge .task-icon { 
+  color: var(--neon-purple); 
+  border-color: rgba(178,102,255,0.4); 
+}
+
+.task-body { 
+  flex: 1; 
+}
+
+.task-body h4 {
+  font-family: 'Chinese-Sans', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: var(--gold-soft);
+  margin-bottom: 4px;
+}
+
+.task-body p { 
+  font-size: 12px; 
+  color: var(--ink-dim); 
+  margin-bottom: 8px; 
+  line-height: 1.5; 
+}
+
+.task-reward { 
+  font-size: 12px; 
+  color: var(--ink-dim); 
+}
+
+.task-reward .reward-life { 
+  color: var(--jade); 
+  font-family: 'Orbitron', sans-serif; 
+}
+
+.task-reward .reward-mod { 
+  color: var(--gold-soft); 
+  font-family: 'Orbitron', sans-serif; 
+}
+
+.task-reward .reward-coin { 
+  color: var(--neon-pink); 
+}
+
+.task-btn {
+  align-self: flex-end;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--jade-deep), var(--jade));
+  color: #001;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  transition: all .2s;
+  box-shadow: 0 0 12px rgba(54,255,208,0.3);
+}
+
+.task-btn:hover { 
+  transform: scale(1.05); 
+  box-shadow: 0 0 18px rgba(54,255,208,0.6); 
+}
+
+.task-btn:disabled { 
+  background: #333; 
+  color: #888; 
+  cursor: not-allowed; 
+  box-shadow: none; 
+}
+
+.step-input { 
+  margin: 8px 0; 
+}
+
+.step-input input[type=range] {
+  width: 100%; 
+  accent-color: var(--jade);
+}
+
+.step-num { 
+  font-family: 'Orbitron', sans-serif; 
+  font-size: 14px; 
+  color: var(--gold-soft); 
+  text-align: right; 
+}
+
+.water-cups { 
+  display: flex; 
+  gap: 4px; 
+  margin: 8px 0; 
+}
+
+.water-cup {
+  flex: 1; 
+  height: 22px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  position: relative;
+  background: rgba(54,255,208,0.05);
+}
+
+.water-cup.filled { 
+  background: linear-gradient(180deg, transparent 30%, var(--jade)); 
+  box-shadow: 0 0 8px rgba(54,255,208,0.5); 
+}
+
+.streak-bar { 
+  display: flex; 
+  gap: 4px; 
+  margin: 6px 0; 
+}
+
+.streak-bar span {
+  flex: 1; 
+  height: 8px;
+  background: rgba(178,102,255,0.1);
+  border: 1px solid rgba(178,102,255,0.3);
+  border-radius: 2px;
+}
+
+.streak-bar span.on { 
+  background: var(--neon-purple); 
+  box-shadow: 0 0 6px var(--neon-purple); 
+}

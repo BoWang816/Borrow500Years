@@ -1,0 +1,139 @@
+/* ==========================================================
+   通用组件样式
+   ========================================================== */
+
+/* 卡片组件 */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  box-shadow: var(--shadow-glow);
+}
+
+.card::before {
+  content: '';
+  position: absolute; 
+  top: -1px; 
+  left: 20px; 
+  right: 20px; 
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.card h3 {
+  font-family: 'Chinese-Sans', sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: var(--gold-soft);
+  margin-bottom: 14px;
+  display: flex; 
+  align-items: center; 
+  gap: 8px;
+}
+
+.card h3 i { 
+  color: var(--jade); 
+}
+
+/* 按钮组件 */
+.ghost-btn {
+  margin-top: 14px;
+  padding: 10px 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--gold-soft);
+  background: rgba(212,175,55,0.05);
+  transition: all .2s;
+  display: inline-flex; 
+  align-items: center; 
+  gap: 8px;
+}
+
+.ghost-btn:hover { 
+  background: rgba(212,175,55,0.12); 
+  border-color: var(--gold); 
+}
+
+/* Toast 通知 */
+.toast-wrap {
+  position: fixed; 
+  top: 90px; 
+  right: 24px;
+  z-index: 200;
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, rgba(54,255,208,0.15), var(--panel));
+  border: 1px solid var(--jade);
+  border-left: 4px solid var(--jade);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--ink);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4), 0 0 12px rgba(54,255,208,0.2);
+  animation: toastIn .3s ease, toastOut .4s ease 2.6s forwards;
+  max-width: 320px;
+}
+
+.toast.bad { 
+  border-color: var(--blood); 
+  border-left-color: var(--blood); 
+  background: linear-gradient(135deg, rgba(255,31,61,0.15), var(--panel)); 
+}
+
+.toast.gold { 
+  border-color: var(--gold); 
+  border-left-color: var(--gold); 
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), var(--panel)); 
+}
+
+@keyframes toastIn { 
+  from { transform: translateX(120%); opacity: 0; } 
+  to { transform: none; opacity: 1; } 
+}
+
+@keyframes toastOut { 
+  to { transform: translateX(120%); opacity: 0; } 
+}
+
+/* 模态框 */
+.modal {
+  position: fixed; 
+  inset: 0; 
+  z-index: 100;
+  background: rgba(5,6,13,0.85);
+  backdrop-filter: blur(10px);
+  display: grid; 
+  place-items: center;
+  padding: 20px;
+}
+
+.modal.hidden { 
+  display: none; 
+}
+
+.modal-card {
+  width: 100%; 
+  max-width: 500px;
+  background: linear-gradient(180deg, var(--panel), var(--bg-1));
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 0 40px rgba(212,175,55,0.3);
+  animation: oracleIn .5s cubic-bezier(.2,1,.4,1);
+}
+
+@keyframes oracleIn { 
+  from { opacity: 0; transform: scale(.9) translateY(20px); } 
+  to { opacity: 1; transform: none; } 
+}
