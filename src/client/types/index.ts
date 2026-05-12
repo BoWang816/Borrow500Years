@@ -52,9 +52,15 @@ export interface Potion {
   desc: string
   cost: number
   type: 'merit' | 'coin'
-  instant_life?: number
+  instant?: {
+    life: number
+  }
+  mod?: {
+    id: string
+    label: string
+    value: number
+  }
   dur?: number
-  dur_decay_reduction?: number
 }
 
 export interface Task {

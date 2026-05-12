@@ -6,6 +6,14 @@ import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 const tasks = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
 
+// 获取养生任务配置
+tasks.get('/wellness/config', async (c) => {
+  const tasks = await c.env.DB.prepare(
+    'SELECT task_key, name, emoji, description, reward_type, life_reward, merit_reward, shard_reward, coin_reward, modifier_value, realm_requirement, sort_order, input_config FROM wellness_tasks_config WHERE is_active = 1 ORDER BY sort_order'
+  ).all()
+  return c.json({ tasks: tasks.results || [] })
+})
+
 // 完成任务
 tasks.post('/:name', authMiddleware, loadProfile, async (c) => {
   const userId = c.get('userId') as number

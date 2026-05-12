@@ -2,11 +2,61 @@
    修炼页面样式
    ========================================================== */
 
+/* 修炼区域分组 */
+.cultivation-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 24px;
+  color: var(--gold-soft);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--line);
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--jade), transparent);
+}
+
+.section-desc {
+  font-size: 14px;
+  color: var(--ink-dim);
+  font-family: 'ZCOOL XiaoWei', serif;
+  margin-left: auto;
+  letter-spacing: 2px;
+}
+
+.subsection-title {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 18px;
+  color: var(--jade);
+  margin: 24px 0 16px;
+  letter-spacing: 2px;
+}
+
 /* 修炼任务卡片 */
 .cultivation-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 18px;
+}
+
+.extra-tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 .task-card {
@@ -18,6 +68,8 @@
   gap: 14px;
   position: relative;
   transition: all .25s;
+  min-height: 160px;
+  align-items: flex-start;
 }
 
 .task-card:hover { 
@@ -48,6 +100,109 @@
   letter-spacing: 2px;
 }
 
+/* 境界标签 */
+.basic-tag {
+  font-size: 10px;
+  background: rgba(54,255,208,0.2);
+  color: var(--jade);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.mortal-tag {
+  font-size: 10px;
+  background: rgba(168,160,138,0.2);
+  color: var(--ink-dim);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.advanced-tag {
+  font-size: 10px;
+  background: rgba(212,175,55,0.2);
+  color: var(--gold);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.challenge-tag {
+  font-size: 10px;
+  background: rgba(178,102,255,0.2);
+  color: var(--neon-purple);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* 基础养生修炼卡片 */
+.task-card.wellness.basic {
+  border-left: 4px solid var(--jade);
+  background: linear-gradient(135deg, rgba(54,255,208,0.08), var(--panel));
+}
+
+/* 凡人养生修炼卡片 */
+.task-card.wellness.mortal {
+  border-left: 4px solid var(--ink-dim);
+  background: linear-gradient(135deg, rgba(168,160,138,0.05), var(--panel));
+  opacity: 0.8;
+}
+
+/* 高阶养生修炼卡片 */
+.task-card.wellness.advanced {
+  border-left: 4px solid var(--gold);
+  background: linear-gradient(135deg, rgba(212,175,55,0.1), var(--panel));
+  box-shadow: 0 0 20px rgba(212,175,55,0.1);
+}
+
+.task-card.wellness.advanced .task-icon {
+  background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(212,175,55,0.1));
+  color: var(--gold);
+  border-color: rgba(212,175,55,0.4);
+}
+
+/* 挑战任务卡片 */
+.task-card.wellness.challenge {
+  border-left: 4px solid var(--neon-purple);
+  background: linear-gradient(135deg, rgba(178,102,255,0.08), var(--panel));
+}
+
+.task-card.wellness.challenge .task-icon {
+  background: linear-gradient(135deg, rgba(178,102,255,0.2), rgba(178,102,255,0.1));
+  color: var(--neon-purple);
+  border-color: rgba(178,102,255,0.3);
+}
+
+/* 养生修炼卡片样式 */
+.task-card.wellness {
+  border-left: 4px solid var(--jade);
+  background: linear-gradient(135deg, rgba(54,255,208,0.05), var(--panel));
+}
+
+.task-card.wellness:hover {
+  border-color: var(--jade);
+  box-shadow: 0 8px 30px rgba(54,255,208,0.15);
+}
+
+.task-card.wellness .task-icon {
+  background: linear-gradient(135deg, rgba(54,255,208,0.2), rgba(54,255,208,0.1));
+  color: var(--jade);
+  border-color: rgba(54,255,208,0.3);
+}
+
+/* 扩展任务卡片 */
+.extra-task-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  transition: all 0.25s;
+}
+
 .task-icon {
   width: 48px; 
   height: 48px;
@@ -61,13 +216,21 @@
   flex-shrink: 0;
 }
 
+.task-icon .task-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
 .task-card.challenge .task-icon { 
   color: var(--neon-purple); 
   border-color: rgba(178,102,255,0.4); 
 }
 
 .task-body { 
-  flex: 1; 
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .task-body h4 {
@@ -76,23 +239,55 @@
   letter-spacing: 2px;
   color: var(--gold-soft);
   margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .task-body p { 
   font-size: 12px; 
   color: var(--ink-dim); 
   margin-bottom: 8px; 
-  line-height: 1.5; 
+  line-height: 1.5;
+  flex: 1;
 }
 
 .task-reward { 
   font-size: 12px; 
-  color: var(--ink-dim); 
+  color: var(--ink-dim);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  line-height: 1.4;
+}
+
+.task-reward > span:first-child {
+  white-space: nowrap;
+}
+
+.task-reward .reward-life,
+.task-reward .reward-mod,
+.task-reward .reward-merit,
+.task-reward .reward-coin { 
+  font-family: 'Orbitron', sans-serif;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .task-reward .reward-life { 
-  color: var(--jade); 
-  font-family: 'Orbitron', sans-serif; 
+  color: var(--jade);
+}
+
+.task-reward .reward-mod {
+  color: var(--crimson);
+}
+
+.task-reward .reward-merit {
+  color: var(--gold-soft);
+}
+
+.task-reward .reward-coin {
+  color: var(--gold);
 }
 
 .task-reward .reward-mod { 
@@ -115,6 +310,8 @@
   letter-spacing: 2px;
   transition: all .2s;
   box-shadow: 0 0 12px rgba(54,255,208,0.3);
+  min-width: 80px;
+  white-space: nowrap;
 }
 
 .task-btn:hover { 
@@ -122,15 +319,270 @@
   box-shadow: 0 0 18px rgba(54,255,208,0.6); 
 }
 
-.task-btn:disabled { 
-  background: #333; 
-  color: #888; 
-  cursor: not-allowed; 
-  box-shadow: none; 
+.wellness-btn {
+  background: linear-gradient(135deg, var(--jade-deep), var(--jade));
+  color: #001;
+  box-shadow: 0 0 12px rgba(54,255,208,0.3);
+}
+
+.wellness-btn:hover:not(:disabled) {
+  box-shadow: 0 0 18px rgba(54,255,208,0.6);
+}
+
+.advanced-btn {
+  background: linear-gradient(135deg, var(--gold), #b8902a);
+  color: #1a1208;
+  box-shadow: 0 0 12px rgba(212,175,55,0.4);
+}
+
+.advanced-btn:hover:not(:disabled) {
+  box-shadow: 0 0 18px rgba(212,175,55,0.6);
+}
+
+.challenge-btn {
+  background: linear-gradient(135deg, var(--neon-purple), #8a4bff);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(178,102,255,0.4);
+}
+
+.challenge-btn:hover:not(:disabled) {
+  box-shadow: 0 0 18px rgba(178,102,255,0.6);
+}
+
+.reward-merit {
+  color: var(--gold-soft);
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* 境界说明 */
+.realm-notice {
+  margin: 24px 0;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(54,255,208,0.05));
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 8px;
+  border-left: 4px solid var(--gold);
+}
+
+.notice-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notice-content i {
+  color: var(--gold);
+  font-size: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.notice-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.notice-text strong {
+  color: var(--gold-soft);
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 1px;
+}
+
+/* 功法修炼样式 */
+.manuals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.manual-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), var(--panel));
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--gold);
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.manual-item:hover {
+  border-color: var(--gold);
+  box-shadow: 0 8px 30px rgba(212,175,55,0.15);
+  transform: translateY(-2px);
+}
+
+.manual-icon {
+  font-size: 48px;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.1));
+  border: 2px solid rgba(212,175,55,0.3);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.manual-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.manual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.manual-name {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 20px;
+  color: var(--gold-soft);
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.manual-lv {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  color: var(--jade);
+  background: rgba(54,255,208,0.1);
+  border: 1px solid rgba(54,255,208,0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.manual-type {
+  font-size: 12px;
+  color: var(--ink-dim);
+  background: rgba(0,0,0,0.3);
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+
+.manual-desc {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.manual-stats {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.manual-cost,
+.manual-reward {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.manual-cost {
+  color: var(--gold-soft);
+}
+
+.manual-cost i {
+  color: var(--gold);
+}
+
+.manual-reward {
+  color: var(--jade);
+}
+
+.manual-reward i {
+  color: var(--jade);
+}
+
+.manual-btn {
+  background: linear-gradient(135deg, var(--gold), #b8902a);
+  color: #1a1208;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 0 14px rgba(212,175,55,0.4);
+  min-width: 120px;
+}
+
+.manual-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(212,175,55,0.6);
+}
+
+.manual-btn:disabled {
+  background: #333;
+  color: #888;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 进度条样式 */
+.streak-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(178,102,255,0.1);
+  border: 1px solid rgba(178,102,255,0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.streak-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon-purple), #8a4bff);
+  transition: width 0.3s ease;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .manual-item {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .manual-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .manual-stats {
+    justify-content: center;
+  }
+  
+  .section-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .section-desc {
+    margin-left: 0;
+  }
+  
+  .notice-content {
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 
 .step-input { 
-  margin: 8px 0; 
+  margin: 8px 0;
+  display: flex;
+  gap: 6px;
 }
 
 .step-input input[type=range] {
@@ -140,24 +592,23 @@
 
 .step-num { 
   font-family: 'Orbitron', sans-serif; 
-  font-size: 14px; 
+  font-size: 13px; 
   color: var(--gold-soft); 
-  text-align: right; 
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 .water-cups { 
   display: flex; 
   gap: 4px; 
-  margin: 8px 0; 
+  margin: 8px 0;
+  justify-content: center;
 }
 
 .water-cup {
-  flex: 1; 
-  height: 22px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  position: relative;
-  background: rgba(54,255,208,0.05);
+  font-size: 16px;
+  line-height: 1;
 }
 
 .water-cup.filled { 
@@ -165,21 +616,287 @@
   box-shadow: 0 0 8px rgba(54,255,208,0.5); 
 }
 
-.streak-bar { 
-  display: flex; 
-  gap: 4px; 
-  margin: 6px 0; 
+.empty {
+  text-align: center;
+  color: var(--ink-dim);
+  font-style: italic;
+  padding: 40px 20px;
 }
 
-.streak-bar span {
-  flex: 1; 
-  height: 8px;
-  background: rgba(178,102,255,0.1);
-  border: 1px solid rgba(178,102,255,0.3);
-  border-radius: 2px;
+
+/* 扩展修炼区域左右布局 */
+.advanced-cultivation-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 0;
 }
 
-.streak-bar span.on { 
-  background: var(--neon-purple); 
-  box-shadow: 0 0 6px var(--neon-purple); 
+/* 当只有功法修炼时（高境界），占满整行 */
+.advanced-cultivation-wrapper:has(.manuals-section:only-child) {
+  grid-template-columns: 1fr;
+}
+
+.advanced-cultivation-wrapper .cultivation-section {
+  margin-bottom: 0;
+}
+
+/* 扩展任务卡片优化 */
+.extra-tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  max-height: none;
+  overflow: hidden;
+  transition: max-height 0.5s ease;
+}
+
+/* 折叠状态：只显示前6个 */
+.extra-tasks-grid.collapsed {
+  max-height: 600px;
+  position: relative;
+}
+
+.extra-tasks-grid.collapsed::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, var(--bg-0));
+  pointer-events: none;
+}
+
+.extra-task-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(168,160,138,0.05), var(--panel));
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--ink-dim);
+  border-radius: 8px;
+  transition: all 0.3s;
+  opacity: 0.8;
+  min-height: 180px;
+}
+
+.extra-task-card:hover {
+  opacity: 1;
+  border-color: var(--ink-dim);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
+}
+
+.extra-task-card .task-icon {
+  font-size: 36px;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(168,160,138,0.1);
+  border: 2px solid rgba(168,160,138,0.2);
+  border-radius: 8px;
+}
+
+.extra-task-card .task-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.extra-task-card .task-body h4 {
+  font-size: 15px;
+  margin: 0;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.extra-task-card .task-body p {
+  font-size: 13px;
+  color: var(--ink-dim);
+  margin: 0;
+  line-height: 1.5;
+  text-align: center;
+  flex: 1;
+}
+
+.extra-task-card .task-reward {
+  font-size: 12px;
+  color: var(--ink-dim);
+  text-align: center;
+  padding-top: 8px;
+  border-top: 1px solid rgba(168,160,138,0.2);
+}
+
+.extra-task-card .task-btn {
+  padding: 10px 20px;
+  width: 100%;
+}
+
+/* 展开/收起按钮 */
+.toggle-tasks-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, rgba(168,160,138,0.1), rgba(168,160,138,0.05));
+  border: 1px solid rgba(168,160,138,0.3);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 1px;
+}
+
+.toggle-tasks-btn:hover {
+  background: linear-gradient(135deg, rgba(168,160,138,0.15), rgba(168,160,138,0.08));
+  border-color: var(--ink-dim);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.toggle-tasks-btn i {
+  transition: transform 0.3s;
+}
+
+/* 功法修炼卡片优化 */
+.manuals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.manual-item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), var(--panel));
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--gold);
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.manual-item:hover {
+  border-color: var(--gold);
+  box-shadow: 0 6px 24px rgba(212,175,55,0.15);
+  transform: translateY(-2px);
+}
+
+.manual-icon {
+  font-size: 40px;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.1));
+  border: 2px solid rgba(212,175,55,0.3);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.manual-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.manual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.manual-name {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 18px;
+  color: var(--gold-soft);
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.manual-desc {
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.manual-stats {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+
+.manual-btn {
+  padding: 12px 24px;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+/* 响应式：中等屏幕 */
+@media (max-width: 1200px) {
+  .advanced-cultivation-wrapper {
+    grid-template-columns: 1fr;
+  }
+  
+  .extra-tasks-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  .extra-tasks-grid.collapsed {
+    max-height: 800px;
+  }
+}
+
+/* 响应式：小屏幕 */
+@media (max-width: 768px) {
+  .manual-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+  
+  .manual-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .manual-stats {
+    justify-content: center;
+  }
+  
+  .manual-btn {
+    width: 100%;
+  }
+  
+  .extra-tasks-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .extra-tasks-grid.collapsed {
+    max-height: 1200px;
+  }
 }

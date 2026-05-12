@@ -1,36 +1,30 @@
 // 丹药模块 - 丹药列表/购买/使用
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile } from '../../types'
-import { SEC_PER_DAY, formatLife, nowSeconds } from '../../lib'
+import { formatLife, nowSeconds } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
-// 默认丹药配置
-const DEFAULT_POTIONS = [
-  // 基础丹药（6个）
-  { id: 'liver', emoji: '💊', name: '护肝片', cost: 30, type: 'merit', mod: { id: 'liver', label: '护肝片 · 抵消熬夜', value: -0.5 }, dur: 24*3600 },
-  { id: 'melatonin', emoji: '🌙', name: '褪黑素', cost: 25, type: 'merit', mod: { id: 'mela', label: '褪黑素 · 作息加倍', value: -0.2 }, dur: 12*3600 },
-  { id: 'deep', emoji: '🛌', name: '深睡胶囊', cost: 40, type: 'merit', mod: { id: 'deep', label: '深睡 · 衰减减半', value: -0.5 }, dur: 8*3600 },
-  { id: 'ginseng', emoji: '🌿', name: '千年人参', cost: 50, type: 'merit', instant: { life: 6*3600 } },
-  { id: 'lingzhi', emoji: '🍄', name: '九叶灵芝', cost: 90, type: 'merit', instant: { life: 12*3600 } },
-  { id: 'pill', emoji: '🟡', name: '九转金丹', cost: 1, type: 'coin', instant: { life: 365*SEC_PER_DAY } },
-  // ... 更多丹药可从数据库加载
-]
-
-// 加载丹药配置（支持覆盖）
+// 从数据库加载丹药配置
 async function loadPotions(db: any): Promise<any[]> {
-  const row = await db.prepare('SELECT value FROM configs WHERE key = ?').bind('potions').first<{ value: string }>()
-  if (!row || !row.value) return DEFAULT_POTIONS
-  try {
-    const overrides = JSON.parse(row.value)
-    return DEFAULT_POTIONS.map(p => ({
-      ...p,
-      ...(overrides[p.id] || {}),
-      mod: p.mod ? { ...(p.mod as any), ...(overrides[p.id]?.mod || {}) } : undefined,
-      instant: p.instant ? { ...(p.instant as any), ...(overrides[p.id]?.instant || {}) } : undefined,
-    }))
-  } catch {
-    return DEFAULT_POTIONS
-  }
+  const result = await db.prepare(
+    'SELECT * FROM potions_config WHERE is_active = 1 ORDER BY sort_order ASC'
+  ).all()
+  
+  return (result.results || []).map((p: any) => ({
+    id: p.id,
+    emoji: p.emoji,
+    name: p.name,
+    desc: p.desc,
+    cost: p.cost,
+    type: p.type,
+    instant: p.instant_life > 0 ? { life: p.instant_life } : undefined,
+    mod: p.dur > 0 && p.dur_decay_reduction > 0 ? {
+      id: p.id,
+      label: `${p.name} · 衰减 -${(p.dur_decay_reduction * 100).toFixed(0)}%`,
+      value: -p.dur_decay_reduction
+    } : undefined,
+    dur: p.dur || 0,
+  }))
 }
 
 const potions = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
@@ -82,4 +76,4 @@ potions.post('/:id', authMiddleware, loadProfile, async (c) => {
 })
 
 export default potions
-export { loadPotions, DEFAULT_POTIONS }
+export { loadPotions }

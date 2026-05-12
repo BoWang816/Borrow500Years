@@ -2,160 +2,337 @@
    丹房页面样式
    ========================================================== */
 
-/* 功德统计栏 */
-.merit-bar {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-@media (max-width: 700px) { 
-  .merit-bar { 
-    grid-template-columns: 1fr; 
-  } 
-}
-
-.merit-item {
-  display: flex; 
-  align-items: center; 
-  gap: 14px;
-  padding: 16px 20px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-
-.merit-item i { 
-  font-size: 28px; 
-  color: var(--gold-soft); 
-}
-
-.merit-label { 
-  font-size: 11px; 
-  letter-spacing: 3px; 
-  color: var(--ink-dim); 
-}
-
-.merit-val { 
-  font-family: 'Orbitron', sans-serif; 
-  font-size: 22px; 
-  font-weight: 700; 
-  color: var(--gold-soft); 
-}
-
 /* 丹药网格 */
 .potion-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
 }
 
-.potion {
-  background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+@media (max-width: 768px) {
+  .potion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 丹药卡片 */
+.potion-card {
+  background: linear-gradient(135deg, rgba(18, 18, 24, 0.95), rgba(24, 24, 32, 0.95));
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 18px;
-  text-align: center;
+  border-radius: 16px;
+  padding: 20px;
   position: relative;
-  transition: all .25s;
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
-.potion:hover { 
-  transform: translateY(-3px); 
-  border-color: var(--gold); 
-  box-shadow: 0 10px 30px rgba(212,175,55,0.15); 
+.potion-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--jade), var(--neon-purple));
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.potion-emoji { 
-  font-size: 44px; 
-  margin-bottom: 8px; 
-  filter: drop-shadow(0 0 12px rgba(212,175,55,0.5)); 
+.potion-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  box-shadow: 0 12px 40px rgba(212, 175, 55, 0.2);
 }
 
-.potion h4 {
+.potion-card:hover::before {
+  opacity: 1;
+}
+
+/* 丹药头部 */
+.potion-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.potion-icon {
+  font-size: 48px;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(54, 255, 208, 0.1));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 12px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.4));
+}
+
+.potion-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.potion-title h4 {
   font-family: 'Chinese-Calligraphy', serif;
   font-size: 20px;
   letter-spacing: 2px;
   color: var(--gold-soft);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.potion .potion-desc { 
-  font-size: 12px; 
-  color: var(--ink-dim); 
-  min-height: 36px; 
-  margin-bottom: 10px; 
-  line-height: 1.5; 
-}
-
-.potion .potion-cost {
-  display: inline-block;
-  margin-bottom: 10px;
-  padding: 4px 10px;
-  background: rgba(178,102,255,0.1);
-  border: 1px solid rgba(178,102,255,0.3);
-  border-radius: 999px;
-  font-size: 11px;
+.potion-cost {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
   color: var(--neon-purple);
-  letter-spacing: 1px;
 }
 
-.potion .potion-buy {
-  display: block; 
+.potion-cost i {
+  font-size: 14px;
+}
+
+.potion-cost span:first-of-type {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.potion-cost .cost-type {
+  opacity: 0.8;
+}
+
+/* 丹药描述 */
+.potion-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+  margin-bottom: 16px;
+  min-height: 40px;
+}
+
+/* 丹药效果 */
+.potion-effects {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.effect-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.effect-item i {
+  width: 20px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.effect-item span:nth-child(2) {
+  flex: 1;
+  color: var(--ink-dim);
+}
+
+.effect-item .effect-value {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.effect-item.instant {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.effect-item.instant i {
+  color: var(--gold);
+}
+
+.effect-item.instant .effect-value {
+  color: var(--gold-soft);
+}
+
+.effect-item.duration {
+  background: rgba(54, 255, 208, 0.1);
+  border: 1px solid rgba(54, 255, 208, 0.2);
+}
+
+.effect-item.duration i {
+  color: var(--jade);
+}
+
+.effect-item.duration .effect-value {
+  color: var(--jade);
+}
+
+.effect-item.buff {
+  background: rgba(178, 102, 255, 0.1);
+  border: 1px solid rgba(178, 102, 255, 0.2);
+}
+
+.effect-item.buff i {
+  color: var(--neon-purple);
+}
+
+.effect-item.buff .effect-value {
+  color: var(--neon-purple);
+}
+
+/* 购买按钮 */
+.buy-btn {
   width: 100%;
-  padding: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(100, 100, 100, 0.3), rgba(80, 80, 80, 0.3));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #888;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  cursor: not-allowed;
+}
+
+.buy-btn.affordable {
   background: linear-gradient(135deg, var(--gold), #a17e1d);
   color: #1a1208;
-  border-radius: 6px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  transition: all .2s;
+  border-color: var(--gold);
+  cursor: pointer;
 }
 
-.potion .potion-buy:hover { 
-  box-shadow: 0 0 16px var(--gold); 
+.buy-btn.affordable:hover {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+  transform: translateY(-2px);
 }
 
-.potion .potion-buy:disabled { 
-  background: #333; 
-  color: #888; 
-  cursor: not-allowed; 
+.buy-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.buy-btn i {
+  font-size: 16px;
 }
 
 /* 激活的丹药 */
 .active-potions {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .active-potions {
+    grid-template-columns: 1fr;
+  }
 }
 
 .active-potions .empty {
   grid-column: 1 / -1;
   text-align: center;
   color: var(--ink-dim);
-  padding: 20px;
-  border: 1px dashed var(--line);
-  border-radius: 8px;
+  padding: 40px 20px;
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.active-potions .empty i {
+  font-size: 18px;
+  opacity: 0.6;
 }
 
 .active-potion {
-  padding: 12px 14px;
-  background: rgba(54,255,208,0.06);
-  border: 1px solid rgba(54,255,208,0.3);
-  border-radius: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(54, 255, 208, 0.08), rgba(54, 255, 208, 0.04));
+  border: 1px solid rgba(54, 255, 208, 0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.3s ease;
+}
+
+.active-potion:hover {
+  border-color: var(--jade);
+  box-shadow: 0 4px 20px rgba(54, 255, 208, 0.2);
+  transform: translateY(-2px);
+}
+
+.active-potion .ap-emoji {
+  font-size: 36px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(54, 255, 208, 0.1);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.active-potion .ap-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.active-potion .ap-name {
+  color: var(--jade);
+  font-family: 'Chinese-Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.active-potion .ap-effect {
+  font-size: 12px;
+  color: var(--ink-dim);
+  opacity: 0.9;
+}
+
+.active-potion .ap-expire {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Orbitron', sans-serif;
   font-size: 13px;
+  font-weight: 600;
+  color: var(--jade);
+  padding: 6px 12px;
+  background: rgba(54, 255, 208, 0.1);
+  border-radius: 6px;
+  white-space: nowrap;
 }
 
-.active-potion .ap-name { 
-  color: var(--jade); 
-  font-family: 'Chinese-Sans', sans-serif; 
-  letter-spacing: 1px; 
-}
-
-.active-potion .ap-time { 
-  font-family: 'Orbitron', sans-serif; 
-  font-size: 11px; 
-  color: var(--ink-dim); 
-  margin-top: 2px; 
+.active-potion .ap-expire i {
+  font-size: 12px;
+  opacity: 0.8;
 }

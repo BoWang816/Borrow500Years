@@ -18,6 +18,7 @@ import manuals from './modules/manuals'
 import extraTasks from './modules/extra-tasks'
 import worldEvents from './modules/world-events'
 import admin from './modules/admin'
+import realms from './modules/realms'
 
 const api = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
 
@@ -25,7 +26,7 @@ const api = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
 api.route('/auth', auth)
 api.route('/profile', profile)
 api.route('/state', state)
-api.route('/task', tasks)
+api.route('/tasks', tasks)
 api.route('/potions', potions)
 api.route('/board', board)
 api.route('/achievements', achievements)
@@ -37,6 +38,7 @@ api.route('/manuals', manuals)
 api.route('/extra-tasks', extraTasks)
 api.route('/world-events', worldEvents)
 api.route('/admin', admin)
+api.route('/realms', realms)
 
 // 管理员检查接口
 api.get('/admin/me', async (c) => {

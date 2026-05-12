@@ -10,7 +10,7 @@ board.get('/:type', async (c) => {
   const all = await c.env.DB.prepare(`
     SELECT id, username, name, gender, age, height, weight,
            smoke, alcohol, stayup, exercise, meditate,
-           initial_life_sec, bonus_sec, start_timestamp, total_gained_sec
+           initial_life_sec, bonus_sec, start_timestamp, total_gained_sec, merit
     FROM users
     WHERE name IS NOT NULL
   `).all<any>()
@@ -26,7 +26,7 @@ board.get('/:type', async (c) => {
       name: r.name,
       age: totalAge,
       lifeSec,
-      meritGained: r.total_gained_sec || 0,
+      meritGained: r.merit || 0,
       realm: getRealmTitle(totalAge),
     }
   })

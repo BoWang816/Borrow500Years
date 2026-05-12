@@ -126,11 +126,38 @@
         </div>
       </div>
     </div>
+
+    <!-- 成就墙 -->
+    <div class="card achievements-card">
+      <div class="achievements-header">
+        <div class="achievements-title">
+          <i class="fas fa-medal"></i>
+          <h3>成就墙 <span class="ach-count">{{ unlockedCount }}/{{ achievements.length }}</span></h3>
+        </div>
+        <button @click="checkAchievements" class="check-btn" :disabled="loading">
+          <i class="fas fa-rotate"></i> 检查成就
+        </button>
+      </div>
+      <p class="achievements-subtitle">修仙路上的里程碑</p>
+      <div class="achievements-list">
+        <div v-if="achievements.length === 0" class="empty">暂无成就</div>
+        <div v-for="ach in achievements" :key="ach.id" :class="['ach-item', { unlocked: ach.unlocked, locked: !ach.unlocked }]">
+          <div class="ach-icon">{{ ach.emoji }}</div>
+          <div class="ach-info">
+            <div class="ach-name">{{ ach.name }}</div>
+            <div class="ach-desc">{{ ach.description }}</div>
+          </div>
+          <div v-if="ach.unlocked" class="ach-badge">
+            <i class="fas fa-check"></i>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useStateStore } from '../stores/state'
 import { formatLife, api, toast } from '../utils/api'
 
@@ -140,6 +167,9 @@ const logs = ref<any[]>([])
 const logContent = ref('')
 const logMood = ref('平静')
 const logType = ref('note')
+const achievements = ref<any[]>([])
+
+const unlockedCount = computed(() => achievements.value.filter(a => a.unlocked).length)
 
 async function loadLogs() {
   try {
@@ -171,6 +201,32 @@ async function addLog() {
   }
 }
 
+async function loadAchievements() {
+  try {
+    const res = await api('/achievements')
+    achievements.value = res.achievements || []
+  } catch (err: any) {
+    console.error('Failed to load achievements:', err)
+  }
+}
+
+async function checkAchievements() {
+  loading.value = true
+  try {
+    const res = await api('/achievements/check', { method: 'POST' })
+    if (res.newAchievements && res.newAchievements.length > 0) {
+      toast(`解锁了 ${res.newAchievements.length} 个新成就！`, 'gold')
+    } else {
+      toast('暂无新成就', 'good')
+    }
+    await loadAchievements()
+  } catch (err: any) {
+    toast(err.message, 'bad')
+  } finally {
+    loading.value = false
+  }
+}
+
 function formatDate(timestamp: number): string {
   return new Date(timestamp * 1000).toLocaleString('zh-CN')
 }
@@ -178,5 +234,6 @@ function formatDate(timestamp: number): string {
 onMounted(async () => {
   await stateStore.fetchState(true)
   await loadLogs()
+  await loadAchievements()
 })
 </script>

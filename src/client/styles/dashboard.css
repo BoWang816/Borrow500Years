@@ -257,3 +257,451 @@ body.crisis .ring1 {
     grid-template-columns: 1fr; 
   } 
 }
+
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: var(--gold);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(212, 175, 55, 0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 事件卡片 */
+.event-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+
+.card-header-row::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--jade), transparent);
+  box-shadow: 0 0 8px var(--jade);
+}
+
+.card-header-row h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 2px;
+  color: var(--gold-soft);
+  text-shadow: 0 0 10px rgba(212,175,55,0.3);
+}
+
+.trigger-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(54,255,208,0.1));
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  color: var(--gold-soft);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Noto Sans SC', sans-serif;
+  letter-spacing: 1px;
+  box-shadow: 0 0 15px rgba(212,175,55,0.2);
+}
+
+.trigger-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(54,255,208,0.15));
+  box-shadow: 0 0 25px rgba(212,175,55,0.4), 0 0 15px rgba(54,255,208,0.2);
+}
+
+.trigger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.trigger-btn i {
+  animation: dice-roll 2s ease-in-out infinite;
+}
+
+@keyframes dice-roll {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(90deg); }
+  50% { transform: rotate(180deg); }
+  75% { transform: rotate(270deg); }
+}
+
+.trigger-btn:hover i {
+  animation-duration: 0.5s;
+}
+
+.event-log {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.event-log .empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ink-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.event-log .empty i {
+  font-size: 48px;
+  color: var(--gold);
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.event-log .empty p {
+  margin: 0;
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 2px;
+  font-size: 14px;
+}
+
+.event-item {
+  padding: 16px 16px 16px 20px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(10,14,26,0.6), rgba(20,24,38,0.4));
+  border: 1px solid rgba(212,175,55,0.15);
+  border-left: 4px solid var(--gold);
+  border-radius: 6px;
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.event-item:hover {
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(54,255,208,0.05));
+  border-color: var(--gold);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 20px rgba(212,175,55,0.1);
+}
+
+.event-time {
+  font-size: 11px;
+  color: var(--ink-dim);
+  padding-left: 18px;
+  font-family: 'Orbitron', sans-serif;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+}
+
+.event-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.event-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.event-content.ev-good {
+  color: var(--jade);
+}
+
+.event-content.ev-good .event-icon {
+  background: rgba(54,255,208,0.15);
+  color: var(--jade);
+  box-shadow: 0 0 10px rgba(54,255,208,0.3);
+}
+
+.event-content.ev-bad {
+  color: var(--crimson);
+}
+
+.event-content.ev-bad .event-icon {
+  background: rgba(255,77,109,0.15);
+  color: var(--crimson);
+  box-shadow: 0 0 10px rgba(255,77,109,0.3);
+}
+
+.event-content:not(.ev-good):not(.ev-bad) {
+  color: var(--ink);
+}
+
+.event-content:not(.ev-good):not(.ev-bad) .event-icon {
+  background: rgba(128,128,128,0.15);
+  color: var(--ink-dim);
+}
+
+.event-msg {
+  flex: 1;
+  font-family: 'Noto Serif SC', serif;
+}
+
+/* 滚动条样式 */
+.event-log::-webkit-scrollbar {
+  width: 6px;
+}
+
+.event-log::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+.event-log::-webkit-scrollbar-thumb {
+  background: rgba(212,175,55,0.3);
+  border-radius: 3px;
+}
+
+.event-log::-webkit-scrollbar-thumb:hover {
+  background: rgba(212,175,55,0.5);
+}
+
+/* 运势卡片 */
+.fortune-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.fortune-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--gold);
+  font-size: 16px;
+  gap: 12px;
+}
+
+.fortune-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fortune-result {
+  text-align: center;
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 32px;
+  letter-spacing: 6px;
+  padding: 20px;
+  border-radius: 8px;
+  text-shadow: 0 0 20px currentColor;
+  background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(54,255,208,0.05));
+  border: 2px solid;
+}
+
+.fortune-大吉 {
+  color: #d946ef;
+  border-color: #d946ef;
+  background: linear-gradient(135deg, rgba(217,70,239,0.15), rgba(217,70,239,0.05));
+}
+
+.fortune-吉 {
+  color: var(--jade);
+  border-color: var(--jade);
+}
+
+.fortune-平 {
+  color: var(--gold-soft);
+  border-color: var(--gold);
+}
+
+.fortune-凶 {
+  color: #fb923c;
+  border-color: #fb923c;
+  background: linear-gradient(135deg, rgba(251,146,60,0.15), rgba(251,146,60,0.05));
+}
+
+.fortune-大凶 {
+  color: var(--crimson);
+  border-color: var(--crimson);
+  background: linear-gradient(135deg, rgba(255,77,109,0.15), rgba(255,77,109,0.05));
+}
+
+.fortune-poem-box {
+  text-align: center;
+  padding: 16px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 6px;
+  border-left: 3px solid var(--gold);
+  position: relative;
+}
+
+.fortune-poem-box i {
+  color: var(--gold);
+  opacity: 0.3;
+  font-size: 14px;
+}
+
+.fortune-poem {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--ink);
+  margin: 8px 0;
+  letter-spacing: 2px;
+}
+
+.fortune-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fortune-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  text-align: center;
+}
+
+.fortune-advice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.advice-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.advice-item.good {
+  background: rgba(54,255,208,0.08);
+  border: 1px solid rgba(54,255,208,0.3);
+  color: var(--jade);
+}
+
+.advice-item.bad {
+  background: rgba(255,77,109,0.08);
+  border: 1px solid rgba(255,77,109,0.3);
+  color: var(--crimson);
+}
+
+.advice-item i {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.fortune-meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+}
+
+@media (max-width: 600px) {
+  .fortune-meta {
+    grid-template-columns: 1fr;
+  }
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.meta-label {
+  color: var(--ink-dim);
+}
+
+.meta-value {
+  color: var(--gold-soft);
+  font-family: 'ZCOOL XiaoWei', serif;
+}
+
+.checkin-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--gold), #b8902a);
+  color: #1a1208;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-family: 'ZCOOL XiaoWei', serif;
+  transition: all 0.3s;
+  box-shadow: 0 0 14px rgba(212,175,55,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.checkin-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(212,175,55,0.6);
+}
+
+.checkin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checked-in-badge {
+  text-align: center;
+  padding: 12px;
+  background: rgba(54,255,208,0.1);
+  border: 1px solid rgba(54,255,208,0.3);
+  border-radius: 6px;
+  color: var(--jade);
+  font-size: 14px;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}

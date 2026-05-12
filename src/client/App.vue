@@ -7,7 +7,7 @@
     <div class="bg-glow"></div>
 
     <!-- 顶部导航 -->
-    <header class="topbar">
+    <header v-if="authStore.isAuthenticated" class="topbar">
       <div class="brand">
         <span class="brand-seal">寿</span>
         <div class="brand-text">
@@ -44,13 +44,12 @@
         >
           <i class="fas fa-shield-halved"></i>
         </router-link>
-        <span v-if="authStore.isAuthenticated" class="user-tag">
+        <span class="user-tag">
           <i class="fas fa-user"></i> <span>{{ authStore.username }}</span>
         </span>
         <span class="title-badge">{{ stateStore.profile?.realm || '凡胎肉身' }}</span>
         <button 
-          v-if="authStore.isAuthenticated" 
-          @click="authStore.logout" 
+          @click="handleLogout" 
           class="reset-btn" 
           title="登出"
         >
@@ -66,32 +65,37 @@
       </router-view>
     </main>
 
-    <!-- 模态框 -->
-    <AuthModal />
-    <OnboardingModal />
+    <!-- 危机弹窗 -->
     <CrisisOverlay />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { useStateStore } from './stores/state'
-import AuthModal from './components/AuthModal.vue'
-import OnboardingModal from './components/OnboardingModal.vue'
 import CrisisOverlay from './components/CrisisOverlay.vue'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const stateStore = useStateStore()
 
-onMounted(() => {
-  authStore.checkAuth()
+onMounted(async () => {
+  const isAuth = await authStore.checkAuth()
+  
+  // 如果已认证，加载用户状态
+  if (isAuth) {
+    try {
+      await stateStore.fetchState(true)
+    } catch (err) {
+      console.error('Failed to fetch state:', err)
+    }
+  }
 })
-</script>
 
-<style>
-#app-container {
-  width: 100%;
-  min-height: 100vh;
+function handleLogout() {
+  authStore.logout()
+  router.push('/login')
 }
-</style>
+</script>

@@ -23,7 +23,7 @@ auth.post('/register', async (c) => {
   const ins = await c.env.DB.prepare(
     'INSERT INTO users (username, password_hash, token, token_expire_at) VALUES (?, ?, ?, ?)'
   ).bind(username, hash, token, expire).run()
-  return c.json({ token, userId: ins.meta.last_row_id, username })
+  return c.json({ token, userId: ins.meta.last_row_id, username, needsOnboarding: true })
 })
 
 // 登录
@@ -46,7 +46,7 @@ auth.post('/login', async (c) => {
 
   // 是否已开命盘
   const hasProfile = await c.env.DB.prepare('SELECT name FROM users WHERE id = ? AND name IS NOT NULL').bind(row.id).first()
-  return c.json({ token, userId: row.id, username, hasProfile: !!hasProfile })
+  return c.json({ token, userId: row.id, username, needsOnboarding: !hasProfile })
 })
 
 // 登出

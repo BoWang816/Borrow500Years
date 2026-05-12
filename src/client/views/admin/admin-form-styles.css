@@ -58,3 +58,702 @@
   width: auto;
   accent-color: var(--jade);
 }
+
+/* 丹药管理特殊样式 */
+.item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.item-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.item-meta i {
+  font-size: 10px;
+}
+
+.meta-highlight {
+  background: rgba(178, 102, 255, 0.15);
+  border: 1px solid rgba(178, 102, 255, 0.3);
+  color: var(--neon-purple);
+}
+
+.meta-success {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: var(--gold-soft);
+}
+
+.meta-info {
+  background: rgba(54, 255, 208, 0.15);
+  border: 1px solid rgba(54, 255, 208, 0.3);
+  color: var(--jade);
+}
+
+.meta-warning {
+  background: rgba(255, 165, 0, 0.15);
+  border: 1px solid rgba(255, 165, 0, 0.3);
+  color: #ffa500;
+}
+
+.meta-special {
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  color: #ffd700;
+}
+
+
+/* ==================== 境界管理样式 ==================== */
+
+.realms-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--jade);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--jade), var(--gold));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #000;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--gold);
+  font-family: 'Courier New', monospace;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
+.major-realm-section {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.major-realm-header {
+  padding: 16px 20px;
+  background: rgba(100, 255, 218, 0.1);
+  border-bottom: 1px solid rgba(100, 255, 218, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.major-realm-header:hover {
+  background: rgba(100, 255, 218, 0.15);
+}
+
+.major-realm-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.major-realm-title i {
+  color: var(--jade);
+  transition: transform 0.3s;
+}
+
+.major-realm-name {
+  color: var(--gold);
+  font-size: 20px;
+}
+
+.major-realm-badge {
+  background: var(--jade);
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.major-realm-users {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+}
+
+.realms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+
+.realm-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.3s;
+}
+
+.realm-card:hover {
+  border-color: var(--jade);
+  box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+  transform: translateY(-2px);
+}
+
+.realm-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+}
+
+.realm-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.realm-id {
+  background: var(--jade);
+  color: #000;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.realm-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.realm-users {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+}
+
+.realm-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.info-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.info-value {
+  color: var(--jade);
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+.realm-desc {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.desc-item {
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.desc-item:last-child {
+  margin-bottom: 0;
+}
+
+.desc-item strong {
+  color: var(--jade);
+  margin-right: 4px;
+}
+
+.realm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit {
+  flex: 1;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, var(--jade), var(--gold));
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-edit:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(100, 255, 218, 0.5);
+}
+
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
+  max-height: 2000px;
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* 编辑弹窗样式 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, rgba(0, 20, 40, 0.95), rgba(20, 0, 40, 0.95));
+  border: 2px solid var(--jade);
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 40px rgba(100, 255, 218, 0.3);
+}
+
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(100, 255, 218, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  color: var(--gold);
+  margin: 0;
+  font-size: 20px;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.3s;
+}
+
+.btn-close:hover {
+  color: var(--jade);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--jade);
+}
+
+.modal-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(100, 255, 218, 0.3);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancel {
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-save {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--jade), var(--gold));
+  border: none;
+  border-radius: 6px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-save:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(100, 255, 218, 0.5);
+}
+
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ==================== 养生任务管理样式 ==================== */
+
+.admin-section {
+  padding: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--jade);
+}
+
+.section-header h3 {
+  color: var(--gold);
+  font-size: 24px;
+  margin: 0;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--jade), var(--gold));
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(100, 255, 218, 0.5);
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.error {
+  color: #ff4757;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.task-item {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: all 0.3s;
+}
+
+.task-item:hover {
+  border-color: var(--jade);
+  box-shadow: 0 0 20px rgba(100, 255, 218, 0.2);
+  transform: translateX(4px);
+}
+
+.task-info {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+}
+
+.task-emoji {
+  font-size: 48px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.task-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--gold);
+}
+
+.task-key {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: normal;
+  font-family: 'Courier New', monospace;
+}
+
+.task-desc {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.task-rewards {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.task-rewards span {
+  background: rgba(100, 255, 218, 0.1);
+  border: 1px solid rgba(100, 255, 218, 0.3);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: var(--jade);
+  font-weight: 500;
+}
+
+.task-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.task-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-active {
+  color: var(--jade) !important;
+  font-weight: bold;
+}
+
+.status-inactive {
+  color: #ff4757 !important;
+  font-weight: bold;
+}
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.btn-edit {
+  background: rgba(100, 255, 218, 0.2);
+  color: var(--jade);
+  border: 1px solid var(--jade);
+}
+
+.btn-edit:hover {
+  background: var(--jade);
+  color: #000;
+}
+
+.btn-delete {
+  background: rgba(255, 71, 87, 0.2);
+  color: #ff4757;
+  border: 1px solid #ff4757;
+}
+
+.btn-delete:hover {
+  background: #ff4757;
+  color: #fff;
+}
+
+/* 表单样式 */
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.task-form::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-form::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.task-form::-webkit-scrollbar-thumb {
+  background: var(--jade);
+  border-radius: 3px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(100, 255, 218, 0.2);
+}
+
+.btn-submit {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--jade), var(--gold));
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-submit:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(100, 255, 218, 0.5);
+}
+
+.btn-cancel {
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .task-item {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .task-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .section-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .section-header .btn-primary {
+    width: 100%;
+  }
+
+  .task-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

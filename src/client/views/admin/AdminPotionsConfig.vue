@@ -22,11 +22,26 @@
             </div>
             <div class="item-desc">{{ potion.desc }}</div>
             <div class="item-meta">
-              <span>消耗: {{ potion.cost }} {{ potion.type === 'merit' ? '功德' : '复活币' }}</span>
-              <span>即时: +{{ potion.instant_life }}秒</span>
-              <span>持续: {{ potion.dur }}秒</span>
-              <span>衰减: {{ potion.dur_decay_reduction }}</span>
-              <span>功德: {{ potion.dur_merit_boost }}</span>
+              <span class="meta-highlight">
+                <i class="fas fa-gem"></i>
+                消耗: {{ potion.cost }} {{ potion.type === 'merit' ? '功德' : '复活币' }}
+              </span>
+              <span v-if="potion.instant_life > 0" class="meta-success">
+                <i class="fas fa-bolt"></i>
+                即时增寿: +{{ formatSeconds(potion.instant_life) }}
+              </span>
+              <span v-if="potion.dur > 0" class="meta-info">
+                <i class="fas fa-clock"></i>
+                持续: {{ formatSeconds(potion.dur) }}
+              </span>
+              <span v-if="potion.dur_decay_reduction > 0" class="meta-warning">
+                <i class="fas fa-shield-alt"></i>
+                衰减减少: {{ (potion.dur_decay_reduction * 100).toFixed(0) }}%
+              </span>
+              <span v-if="potion.dur_merit_boost > 0" class="meta-special">
+                <i class="fas fa-star"></i>
+                功德加成: {{ (potion.dur_merit_boost * 100).toFixed(0) }}%
+              </span>
             </div>
           </div>
           <div class="item-actions">
@@ -151,6 +166,20 @@ const paginatedPotions = computed(() => {
   const end = start + pageSize.value
   return potions.value.slice(start, end)
 })
+
+function formatSeconds(seconds: number): string {
+  if (seconds >= 86400) {
+    const days = Math.floor(seconds / 86400)
+    return `${days}天`
+  } else if (seconds >= 3600) {
+    const hours = Math.floor(seconds / 3600)
+    return `${hours}小时`
+  } else if (seconds >= 60) {
+    const minutes = Math.floor(seconds / 60)
+    return `${minutes}分钟`
+  }
+  return `${seconds}秒`
+}
 
 function resetForm() {
   formData.value = {

@@ -174,25 +174,31 @@ admin.get('/logs', adminMiddleware, async (c) => {
 // 功法管理
 admin.get('/manuals', adminMiddleware, async (c) => {
   const manuals = await c.env.DB.prepare('SELECT * FROM manuals ORDER BY id ASC').all()
-  return c.json({ manuals: manuals.results })
+  return c.json({ manuals: manuals.results || [] })
 })
 
 // 修炼项目管理
 admin.get('/extra-tasks', adminMiddleware, async (c) => {
   const tasks = await c.env.DB.prepare('SELECT * FROM extra_tasks_config ORDER BY sort_order ASC').all()
-  return c.json({ tasks: tasks.results })
+  return c.json({ tasks: tasks.results || [] })
+})
+
+// 养生任务管理
+admin.get('/wellness-tasks', adminMiddleware, async (c) => {
+  const tasks = await c.env.DB.prepare('SELECT * FROM wellness_tasks_config ORDER BY sort_order ASC').all()
+  return c.json({ tasks: tasks.results || [] })
 })
 
 // 历练项目管理
 admin.get('/explore-loot', adminMiddleware, async (c) => {
   const loots = await c.env.DB.prepare('SELECT * FROM explore_loot_config ORDER BY sort_order ASC').all()
-  return c.json({ loots: loots.results })
+  return c.json({ loots: loots.results || [] })
 })
 
 // 丹药基础配置管理
 admin.get('/potions-config', adminMiddleware, async (c) => {
   const potions = await c.env.DB.prepare('SELECT * FROM potions_config ORDER BY id ASC').all()
-  return c.json({ potions: potions.results })
+  return c.json({ potions: potions.results || [] })
 })
 
 // 全服事件列表
@@ -315,6 +321,72 @@ admin.delete('/extra-tasks/:id', adminMiddleware, async (c) => {
 
   await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
     .bind(adminUserId, '删除修炼项目', `${task?.name || 'Unknown'} (ID: ${id})`).run()
+
+  return c.json({ ok: true })
+})
+
+// 创建养生任务
+admin.post('/wellness-tasks', adminMiddleware, async (c) => {
+  const adminUserId = c.get('adminUserId') as number
+  const body = await c.req.json().catch(() => ({})) as any
+
+  await c.env.DB.prepare(`
+    INSERT INTO wellness_tasks_config (task_key, name, emoji, description, reward_type, life_reward, merit_reward, shard_reward, coin_reward, modifier_value, realm_requirement, sort_order, input_config, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).bind(
+    body.taskKey, body.name, body.emoji || '🧘', body.description, 
+    body.rewardType || 'fixed', body.lifeReward || 0, body.meritReward || 0, 
+    body.shardReward || 0, body.coinReward || 0, body.modifierValue || 0,
+    body.realmRequirement || 'basic', body.sortOrder || 0, 
+    body.inputConfig ? JSON.stringify(body.inputConfig) : null,
+    nowSeconds(), nowSeconds()
+  ).run()
+
+  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
+    .bind(adminUserId, '创建养生任务', body.name).run()
+
+  return c.json({ ok: true })
+})
+
+// 更新养生任务
+admin.put('/wellness-tasks/:id', adminMiddleware, async (c) => {
+  const adminUserId = c.get('adminUserId') as number
+  const id = c.req.param('id')
+  const body = await c.req.json().catch(() => ({})) as any
+
+  await c.env.DB.prepare(`
+    UPDATE wellness_tasks_config SET 
+      task_key = ?, name = ?, emoji = ?, description = ?, 
+      reward_type = ?, life_reward = ?, merit_reward = ?, 
+      shard_reward = ?, coin_reward = ?, modifier_value = ?,
+      realm_requirement = ?, sort_order = ?, input_config = ?, 
+      is_active = ?, updated_at = ?
+    WHERE id = ?
+  `).bind(
+    body.taskKey, body.name, body.emoji, body.description,
+    body.rewardType, body.lifeReward, body.meritReward,
+    body.shardReward, body.coinReward, body.modifierValue,
+    body.realmRequirement, body.sortOrder,
+    body.inputConfig ? JSON.stringify(body.inputConfig) : null,
+    body.isActive ? 1 : 0, nowSeconds(), id
+  ).run()
+
+  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
+    .bind(adminUserId, '更新养生任务', `${body.name} (ID: ${id})`).run()
+
+  return c.json({ ok: true })
+})
+
+// 删除养生任务
+admin.delete('/wellness-tasks/:id', adminMiddleware, async (c) => {
+  const adminUserId = c.get('adminUserId') as number
+  const id = c.req.param('id')
+  
+  const task = await c.env.DB.prepare('SELECT name FROM wellness_tasks_config WHERE id = ?').bind(id).first<{ name: string }>()
+  await c.env.DB.prepare('DELETE FROM wellness_tasks_config WHERE id = ?').bind(id).run()
+
+  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
+    .bind(adminUserId, '删除养生任务', `${task?.name || 'Unknown'} (ID: ${id})`).run()
 
   return c.json({ ok: true })
 })
@@ -469,6 +541,69 @@ admin.delete('/world-events/:id', adminMiddleware, async (c) => {
     .bind(adminUserId, '删除全服事件', `${event?.name || 'Unknown'} (ID: ${id})`).run()
 
   return c.json({ ok: true })
+})
+
+// ==================== 境界管理 ====================
+
+// 获取所有境界
+admin.get('/realms', adminMiddleware, async (c) => {
+  const realms = await c.env.DB.prepare(`
+    SELECT * FROM realms ORDER BY sort_order ASC
+  `).all()
+  
+  return c.json({ realms: realms.results || [] })
+})
+
+// 更新境界
+admin.put('/realms/:id', adminMiddleware, async (c) => {
+  const adminUserId = c.get('adminUserId') as number
+  const id = c.req.param('id')
+  const body = await c.req.json()
+  
+  await c.env.DB.prepare(`
+    UPDATE realms 
+    SET name = ?,
+        lifespan_max = ?,
+        breakthrough_age_min = ?,
+        breakthrough_age_max = ?,
+        description = ?,
+        core_logic = ?,
+        cultivation_span_min = ?,
+        cultivation_span_max = ?
+    WHERE id = ?
+  `).bind(
+    body.name,
+    body.lifespan_max,
+    body.breakthrough_age_min || null,
+    body.breakthrough_age_max || null,
+    body.description || null,
+    body.core_logic || null,
+    body.cultivation_span_min || null,
+    body.cultivation_span_max || null,
+    id
+  ).run()
+  
+  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
+    .bind(adminUserId, '更新境界', `${body.name} (ID: ${id})`).run()
+  
+  return c.json({ ok: true })
+})
+
+// 获取用户境界统计
+admin.get('/realms/stats', adminMiddleware, async (c) => {
+  const stats = await c.env.DB.prepare(`
+    SELECT 
+      r.id,
+      r.name,
+      r.major_realm_name,
+      COUNT(ur.user_id) as user_count
+    FROM realms r
+    LEFT JOIN user_realms ur ON r.id = ur.current_realm_id
+    GROUP BY r.id
+    ORDER BY r.sort_order ASC
+  `).all()
+  
+  return c.json({ stats: stats.results || [] })
 })
 
 export default admin

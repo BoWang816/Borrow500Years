@@ -1,5 +1,5 @@
 {
-  "name": "webapp",
+  "name": "borrow-500-years",
   "type": "module",
   "scripts": {
     "dev": "node dev-server.js",

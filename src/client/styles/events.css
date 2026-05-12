@@ -46,7 +46,6 @@
 /* 事件日志 */
 .event-log { 
   list-style: none; 
-  max-height: 240px; 
   overflow-y: auto; 
   padding-right: 4px; 
 }

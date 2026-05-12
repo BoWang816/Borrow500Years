@@ -4,10 +4,9 @@ import { api } from '../utils/api'
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('token'))
-  const username = ref<string>('')
+  const username = ref<string>(localStorage.getItem('username') || '')
   const isAdmin = ref<boolean>(false)
-  const showAuthModal = ref<boolean>(false)
-  const showOnboardingModal = ref<boolean>(false)
+  const adminChecked = ref<boolean>(false)
 
   const isAuthenticated = computed(() => !!token.value)
 
@@ -19,13 +18,9 @@ export const useAuthStore = defineStore('auth', () => {
     
     if (res.token) {
       token.value = res.token
-      username.value = user
+      username.value = res.username || user
       localStorage.setItem('token', res.token)
-      showAuthModal.value = false
-      
-      if (res.needsOnboarding) {
-        showOnboardingModal.value = true
-      }
+      localStorage.setItem('username', res.username || user)
       
       await checkAdmin()
       return true
@@ -41,10 +36,9 @@ export const useAuthStore = defineStore('auth', () => {
     
     if (res.token) {
       token.value = res.token
-      username.value = user
+      username.value = res.username || user
       localStorage.setItem('token', res.token)
-      showAuthModal.value = false
-      showOnboardingModal.value = true
+      localStorage.setItem('username', res.username || user)
       return true
     }
     return false
@@ -54,30 +48,40 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = null
     username.value = ''
     isAdmin.value = false
+    adminChecked.value = false
     localStorage.removeItem('token')
-    showAuthModal.value = true
+    localStorage.removeItem('username')
   }
 
   async function checkAuth() {
     if (!token.value) {
-      showAuthModal.value = true
-      return
+      return false
     }
     
     try {
       await api('/state')
       await checkAdmin()
+      return true
     } catch (err) {
       logout()
+      return false
     }
   }
 
   async function checkAdmin() {
+    if (adminChecked.value) {
+      return isAdmin.value
+    }
+    
     try {
       const res = await api('/admin/me')
       isAdmin.value = res.admin || false
+      adminChecked.value = true
+      return isAdmin.value
     } catch {
       isAdmin.value = false
+      adminChecked.value = true
+      return false
     }
   }
 
@@ -85,9 +89,8 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     username,
     isAdmin,
+    adminChecked,
     isAuthenticated,
-    showAuthModal,
-    showOnboardingModal,
     login,
     register,
     logout,

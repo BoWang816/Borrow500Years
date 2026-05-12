@@ -1,7 +1,7 @@
 <template>
   <section id="leaderboard" class="tab-pane active">
     <h2 class="page-title">
-      <span class="cn">天榜 · The Pantheon</span>
+      <span class="cn">天榜</span>
       <span class="en">Leaderboard</span>
     </h2>
     

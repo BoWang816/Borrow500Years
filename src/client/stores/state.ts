@@ -11,7 +11,8 @@ export const useStateStore = defineStore('state', () => {
   const lastFetch = ref<number>(0)
 
   async function fetchState(force = false) {
-    if (!force && Date.now() - lastFetch.value < 5000) {
+    // 防抖：30秒内不重复请求（除非强制刷新）
+    if (!force && Date.now() - lastFetch.value < 30000) {
       return
     }
 
