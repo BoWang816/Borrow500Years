@@ -2,7 +2,7 @@
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables } from '../../types'
 import { nowSeconds } from '../../lib'
-import { authMiddleware } from '../middleware'
+import { authMiddleware, pushEvent } from '../middleware'
 
 const worldEvents = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
 
@@ -129,6 +129,50 @@ worldEvents.post('/trigger', authMiddleware, async (c) => {
   ).run()
   
   const eventId = result.meta?.last_row_id || 0
+  
+  // 给所有用户推送事件通知
+  try {
+    // 获取所有用户ID
+    const users = await c.env.DB.prepare('SELECT id FROM users').all<{ id: number }>()
+    
+    // 构建事件消息
+    let eventMsg = `${template.emoji} 全服事件：${template.name}`
+    let eventKind = 'good'
+    
+    // 根据效果类型判断事件类型
+    if (template.effect_type === 'global_life') {
+      if (template.effect_value > 0) {
+        eventMsg += ` - 寿元+${Math.floor(template.effect_value / 3600)}小时`
+        eventKind = 'good'
+      } else {
+        eventMsg += ` - 寿元${Math.floor(template.effect_value / 3600)}小时`
+        eventKind = 'bad'
+      }
+    } else if (template.effect_type === 'global_merit') {
+      if (template.effect_value > 1) {
+        eventMsg += ` - 功德×${template.effect_value}`
+        eventKind = 'good'
+      } else {
+        eventMsg += ` - 功德×${template.effect_value}`
+        eventKind = 'bad'
+      }
+    } else if (template.effect_type === 'global_decay') {
+      if (template.effect_value < 0) {
+        eventMsg += ` - 衰减减少${Math.abs(template.effect_value)}`
+        eventKind = 'good'
+      } else {
+        eventMsg += ` - 衰减增加${template.effect_value}`
+        eventKind = 'bad'
+      }
+    }
+    
+    // 给所有用户推送事件
+    for (const user of users.results || []) {
+      await pushEvent(c.env.DB, user.id, eventMsg, eventKind)
+    }
+  } catch (err) {
+    console.error('Failed to push event to users:', err)
+  }
   
   // 记录管理日志
   try {
