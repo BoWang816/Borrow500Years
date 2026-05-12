@@ -128,17 +128,23 @@ worldEvents.post('/trigger', authMiddleware, async (c) => {
     endAt
   ).run()
   
+  const eventId = result.meta?.last_row_id || 0
+  
   // 记录管理日志
-  await c.env.DB.prepare(`
-    INSERT INTO admin_logs (admin_username, action, target_type, target_id, details)
-    VALUES (?, 'trigger', 'world_event', ?, ?)
-  `).bind(user.username, result.meta.last_row_id, `触发全服事件: ${template.name}`).run()
+  try {
+    await c.env.DB.prepare(`
+      INSERT INTO admin_logs (admin_username, action, target_type, target_id, details)
+      VALUES (?, 'trigger', 'world_event', ?, ?)
+    `).bind(user.username, eventId, `触发全服事件: ${template.name}`).run()
+  } catch (err) {
+    console.error('Failed to log admin action:', err)
+  }
   
   return c.json({ 
     ok: true, 
     msg: `已触发全服事件：${template.name}`,
     event: {
-      id: result.meta.last_row_id,
+      id: eventId,
       name: template.name,
       emoji: template.emoji,
       description: template.description,

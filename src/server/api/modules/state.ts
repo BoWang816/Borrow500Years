@@ -90,7 +90,7 @@ state.get('/', authMiddleware, loadProfile, async (c) => {
       meditate: !!dt.meditate, earlyrise: !!dt.earlyrise, diet: !!dt.diet,
     },
     potions: potions.results,
-    events: events.results.reverse().map((e: any) => ({
+    events: events.results.map((e: any) => ({
       msg: e.msg, 
       kind: e.kind,
       created_at: e.created_at, // 返回秒级时间戳
