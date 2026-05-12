@@ -4,9 +4,9 @@
   "scripts": {
     "dev": "node dev-server.js",
     "dev:client": "vite",
-    "dev:server": "wrangler pages dev dist --port 8788",
+    "dev:server": "wrangler pages dev dist --port 8788 --log-level none",
     "build": "vite build && vite build --config vite.server.config.ts",
-    "preview": "wrangler pages dev dist",
+    "preview": "wrangler pages dev dist --log-level none",
     "deploy": "npm run build && wrangler pages deploy dist",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "db:migrate": "wrangler d1 migrations apply webapp-production --remote",

@@ -19,9 +19,6 @@
         <router-link to="/dashboard" class="nav-item" active-class="active">
           <i class="fas fa-heart-pulse"></i><span>命脉</span>
         </router-link>
-        <router-link to="/fortune" class="nav-item" active-class="active">
-          <i class="fas fa-star"></i><span>运势</span>
-        </router-link>
         <router-link to="/cultivation" class="nav-item" active-class="active">
           <i class="fas fa-leaf"></i><span>修炼</span>
         </router-link>

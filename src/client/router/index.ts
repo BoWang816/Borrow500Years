@@ -32,12 +32,6 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, title: '历练 · Adventure' }
   },
   {
-    path: '/fortune',
-    name: 'Fortune',
-    component: () => import('../views/Fortune.vue'),
-    meta: { requiresAuth: true, title: '运势天机 · Fortune' }
-  },
-  {
     path: '/leaderboard',
     name: 'Leaderboard',
     component: () => import('../views/Leaderboard.vue'),

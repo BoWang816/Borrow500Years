@@ -16,7 +16,7 @@ console.log('🚀 启动开发服务器...\n')
 
 // 启动 Wrangler（后端 API）
 console.log('📡 启动后端 API 服务器 (port 8788)...')
-const wrangler = spawn('npx', ['wrangler', 'pages', 'dev', 'dist', '--port', '8788'], {
+const wrangler = spawn('npx', ['wrangler', 'pages', 'dev', 'dist', '--port', '8788', '--log-level', 'none'], {
   stdio: 'inherit',
   shell: true,
   cwd: __dirname
