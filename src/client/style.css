@@ -1487,9 +1487,12 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
   font-size: 14px;
 }
 .fortune-result {
-  padding: 20px 40px;
+  padding: 24px 32px;
   border-radius: 12px;
   border: 2px solid;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 .fortune-daji { background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05)); border-color: var(--gold); }
 .fortune-ji { background: linear-gradient(135deg, rgba(54,255,208,0.2), rgba(54,255,208,0.05)); border-color: var(--jade); }
@@ -1497,10 +1500,11 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .fortune-xiong { background: linear-gradient(135deg, rgba(255,77,109,0.2), rgba(255,77,109,0.05)); border-color: var(--crimson); }
 .fortune-daxiong { background: linear-gradient(135deg, rgba(139,0,0,0.3), rgba(139,0,0,0.1)); border-color: #8b0000; }
 .fortune-title {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 700;
   font-family: 'Ma Shan Zheng', serif;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+  letter-spacing: 4px;
 }
 .fortune-daji .fortune-title { color: var(--gold-soft); text-shadow: 0 0 20px rgba(212,175,55,0.5); }
 .fortune-ji .fortune-title { color: var(--jade); }
@@ -1508,21 +1512,91 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .fortune-xiong .fortune-title { color: var(--crimson); }
 .fortune-daxiong .fortune-title { color: #ff4444; }
 .fortune-hint {
-  font-size: 13px;
-  color: var(--ink-dim);
+  font-size: 15px;
+  color: var(--ink);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.fortune-details {
+  margin-top: 20px;
+  text-align: left;
+}
+.fortune-section {
+  margin-bottom: 16px;
+  padding: 14px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+  border-left: 3px solid var(--gold);
+}
+.fortune-poem {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 14px;
+  color: var(--gold-soft);
+  line-height: 1.8;
+  font-style: italic;
+  letter-spacing: 2px;
+}
+.fortune-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
   margin-bottom: 12px;
 }
+.fortune-item {
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.fortune-label {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+.fortune-value {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.fortune-value.good { color: var(--jade); }
+.fortune-value.bad { color: var(--crimson); }
+
 .fortune-multipliers {
   display: flex;
   justify-content: center;
   gap: 20px;
-  font-size: 12px;
+  font-size: 13px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
 }
-.fortune-multipliers span {
-  padding: 4px 12px;
+.multiplier-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
   background: rgba(0,0,0,0.3);
-  border-radius: 4px;
+  border-radius: 20px;
+  color: var(--gold-soft);
+  font-family: 'Orbitron', sans-serif;
+}
+.multiplier-item i {
   color: var(--jade);
+}
+
+.checked-in-badge {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: rgba(54,255,208,0.1);
+  border: 1px solid var(--jade);
+  border-radius: 8px;
+  color: var(--jade);
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* 功法修炼 */

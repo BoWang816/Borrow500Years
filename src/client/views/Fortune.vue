@@ -9,11 +9,52 @@
     <div class="card fortune-card">
       <div class="fortune-display">
         <div v-if="!fortune" class="fortune-loading">正在推演天机...</div>
-        <div v-else :class="['fortune-result', getFortuneCssClass(fortune.title)]">
+        <div v-else :class="['fortune-result', getFortuneCssClass(fortune.type)]">
           <div class="fortune-title">{{ fortune.title }}</div>
-          <div class="fortune-hint">{{ fortune.text }}</div>
-          <div class="fortune-multipliers" v-if="fortune.reward">
-            <span>{{ fortune.reward }}</span>
+          <div class="fortune-hint">{{ fortune.description }}</div>
+          
+          <div class="fortune-details">
+            <div class="fortune-section">
+              <div class="fortune-label">📿 天机诗</div>
+              <div class="fortune-poem">{{ fortune.poem }}</div>
+            </div>
+            
+            <div class="fortune-grid">
+              <div class="fortune-item">
+                <div class="fortune-label">✨ 宜</div>
+                <div class="fortune-value good">{{ fortune.advice }}</div>
+              </div>
+              <div class="fortune-item">
+                <div class="fortune-label">⚠️ 忌</div>
+                <div class="fortune-value bad">{{ fortune.avoid }}</div>
+              </div>
+            </div>
+            
+            <div class="fortune-grid">
+              <div class="fortune-item">
+                <div class="fortune-label">🧭 吉方</div>
+                <div class="fortune-value">{{ fortune.luckyDirection }}</div>
+              </div>
+              <div class="fortune-item">
+                <div class="fortune-label">⏰ 吉时</div>
+                <div class="fortune-value">{{ fortune.luckyTime }}</div>
+              </div>
+              <div class="fortune-item">
+                <div class="fortune-label">🎨 幸运色</div>
+                <div class="fortune-value">{{ fortune.luckyColor }}</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="fortune-multipliers">
+            <span class="multiplier-item">
+              <i class="fas fa-heart-pulse"></i>
+              寿命加成: {{ (fortune.lifeMultiplier * 100).toFixed(0) }}%
+            </span>
+            <span class="multiplier-item">
+              <i class="fas fa-yin-yang"></i>
+              功德加成: {{ (fortune.meritMultiplier * 100).toFixed(0) }}%
+            </span>
           </div>
         </div>
       </div>
@@ -25,6 +66,9 @@
       >
         <i class="fas fa-gift"></i> 签到领取运势奖励
       </button>
+      <div v-else class="checked-in-badge">
+        <i class="fas fa-check-circle"></i> 今日已签到
+      </div>
     </div>
 
     <!-- 功法修炼 -->
@@ -124,10 +168,17 @@ async function loadFortune() {
   try {
     const res = await api('/fortune')
     fortune.value = {
-      title: res.fortune,
-      text: res.hint,
-      reward: res.lifeMultiplier > 1 ? `寿命加成 ${(res.lifeMultiplier * 100).toFixed(0)}%` : 
-              res.lifeMultiplier < 1 ? `寿命减少 ${((1 - res.lifeMultiplier) * 100).toFixed(0)}%` : '无加成'
+      type: res.fortune,
+      title: res.title,
+      description: res.description,
+      advice: res.advice,
+      avoid: res.avoid,
+      luckyDirection: res.luckyDirection,
+      luckyTime: res.luckyTime,
+      luckyColor: res.luckyColor,
+      poem: res.poem,
+      lifeMultiplier: res.lifeMultiplier,
+      meritMultiplier: res.meritMultiplier
     }
     checkedIn.value = res.checkedIn
   } catch (err: any) {
