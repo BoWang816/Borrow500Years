@@ -7,52 +7,55 @@
     
     <!-- 今日运势 -->
     <div class="card fortune-card">
-      <div v-if="!fortune" class="fortune-loading">
-        <div class="loading-spinner"></div>
-        <p>正在推演天机...</p>
-      </div>
+      <h3><i class="fas fa-star"></i> 今日运势</h3>
       
-      <div v-else class="fortune-container">
-        <!-- 运势主卡片 - 紧凑版 -->
-        <div :class="['fortune-main-card', getFortuneCssClass(fortune.type)]">
-          <!-- 头部：图标+标题 -->
-          <div class="fortune-header">
-            <div class="fortune-icon">{{ getFortuneIcon(fortune.type) }}</div>
-            <div class="fortune-title-wrap">
-              <h3 class="fortune-title">{{ fortune.title }}</h3>
-              <p class="fortune-desc">{{ fortune.description }}</p>
+      <div v-if="!fortune" class="fortune-loading">正在推演天机...</div>
+      
+      <div v-else class="fortune-content">
+        <!-- 运势结果 -->
+        <div :class="['fortune-result', getFortuneCssClass(fortune.type)]">
+          <div class="fortune-type">{{ fortune.type }}</div>
+          <div class="fortune-title">{{ fortune.title }}</div>
+          <div class="fortune-description">{{ fortune.description }}</div>
+        </div>
+
+        <!-- 天机诗 -->
+        <div class="fortune-poem-box">
+          <div class="poem-label">天机诗</div>
+          <div class="fortune-poem">{{ fortune.poem }}</div>
+        </div>
+
+        <!-- 详细信息 -->
+        <div class="fortune-details">
+          <div class="detail-row">
+            <div class="detail-item">
+              <span class="detail-label good">✓ 宜</span>
+              <span class="detail-value">{{ fortune.advice }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label bad">✗ 忌</span>
+              <span class="detail-value">{{ fortune.avoid }}</span>
+            </div>
+          </div>
+          
+          <div class="detail-row">
+            <div class="detail-item">
+              <span class="detail-label">🧭 吉方</span>
+              <span class="detail-value">{{ fortune.luckyDirection }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">⏰ 吉时</span>
+              <span class="detail-value">{{ fortune.luckyTime }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">🎨 幸运色</span>
+              <span class="detail-value">{{ fortune.luckyColor }}</span>
             </div>
           </div>
 
-          <!-- 诗词 -->
-          <div class="fortune-poem">{{ fortune.poem }}</div>
-
-          <!-- 宜忌 + 吉祥元素 -->
-          <div class="fortune-info-grid">
-            <div class="info-item">
-              <span class="info-label good">✓ 宜</span>
-              <span class="info-value">{{ fortune.advice }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label bad">✗ 忌</span>
-              <span class="info-value">{{ fortune.avoid }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">🧭 吉方</span>
-              <span class="info-value">{{ fortune.luckyDirection }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">⏰ 吉时</span>
-              <span class="info-value">{{ fortune.luckyTime }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">🎨 幸运色</span>
-              <span class="info-value">{{ fortune.luckyColor }}</span>
-            </div>
-            <div class="info-item bonus">
-              <span class="info-label">💫 加成</span>
-              <span class="info-value">寿命 {{ (fortune.lifeMultiplier * 100).toFixed(0) }}% · 功德 {{ (fortune.meritMultiplier * 100).toFixed(0) }}%</span>
-            </div>
+          <div class="fortune-multipliers">
+            <span>寿命加成: <strong>{{ (fortune.lifeMultiplier * 100).toFixed(0) }}%</strong></span>
+            <span>功德加成: <strong>{{ (fortune.meritMultiplier * 100).toFixed(0) }}%</strong></span>
           </div>
         </div>
 
@@ -60,13 +63,12 @@
         <button 
           v-if="!checkedIn" 
           @click="checkin" 
-          class="fortune-checkin-btn"
+          class="oracle-btn"
           :disabled="loading"
         >
-          <i class="fas fa-gift"></i>
-          <span>签到领取运势奖励</span>
+          <i class="fas fa-gift"></i> 签到领取运势奖励
         </button>
-        <div v-else class="fortune-checked">
+        <div v-else class="checked-badge">
           <i class="fas fa-check-circle"></i> 今日已签到
         </div>
       </div>
