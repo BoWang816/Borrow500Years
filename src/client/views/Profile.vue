@@ -77,8 +77,13 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { useStateStore } from '../stores/state'
 import { formatLife } from '../utils/api'
 
 const stateStore = useStateStore()
+
+onMounted(async () => {
+  await stateStore.fetchState(true)
+})
 </script>
