@@ -1,0 +1,60 @@
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-item label {
+  font-size: 13px;
+  color: var(--gold-soft);
+  font-weight: 600;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.form-item input,
+.form-item select,
+.form-item textarea {
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 4px;
+  color: var(--ink);
+  font-size: 13px;
+  transition: all 0.3s;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.form-item input:focus,
+.form-item select:focus,
+.form-item textarea:focus {
+  outline: none;
+  border-color: var(--jade);
+  background: rgba(0,0,0,0.5);
+  box-shadow: 0 0 0 2px rgba(54,255,208,0.15), 0 0 15px rgba(54,255,208,0.2);
+}
+
+.form-item textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.form-item input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--jade);
+}

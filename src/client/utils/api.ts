@@ -16,8 +16,23 @@ export async function api(endpoint: string, options: RequestInit = {}) {
   })
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Request failed' }))
-    throw new Error(error.error || `HTTP ${response.status}`)
+    const contentType = response.headers.get('content-type')
+    if (contentType && contentType.includes('application/json')) {
+      const error = await response.json().catch(() => ({ error: 'Request failed' }))
+      throw new Error(error.error || `HTTP ${response.status}`)
+    } else {
+      // 如果返回的不是JSON，可能是HTML错误页面
+      const text = await response.text()
+      console.error('API返回非JSON响应:', text.substring(0, 200))
+      throw new Error(`API请求失败 (HTTP ${response.status})`)
+    }
+  }
+
+  const contentType = response.headers.get('content-type')
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text()
+    console.error('API返回非JSON响应:', text.substring(0, 200))
+    throw new Error('API返回格式错误')
   }
 
   return response.json()

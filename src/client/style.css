@@ -1316,7 +1316,7 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 }
 
 /* 管理子页面条目样式 */
-.admin-manual-item, .admin-extra-task-item, .admin-explore-item, .admin-potion-config-item {
+.admin-manual-item, .admin-extra-task-item, .admin-explore-item, .admin-potion-config-item, .admin-potion-item, .admin-event-item, .admin-log-item {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -1467,7 +1467,7 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
   .admin-stats { grid-template-columns: repeat(3, 1fr); }
   .admin-potion-row { flex-direction: column; align-items: flex-start; }
   .ap-fields { width: 100%; }
-  .admin-manual-item, .admin-extra-task-item, .admin-potion-config-item { flex-direction: column; align-items: flex-start; }
+  .admin-manual-item, .admin-extra-task-item, .admin-potion-config-item, .admin-potion-item, .admin-event-item { flex-direction: column; align-items: flex-start; }
   .item-actions { margin-top: 12px; width: 100%; justify-content: flex-end; }
 }
 
@@ -2101,14 +2101,19 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-manuals-list,
 .admin-extra-tasks-list,
 .admin-explore-list,
-.admin-potions-config-list {
+.admin-potions-config-list,
+.admin-potions-list,
+.admin-events-list,
+.admin-logs-list {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 .admin-extra-tasks-form .form-row,
 .admin-explore-form .form-row,
-.admin-potions-config-form .form-row {
+.admin-potions-config-form .form-row,
+.admin-potions-form .form-row,
+.admin-events-form .form-row {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
@@ -2121,7 +2126,11 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-explore-form input,
 .admin-explore-form select,
 .admin-potions-config-form input,
-.admin-potions-config-form select {
+.admin-potions-config-form select,
+.admin-potions-form input,
+.admin-potions-form select,
+.admin-events-form input,
+.admin-events-form select {
   flex: 1;
   padding: 8px 12px;
   background: rgba(0,0,0,0.3);
@@ -2134,14 +2143,18 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-manuals-form input[type="text"],
 .admin-extra-tasks-form input[type="text"],
 .admin-explore-form input[type="text"],
-.admin-potions-config-form input[type="text"] {
+.admin-potions-config-form input[type="text"],
+.admin-potions-form input[type="text"],
+.admin-events-form input[type="text"] {
   min-width: 120px;
 }
 
 .admin-manuals-form button,
 .admin-extra-tasks-form button,
 .admin-explore-form button,
-.admin-potions-config-form button {
+.admin-potions-config-form button,
+.admin-potions-form button,
+.admin-events-form button {
   margin-top: 10px;
   width: 100%;
 }
@@ -2149,14 +2162,20 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-manuals-list,
 .admin-extra-tasks-list,
 .admin-explore-list,
-.admin-potions-config-list {
+.admin-potions-config-list,
+.admin-potions-list,
+.admin-events-list,
+.admin-logs-list {
   margin-top: 16px;
 }
 
 .admin-manual-item,
 .admin-extra-task-item,
 .admin-explore-item,
-.admin-potion-config-item {
+.admin-potion-config-item,
+.admin-potion-item,
+.admin-event-item,
+.admin-log-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -2170,7 +2189,9 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-manual-item .item-emoji,
 .admin-extra-task-item .item-emoji,
 .admin-explore-item .item-emoji,
-.admin-potion-config-item .item-emoji {
+.admin-potion-config-item .item-emoji,
+.admin-potion-item .item-emoji,
+.admin-event-item .item-emoji {
   font-size: 24px;
   flex-shrink: 0;
 }
@@ -2178,7 +2199,10 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-manual-item .item-info,
 .admin-extra-task-item .item-info,
 .admin-explore-item .item-info,
-.admin-potion-config-item .item-info {
+.admin-potion-config-item .item-info,
+.admin-potion-item .item-info,
+.admin-event-item .item-info,
+.admin-log-item .log-info {
   flex: 1;
   min-width: 0;
 }
@@ -2186,7 +2210,9 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-manual-item .item-name,
 .admin-extra-task-item .item-name,
 .admin-explore-item .item-name,
-.admin-potion-config-item .item-name {
+.admin-potion-config-item .item-name,
+.admin-potion-item .item-name,
+.admin-event-item .item-name {
   font-weight: 700;
   color: var(--gold-soft);
   margin-bottom: 4px;
@@ -2195,7 +2221,9 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-manual-item .item-desc,
 .admin-extra-task-item .item-desc,
 .admin-explore-item .item-desc,
-.admin-potion-config-item .item-desc {
+.admin-potion-config-item .item-desc,
+.admin-potion-item .item-desc,
+.admin-event-item .item-desc {
   font-size: 12px;
   color: var(--ink-dim);
   margin-bottom: 4px;
@@ -2204,7 +2232,9 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-manual-item .item-meta,
 .admin-extra-task-item .item-meta,
 .admin-explore-item .item-meta,
-.admin-potion-config-item .item-meta {
+.admin-potion-config-item .item-meta,
+.admin-potion-item .item-meta,
+.admin-event-item .item-meta {
   font-size: 11px;
   color: var(--jade);
 }
@@ -2212,21 +2242,29 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-manual-item .item-actions,
 .admin-extra-task-item .item-actions,
 .admin-explore-item .item-actions,
-.admin-potion-config-item .item-actions {
+.admin-potion-config-item .item-actions,
+.admin-event-item .item-actions {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 .admin-manual-item .item-actions button,
 .admin-extra-task-item .item-actions button,
 .admin-explore-item .item-actions button,
-.admin-potion-config-item .item-actions button {
+.admin-potion-config-item .item-actions button,
+.admin-event-item .item-actions button {
   padding: 6px 12px;
   background: var(--jade-deep);
   color: #fff;
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
+}
+
+.admin-event-item .item-actions button.small {
+  padding: 4px 8px;
+  font-size: 11px;
 }
 
 .admin-manual-item .item-actions .delete-btn,
@@ -2245,6 +2283,502 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .edit-mode input {
   background: rgba(0,0,0,0.5);
   border-color: var(--jade);
+}
+
+/* 丹药和事件状态样式 */
+.admin-potion-item .item-status,
+.admin-event-item .item-status {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-potion-item .item-status {
+  background: var(--jade-deep);
+  color: #fff;
+}
+
+.admin-potion-item .item-status.expired {
+  background: rgba(128, 128, 128, 0.3);
+  color: var(--ink-dim);
+}
+
+.admin-event-item .item-status {
+  background: rgba(128, 128, 128, 0.3);
+  color: var(--ink-dim);
+}
+
+.admin-event-item .item-status.active {
+  background: var(--jade-deep);
+  color: #fff;
+}
+
+.admin-potion-config-item .item-status {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(128, 128, 128, 0.3);
+  color: var(--ink-dim);
+}
+
+.admin-potion-config-item .item-status.active {
+  background: var(--jade-deep);
+  color: #fff;
+}
+
+.admin-potion-config-item .item-id {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-left: 8px;
+}
+
+/* 操作日志样式 */
+.admin-log-item {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.admin-log-item .log-time {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-bottom: 6px;
+}
+
+.admin-log-item .log-admin,
+.admin-log-item .log-action {
+  font-size: 13px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.admin-log-item .log-detail {
+  font-size: 12px;
+  color: var(--jade);
+  margin-top: 4px;
+}
+
+/* ============ 后台管理页面 - 赛博朋克修仙风格 ============ */
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+
+.card-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--jade), transparent);
+  box-shadow: 0 0 8px var(--jade);
+}
+
+.card-header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 2px;
+  color: var(--gold-soft);
+  text-shadow: 0 0 10px rgba(212,175,55,0.3);
+}
+
+/* 按钮样式 - 赛博朋克风格 */
+.btn-primary, .btn-success, .btn-secondary, .btn-edit, .btn-delete, .btn-warning {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Noto Sans SC', sans-serif;
+  letter-spacing: 1px;
+}
+
+.btn-primary {
+  background: rgba(212,175,55,0.15);
+  border-color: var(--gold);
+  color: var(--gold-soft);
+  box-shadow: 0 0 10px rgba(212,175,55,0.2), inset 0 0 10px rgba(212,175,55,0.05);
+}
+
+.btn-primary:hover {
+  background: rgba(212,175,55,0.25);
+  box-shadow: 0 0 20px rgba(212,175,55,0.4), inset 0 0 15px rgba(212,175,55,0.1);
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: rgba(54,255,208,0.15);
+  border-color: var(--jade);
+  color: var(--jade);
+  box-shadow: 0 0 10px rgba(54,255,208,0.2), inset 0 0 10px rgba(54,255,208,0.05);
+}
+
+.btn-success:hover {
+  background: rgba(54,255,208,0.25);
+  box-shadow: 0 0 20px rgba(54,255,208,0.4), inset 0 0 15px rgba(54,255,208,0.1);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(128,128,128,0.1);
+  border-color: rgba(232,225,200,0.3);
+  color: var(--ink-dim);
+}
+
+.btn-secondary:hover {
+  background: rgba(128,128,128,0.2);
+  border-color: rgba(232,225,200,0.5);
+}
+
+.btn-edit {
+  background: rgba(54,255,208,0.1);
+  border-color: var(--jade);
+  color: var(--jade);
+  padding: 6px 12px;
+  box-shadow: 0 0 8px rgba(54,255,208,0.15);
+}
+
+.btn-edit:hover {
+  background: rgba(54,255,208,0.2);
+  box-shadow: 0 0 15px rgba(54,255,208,0.3);
+}
+
+.btn-delete {
+  background: rgba(255,77,109,0.1);
+  border-color: var(--crimson);
+  color: var(--crimson);
+  padding: 6px 12px;
+  box-shadow: 0 0 8px rgba(255,77,109,0.15);
+}
+
+.btn-delete:hover {
+  background: rgba(255,77,109,0.2);
+  box-shadow: 0 0 15px rgba(255,77,109,0.3);
+}
+
+.btn-warning {
+  background: rgba(255,193,7,0.1);
+  border-color: #ffc107;
+  color: #ffc107;
+  padding: 6px 12px;
+  box-shadow: 0 0 8px rgba(255,193,7,0.15);
+}
+
+.btn-warning:hover {
+  background: rgba(255,193,7,0.2);
+  box-shadow: 0 0 15px rgba(255,193,7,0.3);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* 表单样式 - 古风科技感 */
+.admin-form {
+  background: linear-gradient(135deg, rgba(10,14,26,0.8), rgba(20,24,38,0.6));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 0 30px rgba(54,255,208,0.03);
+}
+
+.admin-form::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--jade), transparent);
+  opacity: 0.5;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 4px;
+  color: var(--ink);
+  font-size: 13px;
+  transition: all 0.3s;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+  outline: none;
+  border-color: var(--jade);
+  background: rgba(0,0,0,0.5);
+  box-shadow: 0 0 0 2px rgba(54,255,208,0.15), 0 0 15px rgba(54,255,208,0.2);
+}
+
+.admin-form input::placeholder,
+.admin-form textarea::placeholder {
+  color: var(--ink-dim);
+  opacity: 0.6;
+}
+
+.admin-form textarea {
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 10px 14px;
+  color: var(--ink);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  cursor: pointer;
+  accent-color: var(--jade);
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* 列表样式 - 修仙卷轴风格 */
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(10,14,26,0.7), rgba(20,24,38,0.5));
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.admin-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--gold), var(--jade));
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.admin-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(54,255,208,0.08), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.admin-item:hover {
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(54,255,208,0.05));
+  border-color: var(--gold);
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 20px rgba(212,175,55,0.1);
+}
+
+.admin-item:hover::before {
+  opacity: 1;
+}
+
+.admin-item:hover::after {
+  opacity: 1;
+}
+
+.item-emoji {
+  font-size: 28px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 8px rgba(212,175,55,0.4));
+}
+
+.item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.item-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--gold-soft);
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(212,175,55,0.3);
+}
+
+.item-badge {
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(128,128,128,0.15);
+  color: var(--ink-dim);
+  border: 1px solid rgba(128,128,128,0.3);
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.item-badge.active {
+  background: rgba(54,255,208,0.15);
+  color: var(--jade);
+  border-color: var(--jade);
+  box-shadow: 0 0 10px rgba(54,255,208,0.2);
+}
+
+.item-badge.expired {
+  background: rgba(255,77,109,0.15);
+  color: var(--crimson);
+  border-color: var(--crimson);
+  box-shadow: 0 0 10px rgba(255,77,109,0.2);
+}
+
+.item-id {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-left: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.item-desc {
+  font-size: 13px;
+  color: var(--ink-dim);
+  margin-bottom: 8px;
+  line-height: 1.6;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--jade);
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.item-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.9;
+}
+
+.item-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ink-dim);
+  font-size: 14px;
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 2px;
+  opacity: 0.6;
+}
+
+.empty::before {
+  content: '〜';
+  display: block;
+  font-size: 32px;
+  margin-bottom: 12px;
+  color: var(--gold);
+  opacity: 0.3;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .item-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
 }
 
 
@@ -2341,6 +2875,9 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-extra-task-item, 
 .admin-explore-item, 
 .admin-potion-config-item,
+.admin-potion-item,
+.admin-event-item,
+.admin-log-item,
 .explore-config-item {
   background: linear-gradient(135deg, rgba(10,14,26,0.6), rgba(20,24,38,0.4)) !important;
   border: 1px solid rgba(212,175,55,0.12) !important;
@@ -2355,6 +2892,9 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-extra-task-item::before, 
 .admin-explore-item::before, 
 .admin-potion-config-item::before,
+.admin-potion-item::before,
+.admin-event-item::before,
+.admin-log-item::before,
 .explore-config-item::before {
   content: '';
   position: absolute;
@@ -2371,6 +2911,9 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-extra-task-item:hover, 
 .admin-explore-item:hover, 
 .admin-potion-config-item:hover,
+.admin-potion-item:hover,
+.admin-event-item:hover,
+.admin-log-item:hover,
 .explore-config-item:hover {
   background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(54,255,208,0.05)) !important;
   border-color: var(--gold) !important;
@@ -2382,6 +2925,9 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-extra-task-item:hover::before,
 .admin-explore-item:hover::before, 
 .admin-potion-config-item:hover::before,
+.admin-potion-item:hover::before,
+.admin-event-item:hover::before,
+.admin-log-item:hover::before,
 .explore-config-item:hover::before {
   opacity: 1;
 }
