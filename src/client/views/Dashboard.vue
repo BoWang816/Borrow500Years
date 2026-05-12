@@ -6,59 +6,121 @@
     </div>
     
     <template v-else>
-      <div class="pulse-wrap">
-        <div class="pulse-rings">
-          <div class="ring ring1"></div>
-          <div class="ring ring2"></div>
-          <div class="ring ring3"></div>
-          <div class="ring-bagua"></div>
+      <!-- 倒计时和运势左右布局 -->
+      <div class="dashboard-top-grid">
+        <!-- 左侧：寿命倒计时 -->
+        <div class="pulse-wrap">
+          <div class="pulse-rings">
+            <div class="ring ring1"></div>
+            <div class="ring ring2"></div>
+            <div class="ring ring3"></div>
+            <div class="ring-bagua"></div>
+          </div>
+
+          <div class="pulse-core">
+            <div class="pulse-label">PULSE · 寿命倒计时</div>
+            <div class="pulse-time">
+              <span class="seg">{{ timeDisplay.years }}</span><em>年</em>
+              <span class="seg">{{ timeDisplay.days }}</span><em>日</em>
+              <span class="seg">{{ timeDisplay.hours }}</span><em>:</em>
+              <span class="seg">{{ timeDisplay.minutes }}</span><em>:</em>
+              <span class="seg">{{ timeDisplay.seconds }}</span>
+            </div>
+            <div class="pulse-seconds">{{ secondsDisplay }}</div>
+            <div class="pulse-meta">
+              <div class="meta-item">
+                <span class="meta-label">衰减速率</span>
+                <span class="meta-val">{{ decayRate }}x</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">境界</span>
+                <span class="meta-val realm">{{ stateStore.profile.realm || '凡胎肉身' }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">复活币</span>
+                <span class="meta-val coin">
+                  <i class="fas fa-coins"></i> {{ stateStore.profile.coin || 0 }}
+                </span>
+              </div>
+            </div>
+            <div class="pulse-toggle">
+              <button 
+                :class="['t-btn', { active: displayMode === 'full' }]" 
+                @click="displayMode = 'full'"
+              >
+                岁·日·时·分·秒
+              </button>
+              <button 
+                :class="['t-btn', { active: displayMode === 'seconds' }]" 
+                @click="displayMode = 'seconds'"
+              >
+                精确秒
+              </button>
+              <button 
+                :class="['t-btn', { active: displayMode === 'days' }]" 
+                @click="displayMode = 'days'"
+              >
+                总天数
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="pulse-core">
-          <div class="pulse-label">PULSE · 寿命倒计时</div>
-          <div class="pulse-time">
-            <span class="seg">{{ timeDisplay.years }}</span><em>年</em>
-            <span class="seg">{{ timeDisplay.days }}</span><em>日</em>
-            <span class="seg">{{ timeDisplay.hours }}</span><em>:</em>
-            <span class="seg">{{ timeDisplay.minutes }}</span><em>:</em>
-            <span class="seg">{{ timeDisplay.seconds }}</span>
+        <!-- 右侧：今日运势 -->
+        <div class="fortune-wrap">
+          <div v-if="!fortune" class="fortune-loading">
+            <div class="loading-spinner"></div>
+            <p>正在推演天机...</p>
           </div>
-          <div class="pulse-seconds">{{ secondsDisplay }}</div>
-          <div class="pulse-meta">
-            <div class="meta-item">
-              <span class="meta-label">衰减速率</span>
-              <span class="meta-val">{{ decayRate }}x</span>
+          
+          <div v-else class="fortune-content">
+            <div class="fortune-header">
+              <h3><i class="fas fa-star"></i> 今日运势</h3>
             </div>
-            <div class="meta-item">
-              <span class="meta-label">境界</span>
-              <span class="meta-val realm">{{ stateStore.profile.realm || '凡胎肉身' }}</span>
+
+            <!-- 运势结果 -->
+            <div :class="['fortune-result', getFortuneCssClass(fortune.type)]">
+              <div class="fortune-type">{{ fortune.type }}</div>
+              <div class="fortune-title">{{ fortune.title }}</div>
             </div>
-            <div class="meta-item">
-              <span class="meta-label">复活币</span>
-              <span class="meta-val coin">
-                <i class="fas fa-coins"></i> {{ stateStore.profile.coin || 0 }}
-              </span>
+
+            <!-- 天机诗 -->
+            <div class="fortune-poem-box">
+              <div class="poem-label">天机诗</div>
+              <div class="fortune-poem">{{ fortune.poem }}</div>
             </div>
-          </div>
-          <div class="pulse-toggle">
+
+            <!-- 详细信息 -->
+            <div class="fortune-details">
+              <div class="detail-row">
+                <div class="detail-item">
+                  <span class="detail-label good">✓ 宜</span>
+                  <span class="detail-value">{{ fortune.advice }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label bad">✗ 忌</span>
+                  <span class="detail-value">{{ fortune.avoid }}</span>
+                </div>
+              </div>
+              
+              <div class="fortune-multipliers">
+                <span>寿命 <strong>{{ (fortune.lifeMultiplier * 100).toFixed(0) }}%</strong></span>
+                <span>功德 <strong>{{ (fortune.meritMultiplier * 100).toFixed(0) }}%</strong></span>
+              </div>
+            </div>
+
+            <!-- 签到按钮 -->
             <button 
-              :class="['t-btn', { active: displayMode === 'full' }]" 
-              @click="displayMode = 'full'"
+              v-if="!checkedIn" 
+              @click="checkin" 
+              class="fortune-checkin-btn"
+              :disabled="fortuneLoading"
             >
-              岁·日·时·分·秒
+              <i class="fas fa-gift"></i> 签到领取运势奖励
             </button>
-            <button 
-              :class="['t-btn', { active: displayMode === 'seconds' }]" 
-              @click="displayMode = 'seconds'"
-            >
-              精确秒
-            </button>
-            <button 
-              :class="['t-btn', { active: displayMode === 'days' }]" 
-              @click="displayMode = 'days'"
-            >
-              总天数
-            </button>
+            <div v-else class="checked-badge">
+              <i class="fas fa-check-circle"></i> 今日已签到
+            </div>
           </div>
         </div>
       </div>
@@ -103,6 +165,9 @@ const currentTime = ref(Date.now())
 const serverLifeSec = ref(0)
 const serverFetchTime = ref(Date.now())
 const triggerLoading = ref(false)
+const fortuneLoading = ref(false)
+const checkedIn = ref(false)
+const fortune = ref<any>(null)
 let timer: number | null = null
 let countdownTimer: number | null = null
 
@@ -218,8 +283,57 @@ async function triggerRandomEvent() {
   }
 }
 
+async function loadFortune() {
+  try {
+    const res = await api('/fortune')
+    fortune.value = {
+      type: res.fortune,
+      title: res.title,
+      description: res.description,
+      advice: res.advice,
+      avoid: res.avoid,
+      luckyDirection: res.luckyDirection,
+      luckyTime: res.luckyTime,
+      luckyColor: res.luckyColor,
+      poem: res.poem,
+      lifeMultiplier: res.lifeMultiplier,
+      meritMultiplier: res.meritMultiplier
+    }
+    checkedIn.value = res.checkedIn
+  } catch (err: any) {
+    console.error('Failed to load fortune:', err)
+  }
+}
+
+async function checkin() {
+  fortuneLoading.value = true
+  try {
+    const res = await api('/fortune/checkin', { method: 'POST' })
+    toast(res.msg || '签到成功', 'gold')
+    checkedIn.value = true
+    await loadFortune()
+    await stateStore.fetchState(true)
+  } catch (err: any) {
+    toast(err.message, 'bad')
+  } finally {
+    fortuneLoading.value = false
+  }
+}
+
+function getFortuneCssClass(fortuneType: string): string {
+  const map: Record<string, string> = {
+    '大吉': 'fortune-daji',
+    '吉': 'fortune-ji',
+    '平': 'fortune-ping',
+    '凶': 'fortune-xiong',
+    '大凶': 'fortune-daxiong'
+  }
+  return map[fortuneType] || 'fortune-ping'
+}
+
 onMounted(async () => {
   await stateStore.fetchState(true)
+  await loadFortune()
   
   // 保存服务器返回的lifeSec和获取时间
   if (stateStore.profile) {
@@ -270,6 +384,265 @@ onUnmounted(() => {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* 顶部左右布局 */
+.dashboard-top-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-top-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 运势卡片样式 */
+.fortune-wrap {
+  background: linear-gradient(135deg, rgba(10,14,26,0.8), rgba(20,24,38,0.6));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.fortune-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--jade), transparent);
+  opacity: 0.6;
+}
+
+.fortune-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: var(--gold);
+}
+
+.fortune-loading .loading-spinner {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
+}
+
+.fortune-header {
+  margin-bottom: 20px;
+}
+
+.fortune-header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 2px;
+  color: var(--gold-soft);
+  text-shadow: 0 0 10px rgba(212,175,55,0.3);
+}
+
+.fortune-result {
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+  border: 2px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.fortune-result::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.05), transparent);
+  pointer-events: none;
+}
+
+.fortune-daji {
+  background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,140,0,0.05));
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255,215,0,0.3);
+}
+
+.fortune-ji {
+  background: linear-gradient(135deg, rgba(54,255,208,0.1), rgba(0,255,127,0.05));
+  border-color: var(--jade);
+  box-shadow: 0 0 20px rgba(54,255,208,0.2);
+}
+
+.fortune-ping {
+  background: linear-gradient(135deg, rgba(128,128,128,0.1), rgba(169,169,169,0.05));
+  border-color: #a9a9a9;
+  box-shadow: 0 0 20px rgba(128,128,128,0.2);
+}
+
+.fortune-xiong {
+  background: linear-gradient(135deg, rgba(255,77,109,0.1), rgba(255,0,0,0.05));
+  border-color: var(--crimson);
+  box-shadow: 0 0 20px rgba(255,77,109,0.2);
+}
+
+.fortune-daxiong {
+  background: linear-gradient(135deg, rgba(139,0,0,0.2), rgba(0,0,0,0.1));
+  border-color: #8b0000;
+  box-shadow: 0 0 20px rgba(139,0,0,0.3);
+}
+
+.fortune-type {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Ma Shan Zheng', cursive;
+  margin-bottom: 8px;
+  text-shadow: 0 0 15px currentColor;
+}
+
+.fortune-title {
+  font-size: 16px;
+  font-family: 'ZCOOL XiaoWei', serif;
+  opacity: 0.9;
+}
+
+.fortune-poem-box {
+  background: rgba(0,0,0,0.3);
+  border-left: 3px solid var(--gold);
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.poem-label {
+  font-size: 12px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  font-family: 'ZCOOL XiaoWei', serif;
+}
+
+.fortune-poem {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--ink);
+  font-family: 'Noto Serif SC', serif;
+  font-style: italic;
+}
+
+.fortune-details {
+  margin-bottom: 16px;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.detail-label {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.detail-label.good {
+  background: rgba(54,255,208,0.15);
+  color: var(--jade);
+  border: 1px solid var(--jade);
+}
+
+.detail-label.bad {
+  background: rgba(255,77,109,0.15);
+  color: var(--crimson);
+  border: 1px solid var(--crimson);
+}
+
+.detail-value {
+  flex: 1;
+  color: var(--ink);
+  font-family: 'Noto Serif SC', serif;
+}
+
+.fortune-multipliers {
+  display: flex;
+  justify-content: space-around;
+  padding: 12px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--ink-dim);
+  font-family: 'Noto Sans SC', sans-serif;
+}
+
+.fortune-multipliers strong {
+  color: var(--jade);
+  font-family: 'Orbitron', sans-serif;
+  margin-left: 4px;
+}
+
+.fortune-checkin-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(54,255,208,0.1));
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  color: var(--gold-soft);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Noto Sans SC', sans-serif;
+  box-shadow: 0 0 15px rgba(212,175,55,0.2);
+}
+
+.fortune-checkin-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(54,255,208,0.15));
+  box-shadow: 0 0 25px rgba(212,175,55,0.4);
+  transform: translateY(-2px);
+}
+
+.fortune-checkin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checked-badge {
+  text-align: center;
+  padding: 12px;
+  background: rgba(54,255,208,0.1);
+  border: 1px solid var(--jade);
+  border-radius: 6px;
+  color: var(--jade);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* 事件卡片优化 */

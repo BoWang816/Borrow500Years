@@ -5,97 +5,6 @@
       <span class="en">Daily Fortune</span>
     </h2>
     
-    <!-- 今日运势 -->
-    <div class="card fortune-card">
-      <h3><i class="fas fa-star"></i> 今日运势</h3>
-      
-      <div v-if="!fortune" class="fortune-loading">正在推演天机...</div>
-      
-      <div v-else class="fortune-content">
-        <!-- 运势结果 -->
-        <div :class="['fortune-result', getFortuneCssClass(fortune.type)]">
-          <div class="fortune-type">{{ fortune.type }}</div>
-          <div class="fortune-title">{{ fortune.title }}</div>
-          <div class="fortune-description">{{ fortune.description }}</div>
-        </div>
-
-        <!-- 天机诗 -->
-        <div class="fortune-poem-box">
-          <div class="poem-label">天机诗</div>
-          <div class="fortune-poem">{{ fortune.poem }}</div>
-        </div>
-
-        <!-- 详细信息 -->
-        <div class="fortune-details">
-          <div class="detail-row">
-            <div class="detail-item">
-              <span class="detail-label good">✓ 宜</span>
-              <span class="detail-value">{{ fortune.advice }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label bad">✗ 忌</span>
-              <span class="detail-value">{{ fortune.avoid }}</span>
-            </div>
-          </div>
-          
-          <div class="detail-row">
-            <div class="detail-item">
-              <span class="detail-label">🧭 吉方</span>
-              <span class="detail-value">{{ fortune.luckyDirection }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">⏰ 吉时</span>
-              <span class="detail-value">{{ fortune.luckyTime }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="detail-label">🎨 幸运色</span>
-              <span class="detail-value">{{ fortune.luckyColor }}</span>
-            </div>
-          </div>
-
-          <div class="fortune-multipliers">
-            <span>寿命加成: <strong>{{ (fortune.lifeMultiplier * 100).toFixed(0) }}%</strong></span>
-            <span>功德加成: <strong>{{ (fortune.meritMultiplier * 100).toFixed(0) }}%</strong></span>
-          </div>
-        </div>
-
-        <!-- 签到按钮 -->
-        <button 
-          v-if="!checkedIn" 
-          @click="checkin" 
-          class="oracle-btn"
-          :disabled="loading"
-        >
-          <i class="fas fa-gift"></i> 签到领取运势奖励
-        </button>
-        <div v-else class="checked-badge">
-          <i class="fas fa-check-circle"></i> 今日已签到
-        </div>
-      </div>
-    </div>
-
-    <!-- 功法修炼 -->
-    <div class="card manuals-card">
-      <h3><i class="fas fa-book-open"></i> 功法修炼</h3>
-      <div class="manuals-list">
-        <div v-if="manuals.length === 0" class="empty">暂无功法</div>
-        <div v-for="manual in manuals" :key="manual.key" class="manual-item">
-          <span class="manual-icon">{{ manual.emoji }}</span>
-          <div class="manual-body">
-            <div class="manual-name">
-              {{ manual.name }}
-              <span class="manual-lv" v-if="manual.myLevel">Lv.{{ manual.myLevel }}</span>
-            </div>
-            <div class="manual-desc">{{ manual.description }}</div>
-            <div class="manual-cost">消耗: {{ manual.costMerit }} 功德</div>
-          </div>
-          <button @click="upgradeManual(manual.key)" class="practice-btn" :disabled="loading">
-            {{ manual.myLevel === 0 ? '解锁' : '升级' }}
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- 全服事件 -->
     <div class="card world-events-card">
       <h3><i class="fas fa-globe"></i> 全服事件</h3>
@@ -159,74 +68,11 @@ import { ref, onMounted } from 'vue'
 import { api, toast } from '../utils/api'
 
 const loading = ref(false)
-const checkedIn = ref(false)
-const fortune = ref<any>(null)
-const manuals = ref<any[]>([])
 const worldEvents = ref<any[]>([])
 const logs = ref<any[]>([])
 const logContent = ref('')
 const logMood = ref('平静')
 const logType = ref('note')
-
-async function loadFortune() {
-  try {
-    const res = await api('/fortune')
-    console.log('Fortune API response:', res)
-    fortune.value = {
-      type: res.fortune,
-      title: res.title,
-      description: res.description,
-      advice: res.advice,
-      avoid: res.avoid,
-      luckyDirection: res.luckyDirection,
-      luckyTime: res.luckyTime,
-      luckyColor: res.luckyColor,
-      poem: res.poem,
-      lifeMultiplier: res.lifeMultiplier,
-      meritMultiplier: res.meritMultiplier
-    }
-    console.log('Fortune value:', fortune.value)
-    checkedIn.value = res.checkedIn
-  } catch (err: any) {
-    console.error('Failed to load fortune:', err)
-  }
-}
-
-async function checkin() {
-  loading.value = true
-  try {
-    const res = await api('/fortune/checkin', { method: 'POST' })
-    toast(res.msg || '签到成功', 'gold')
-    checkedIn.value = true
-    await loadFortune()
-  } catch (err: any) {
-    toast(err.message, 'bad')
-  } finally {
-    loading.value = false
-  }
-}
-
-async function loadManuals() {
-  try {
-    const res = await api('/manuals')
-    manuals.value = res.manuals || []
-  } catch (err: any) {
-    console.error('Failed to load manuals:', err)
-  }
-}
-
-async function upgradeManual(key: string) {
-  loading.value = true
-  try {
-    const res = await api(`/manuals/${key}/practice`, { method: 'POST' })
-    toast(res.msg || '修炼成功', 'good')
-    await loadManuals()
-  } catch (err: any) {
-    toast(err.message, 'bad')
-  } finally {
-    loading.value = false
-  }
-}
 
 async function loadWorldEvents() {
   try {
@@ -302,8 +148,6 @@ function formatDate(timestamp: number): string {
 }
 
 onMounted(() => {
-  loadFortune()
-  loadManuals()
   loadWorldEvents()
   loadLogs()
 })

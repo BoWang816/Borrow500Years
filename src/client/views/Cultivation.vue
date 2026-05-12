@@ -113,6 +113,28 @@
         </div>
       </div>
     </div>
+
+    <!-- 功法修炼 -->
+    <div class="manuals-section">
+      <h3 class="section-title">📖 功法修炼</h3>
+      <div class="manuals-list">
+        <div v-if="manuals.length === 0" class="empty">暂无功法</div>
+        <div v-for="manual in manuals" :key="manual.key" class="manual-item">
+          <span class="manual-icon">{{ manual.emoji }}</span>
+          <div class="manual-body">
+            <div class="manual-name">
+              {{ manual.name }}
+              <span class="manual-lv" v-if="manual.myLevel">Lv.{{ manual.myLevel }}</span>
+            </div>
+            <div class="manual-desc">{{ manual.description }}</div>
+            <div class="manual-cost">消耗: {{ manual.costMerit }} 功德</div>
+          </div>
+          <button @click="upgradeManual(manual.key)" class="task-btn" :disabled="loading">
+            {{ manual.myLevel === 0 ? '解锁' : '升级' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -127,6 +149,7 @@ const loading = ref(false)
 const steps = ref(0)
 const streak = ref(0)
 const extraTasks = ref<Task[]>([])
+const manuals = ref<any[]>([])
 
 const stepsReward = computed(() => {
   const s = steps.value || 0
@@ -174,7 +197,31 @@ async function loadExtraTasks() {
   }
 }
 
+async function loadManuals() {
+  try {
+    const res = await api('/manuals')
+    manuals.value = res.manuals || []
+  } catch (err: any) {
+    console.error('Failed to load manuals:', err)
+  }
+}
+
+async function upgradeManual(key: string) {
+  loading.value = true
+  try {
+    const res = await api(`/manuals/${key}/practice`, { method: 'POST' })
+    toast(res.msg || '修炼成功', 'good')
+    await loadManuals()
+    await stateStore.fetchState(true)
+  } catch (err: any) {
+    toast(err.message, 'bad')
+  } finally {
+    loading.value = false
+  }
+}
+
 onMounted(() => {
   loadExtraTasks()
+  loadManuals()
 })
 </script>
