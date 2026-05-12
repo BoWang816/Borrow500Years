@@ -1913,20 +1913,79 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .admin-extra-tasks-card,
 .admin-explore-card,
 .admin-potions-config-card {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .admin-manuals-form,
 .admin-extra-tasks-form,
 .admin-explore-form,
 .admin-potions-config-form {
-  background: rgba(0,0,0,0.2);
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 16px;
+  background: linear-gradient(135deg, rgba(10,14,26,0.7), rgba(20,24,38,0.5));
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(212,175,55,0.15);
+  margin-bottom: 24px;
 }
 
 .admin-manuals-form .form-row,
+.admin-extra-tasks-form .form-row,
+.admin-explore-form .form-row,
+.admin-potions-config-form .form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-manuals-form input,
+.admin-extra-tasks-form input,
+.admin-explore-form input,
+.admin-potions-config-form input,
+.admin-manuals-form select,
+.admin-extra-tasks-form select,
+.admin-explore-form select,
+.admin-potions-config-form select {
+  flex: 1;
+  min-width: 140px;
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 14px;
+  transition: all .3s;
+}
+
+.admin-manuals-form input:focus,
+.admin-extra-tasks-form input:focus,
+.admin-explore-form input:focus,
+.admin-potions-config-form input:focus,
+.admin-manuals-form select:focus,
+.admin-extra-tasks-form select:focus,
+.admin-explore-form select:focus,
+.admin-potions-config-form select:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.05);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.1);
+}
+
+.admin-manuals-form input::placeholder,
+.admin-extra-tasks-form input::placeholder,
+.admin-explore-form input::placeholder,
+.admin-potions-config-form input::placeholder {
+  color: var(--ink-dim);
+  opacity: 0.6;
+}
+
+.admin-manuals-list,
+.admin-extra-tasks-list,
+.admin-explore-list,
+.admin-potions-config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
 .admin-extra-tasks-form .form-row,
 .admin-explore-form .form-row,
 .admin-potions-config-form .form-row {
@@ -2066,4 +2125,335 @@ body.crisis .ring1 { border-color: var(--blood); animation: heartbeat 1.2s infin
 .edit-mode input {
   background: rgba(0,0,0,0.5);
   border-color: var(--jade);
+}
+
+
+/* ============ 后台管理UI优化 ============ */
+/* 覆盖原有样式，使其更加现代化和扁平化 */
+
+.admin-nav-card {
+  background: linear-gradient(135deg, rgba(10,14,26,0.8), rgba(20,24,38,0.6)) !important;
+  border: 1px solid rgba(212,175,55,0.15) !important;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-nav-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--jade));
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.admin-nav-card:hover {
+  background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(54,255,208,0.08)) !important;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3), 0 0 20px rgba(212,175,55,0.15) !important;
+}
+
+.admin-nav-card:hover::before {
+  opacity: 1;
+}
+
+.admin-nav-icon {
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(54,255,208,0.1)) !important;
+  border: 1px solid rgba(212,175,55,0.2) !important;
+  transition: all .3s;
+}
+
+.admin-nav-card:hover .admin-nav-icon {
+  background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(54,255,208,0.15)) !important;
+  transform: scale(1.1) rotate(5deg);
+}
+
+/* 表单样式优化 */
+.admin-manuals-form,
+.admin-extra-tasks-form,
+.admin-explore-form,
+.admin-potions-config-form,
+.admin-we-form {
+  background: linear-gradient(135deg, rgba(10,14,26,0.7), rgba(20,24,38,0.5)) !important;
+  border: 1px solid rgba(212,175,55,0.15) !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+}
+
+.admin-manuals-form input,
+.admin-extra-tasks-form input,
+.admin-explore-form input,
+.admin-potions-config-form input,
+.admin-we-form input,
+.admin-manuals-form select,
+.admin-extra-tasks-form select,
+.admin-explore-form select,
+.admin-potions-config-form select,
+.admin-we-form select {
+  padding: 12px 16px !important;
+  background: rgba(0,0,0,0.3) !important;
+  border: 1px solid rgba(212,175,55,0.2) !important;
+  border-radius: 8px !important;
+  transition: all .3s !important;
+}
+
+.admin-manuals-form input:focus,
+.admin-extra-tasks-form input:focus,
+.admin-explore-form input:focus,
+.admin-potions-config-form input:focus,
+.admin-we-form input:focus,
+.admin-manuals-form select:focus,
+.admin-extra-tasks-form select:focus,
+.admin-explore-form select:focus,
+.admin-potions-config-form select:focus,
+.admin-we-form select:focus {
+  outline: none !important;
+  border-color: var(--gold) !important;
+  background: rgba(212,175,55,0.05) !important;
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.1) !important;
+}
+
+/* 列表项样式优化 */
+.admin-manual-item, 
+.admin-extra-task-item, 
+.admin-explore-item, 
+.admin-potion-config-item,
+.explore-config-item {
+  background: linear-gradient(135deg, rgba(10,14,26,0.6), rgba(20,24,38,0.4)) !important;
+  border: 1px solid rgba(212,175,55,0.12) !important;
+  border-radius: 10px !important;
+  padding: 16px 20px !important;
+  position: relative;
+  overflow: hidden;
+  transition: all .3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.admin-manual-item::before, 
+.admin-extra-task-item::before, 
+.admin-explore-item::before, 
+.admin-potion-config-item::before,
+.explore-config-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--gold), var(--jade));
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.admin-manual-item:hover, 
+.admin-extra-task-item:hover, 
+.admin-explore-item:hover, 
+.admin-potion-config-item:hover,
+.explore-config-item:hover {
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(54,255,208,0.05)) !important;
+  border-color: var(--gold) !important;
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.admin-manual-item:hover::before, 
+.admin-extra-task-item:hover::before,
+.admin-explore-item:hover::before, 
+.admin-potion-config-item:hover::before,
+.explore-config-item:hover::before {
+  opacity: 1;
+}
+
+/* 探索配置项特殊样式 */
+.explore-config-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.explore-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.explore-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.explore-weight {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: rgba(212,175,55,0.15);
+  border-radius: 12px;
+  color: var(--gold);
+  border: 1px solid rgba(212,175,55,0.3);
+}
+
+.explore-effect {
+  font-size: 13px;
+  color: var(--ink-dim);
+  line-height: 1.5;
+}
+
+.explore-reward {
+  font-size: 13px;
+  color: var(--jade);
+  font-weight: 500;
+}
+
+/* 按钮样式优化 */
+.item-actions button {
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  transition: all .3s !important;
+  font-weight: 500;
+}
+
+.item-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.item-actions button.delete-btn:hover {
+  background: rgba(255,77,109,0.15) !important;
+  border-color: var(--crimson) !important;
+}
+
+/* 统计卡片优化 */
+.stat-card {
+  background: linear-gradient(135deg, rgba(10,14,26,0.7), rgba(20,24,38,0.5)) !important;
+  border: 1px solid rgba(212,175,55,0.15) !important;
+  border-radius: 10px !important;
+  padding: 20px !important;
+  transition: all .3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  border-color: var(--gold) !important;
+}
+
+/* 表格样式优化 */
+.admin-table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.admin-table th {
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(54,255,208,0.1)) !important;
+  padding: 14px 16px !important;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.admin-table tbody tr {
+  transition: all .2s;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(212,175,55,0.05) !important;
+}
+
+/* 徽章样式优化 */
+.badge {
+  padding: 4px 12px !important;
+  border-radius: 12px !important;
+  font-size: 12px !important;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+
+/* 丹药配置项样式 */
+.potion-config-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(10,14,26,0.6), rgba(20,24,38,0.4));
+  border: 1px solid rgba(212,175,55,0.12);
+  border-radius: 10px;
+  transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.potion-config-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--gold), var(--jade));
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.potion-config-item:hover {
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(54,255,208,0.05));
+  border-color: var(--gold);
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.potion-config-item:hover::before {
+  opacity: 1;
+}
+
+.potion-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.potion-icon {
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: rgba(212,175,55,0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(212,175,55,0.2);
+}
+
+.potion-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  flex: 1;
+}
+
+.potion-id {
+  font-size: 12px;
+  padding: 4px 10px;
+  background: rgba(54,255,208,0.15);
+  border-radius: 12px;
+  color: var(--jade);
+  border: 1px solid rgba(54,255,208,0.3);
+  font-family: 'Orbitron', monospace;
+}
+
+.potion-desc {
+  font-size: 13px;
+  color: var(--ink-dim);
+  line-height: 1.5;
+  padding-left: 52px;
+}
+
+.potion-cost {
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 500;
+  padding-left: 52px;
 }

@@ -255,11 +255,11 @@ export async function loadAdminExplore() {
   try {
     const r = await api('/admin/explore-loot');
     const list = document.getElementById('admin-explore-list');
-    if (!r.loot || r.loot.length === 0) {
+    if (!r.loots || r.loots.length === 0) {
       list.innerHTML = '<div class="empty">暂无探险配置</div>';
       return;
     }
-    list.innerHTML = r.loot.map(l => `
+    list.innerHTML = r.loots.map(l => `
       <div class="explore-config-item">
         <div class="explore-header">
           <span class="explore-name">${l.name}</span>
@@ -279,23 +279,32 @@ export async function loadAdminPotionsConfig() {
   try {
     const r = await api('/admin/potions-config');
     const list = document.getElementById('admin-potions-config-list');
+    if (!list) {
+      console.error('admin-potions-config-list element not found');
+      return;
+    }
+    console.log('Potions config response:', r);
     if (!r.potions || r.potions.length === 0) {
       list.innerHTML = '<div class="empty">暂无丹药配置</div>';
       return;
     }
     list.innerHTML = r.potions.map(p => `
-      <div class="potion-config-item">
+      <div class="admin-potion-config-item potion-config-item" data-id="${p.id}">
         <div class="potion-header">
-          <span class="potion-icon">${p.emoji}</span>
+          <span class="potion-icon">${p.emoji || '💊'}</span>
           <span class="potion-name">${p.name}</span>
-          <span class="potion-id">${p.id}</span>
+          <span class="potion-id">#${p.id}</span>
         </div>
-        <div class="potion-desc">${p.description}</div>
-        <div class="potion-cost">${p.costType === 'merit' ? '功德' : '复活币'} ${p.cost}</div>
+        <div class="potion-desc">${p.desc || '无描述'}</div>
+        <div class="potion-cost">消耗: ${p.cost} ${p.type === 'merit' ? '功德' : '复活币'} | 立即+${p.instant_life}s | 持续${p.dur}s | 衰减-${p.dur_decay_reduction}</div>
       </div>
     `).join('');
   } catch (err) {
-    document.getElementById('admin-potions-config-list').innerHTML = '<div class="empty">加载失败</div>';
+    console.error('Load potions config error:', err);
+    const list = document.getElementById('admin-potions-config-list');
+    if (list) {
+      list.innerHTML = '<div class="empty">加载失败: ' + err.message + '</div>';
+    }
   }
 }
 
