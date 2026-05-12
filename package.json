@@ -2,21 +2,29 @@
   "name": "webapp",
   "type": "module",
   "scripts": {
-    "dev": "npm run build && npx wrangler pages dev",
-    "build": "vite build",
-    "preview": "wrangler pages dev",
-    "deploy": "npm run build && wrangler pages deploy",
+    "dev": "node dev-server.js",
+    "dev:client": "vite",
+    "dev:server": "wrangler pages dev dist --port 8788",
+    "build": "vite build && vite build --config vite.server.config.ts",
+    "preview": "wrangler pages dev dist",
+    "deploy": "npm run build && wrangler pages deploy dist",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "db:migrate": "wrangler d1 migrations apply webapp-production --remote",
     "db:seed": "wrangler d1 execute webapp-production --remote --file=./seed.sql"
   },
   "dependencies": {
-    "hono": "^4.12.12"
+    "hono": "^4.12.12",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.34",
+    "vue-router": "^5.0.6"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260511.1",
     "@hono/vite-build": "^1.2.0",
     "@hono/vite-dev-server": "^0.18.2",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "@vue/tsconfig": "^0.9.1",
+    "typescript": "^6.0.3",
     "vite": "^6.3.5",
     "wrangler": "^4.4.0"
   }
