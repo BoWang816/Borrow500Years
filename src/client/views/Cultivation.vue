@@ -8,30 +8,46 @@
     <!-- 养生修炼区域 -->
     <div class="cultivation-section">
       <h3 class="section-title">
-        <i class="fas fa-leaf"></i> 养生修炼 · 延年益寿
-        <span class="section-desc">简单易行，增加寿命与功德</span>
+        <i class="fas fa-leaf"></i> 养生修炼 · 筑基之道
+        <span class="section-desc">凡人基础修行，为高深功法打基础</span>
       </h3>
       
       <div class="cultivation-grid">
-        <div class="task-card wellness">
+        <!-- 基础养生 - 永远可用 -->
+        <div class="task-card wellness basic">
           <div class="task-icon"><i class="fas fa-moon"></i></div>
           <div class="task-body">
-            <h4>子午流注</h4>
-            <p>23:00 前入睡，次日衰减率降低 20%</p>
+            <h4>子午流注 <span class="basic-tag">基础</span></h4>
+            <p>顺应天地阴阳，23:00 前入睡调息</p>
             <div class="task-reward">
               奖励：<span class="reward-life">+30 分钟</span> · 
               <span class="reward-mod">-0.2x 衰减</span> · 
               <span class="reward-merit">功德 +2</span>
             </div>
           </div>
-          <button @click="doTask('ziwu')" class="task-btn wellness-btn" :disabled="loading">打卡</button>
+          <button @click="doTask('ziwu')" class="task-btn wellness-btn" :disabled="loading">调息</button>
         </div>
 
-        <div class="task-card wellness">
+        <div class="task-card wellness basic">
+          <div class="task-icon"><i class="fas fa-spa"></i></div>
+          <div class="task-body">
+            <h4>静坐冥想 <span class="basic-tag">基础</span></h4>
+            <p>凝神静气，感悟天地灵机</p>
+            <div class="task-reward">
+              奖励：<span class="reward-life">+15 分钟</span> · 
+              <span class="reward-merit">功德 +3</span> · 
+              <span class="reward-coin">复活币碎片</span>
+            </div>
+          </div>
+          <button @click="doTask('meditate')" class="task-btn wellness-btn" :disabled="loading">入定</button>
+        </div>
+
+        <!-- 凡人阶段养生 - 低境界可用 -->
+        <div v-if="isLowRealm" class="task-card wellness mortal">
           <div class="task-icon"><i class="fas fa-shoe-prints"></i></div>
           <div class="task-body">
-            <h4>步步为营</h4>
-            <p>每日步行修行，1000 步 = +12 分钟，达 10000 步 +2 小时</p>
+            <h4>步步为营 <span class="mortal-tag">凡人</span></h4>
+            <p>凡人炼体，步行千里始于足下</p>
             <div class="step-input">
               <input 
                 type="range" 
@@ -50,11 +66,11 @@
           <button @click="submitSteps" class="task-btn wellness-btn" :disabled="loading">提交</button>
         </div>
 
-        <div class="task-card wellness">
+        <div v-if="isLowRealm" class="task-card wellness mortal">
           <div class="task-icon"><i class="fas fa-tint"></i></div>
           <div class="task-body">
-            <h4>上善若水</h4>
-            <p>每日 8 次饮水，单次 +5 分钟寿命</p>
+            <h4>上善若水 <span class="mortal-tag">凡人</span></h4>
+            <p>凡人需水润体，修士渐脱此需</p>
             <div class="water-cups">
               <span v-for="i in 8" :key="i" class="water-cup">💧</span>
             </div>
@@ -66,25 +82,52 @@
           <button @click="doTask('water')" class="task-btn wellness-btn" :disabled="loading">饮一杯</button>
         </div>
 
-        <div class="task-card wellness">
-          <div class="task-icon"><i class="fas fa-spa"></i></div>
+        <div v-if="isLowRealm" class="task-card wellness mortal">
+          <div class="task-icon"><i class="fas fa-bowl-rice"></i></div>
           <div class="task-body">
-            <h4>静坐冥想</h4>
-            <p>静坐 10 分钟，心境清明，+15 分钟寿命</p>
+            <h4>清淡饮食 <span class="mortal-tag">凡人</span></h4>
+            <p>凡胎肉身需食，高阶修士辟谷</p>
             <div class="task-reward">
-              奖励：<span class="reward-life">+15 分钟</span> · 
-              <span class="reward-merit">功德 +3</span> · 
-              <span class="reward-coin">复活币碎片</span>
+              奖励：<span class="reward-life">+20 分钟</span> · 
+              <span class="reward-merit">功德 +3</span>
             </div>
           </div>
-          <button @click="doTask('meditate')" class="task-btn wellness-btn" :disabled="loading">入定</button>
+          <button @click="doTask('diet')" class="task-btn wellness-btn" :disabled="loading">今日清淡</button>
         </div>
 
+        <!-- 高阶养生 - 高境界解锁 -->
+        <div v-if="isHighRealm" class="task-card wellness advanced">
+          <div class="task-icon"><i class="fas fa-wind"></i></div>
+          <div class="task-body">
+            <h4>吐纳天地 <span class="advanced-tag">高阶</span></h4>
+            <p>不食人间烟火，吸纳天地灵气</p>
+            <div class="task-reward">
+              奖励：<span class="reward-life">+2 小时</span> · 
+              <span class="reward-merit">功德 +10</span>
+            </div>
+          </div>
+          <button @click="doTask('breathe_qi')" class="task-btn advanced-btn" :disabled="loading">吐纳</button>
+        </div>
+
+        <div v-if="isHighRealm" class="task-card wellness advanced">
+          <div class="task-icon"><i class="fas fa-mountain"></i></div>
+          <div class="task-body">
+            <h4>观星悟道 <span class="advanced-tag">高阶</span></h4>
+            <p>夜观天象，感悟宇宙奥秘</p>
+            <div class="task-reward">
+              奖励：<span class="reward-life">+3 小时</span> · 
+              <span class="reward-merit">功德 +15</span>
+            </div>
+          </div>
+          <button @click="doTask('star_gaze')" class="task-btn advanced-btn" :disabled="loading">观星</button>
+        </div>
+
+        <!-- 挑战任务 - 所有境界 -->
         <div class="task-card wellness challenge">
           <div class="task-icon"><i class="fas fa-sun"></i></div>
           <div class="task-body">
-            <h4>早起挑战 · 七日劫数</h4>
-            <p>连续 7 天 7:00 前起床，奖励 1 枚复活币</p>
+            <h4>早起挑战 · 七日劫数 <span class="challenge-tag">挑战</span></h4>
+            <p>连续 7 天卯时（5-7点）起床修行</p>
             <div class="streak-bar">
               <div class="streak-progress" :style="{ width: `${(streak / 7) * 100}%` }"></div>
             </div>
@@ -93,31 +136,31 @@
               <span class="reward-merit">功德 +5</span>
             </div>
           </div>
-          <button @click="doTask('earlyrise')" class="task-btn wellness-btn" :disabled="loading">今日已早起</button>
-        </div>
-
-        <div class="task-card wellness">
-          <div class="task-icon"><i class="fas fa-bowl-rice"></i></div>
-          <div class="task-body">
-            <h4>清淡饮食</h4>
-            <p>记录三餐，少油少盐，+20 分钟寿命</p>
-            <div class="task-reward">
-              奖励：<span class="reward-life">+20 分钟</span> · 
-              <span class="reward-merit">功德 +3</span>
-            </div>
-          </div>
-          <button @click="doTask('diet')" class="task-btn wellness-btn" :disabled="loading">今日清淡</button>
+          <button @click="doTask('earlyrise')" class="task-btn challenge-btn" :disabled="loading">今日已早起</button>
         </div>
       </div>
 
-      <!-- 扩展养生修炼任务 -->
-      <div class="extra-tasks-section">
-        <h4 class="subsection-title">📋 扩展养生修炼</h4>
+      <!-- 境界说明 -->
+      <div class="realm-notice">
+        <div class="notice-content">
+          <i class="fas fa-info-circle"></i>
+          <div class="notice-text">
+            <strong>修仙之道：</strong>
+            <span v-if="isLowRealm">凡胎肉身阶段需要基础养生维持生机，随着境界提升将逐渐脱离凡俗需求</span>
+            <span v-else-if="isHighRealm">已达高深境界，无需凡人养生，可直接吸纳天地灵气</span>
+            <span v-else>正处修炼关键期，部分凡俗养生仍有助益</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 扩展养生修炼任务 - 仅低境界显示 -->
+      <div v-if="isLowRealm && extraTasks.length > 0" class="extra-tasks-section">
+        <h4 class="subsection-title">📋 扩展凡俗修行</h4>
         <div class="extra-tasks-grid">
-          <div v-for="task in extraTasks" :key="task.task_key" class="extra-task-card wellness">
+          <div v-for="task in extraTasks" :key="task.task_key" class="extra-task-card wellness mortal">
             <div class="task-icon">{{ task.emoji }}</div>
             <div class="task-body">
-              <h4>{{ task.name }}</h4>
+              <h4>{{ task.name }} <span class="mortal-tag">凡人</span></h4>
               <p>{{ task.description }}</p>
               <div class="task-reward">
                 奖励：<span class="reward-life">+{{ formatLife(task.life_reward) }}</span>
@@ -182,6 +225,28 @@ const steps = ref(0)
 const streak = ref(0)
 const extraTasks = ref<Task[]>([])
 const manuals = ref<any[]>([])
+
+// 境界等级判断
+const realmLevel = computed(() => {
+  const realm = stateStore.profile?.realm || '凡胎肉身'
+  const realmLevels = [
+    '凡胎肉身', '练气初期', '练气中期', '练气后期', '练气大圆满',
+    '筑基初期', '筑基中期', '筑基后期', '筑基大圆满',
+    '金丹初期', '金丹中期', '金丹后期', '金丹大圆满',
+    '元婴初期', '元婴中期', '元婴后期', '元婴大圆满'
+  ]
+  return realmLevels.indexOf(realm)
+})
+
+// 是否为低境界（需要凡俗养生）
+const isLowRealm = computed(() => {
+  return realmLevel.value <= 7 // 筑基大圆满及以下
+})
+
+// 是否为高境界（可以高阶修炼）
+const isHighRealm = computed(() => {
+  return realmLevel.value >= 8 // 金丹初期及以上
+})
 
 const stepsReward = computed(() => {
   const s = steps.value || 0
@@ -346,6 +411,81 @@ onMounted(() => {
   letter-spacing: 2px;
 }
 
+/* 境界标签 */
+.basic-tag {
+  font-size: 10px;
+  background: rgba(54,255,208,0.2);
+  color: var(--jade);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.mortal-tag {
+  font-size: 10px;
+  background: rgba(168,160,138,0.2);
+  color: var(--ink-dim);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.advanced-tag {
+  font-size: 10px;
+  background: rgba(212,175,55,0.2);
+  color: var(--gold);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.challenge-tag {
+  font-size: 10px;
+  background: rgba(178,102,255,0.2);
+  color: var(--neon-purple);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* 基础养生修炼卡片 */
+.task-card.wellness.basic {
+  border-left: 4px solid var(--jade);
+  background: linear-gradient(135deg, rgba(54,255,208,0.08), var(--panel));
+}
+
+/* 凡人养生修炼卡片 */
+.task-card.wellness.mortal {
+  border-left: 4px solid var(--ink-dim);
+  background: linear-gradient(135deg, rgba(168,160,138,0.05), var(--panel));
+  opacity: 0.8;
+}
+
+/* 高阶养生修炼卡片 */
+.task-card.wellness.advanced {
+  border-left: 4px solid var(--gold);
+  background: linear-gradient(135deg, rgba(212,175,55,0.1), var(--panel));
+  box-shadow: 0 0 20px rgba(212,175,55,0.1);
+}
+
+.task-card.wellness.advanced .task-icon {
+  background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(212,175,55,0.1));
+  color: var(--gold);
+  border-color: rgba(212,175,55,0.4);
+}
+
+/* 挑战任务卡片 */
+.task-card.wellness.challenge {
+  border-left: 4px solid var(--neon-purple);
+  background: linear-gradient(135deg, rgba(178,102,255,0.08), var(--panel));
+}
+
+.task-card.wellness.challenge .task-icon {
+  background: linear-gradient(135deg, rgba(178,102,255,0.2), rgba(178,102,255,0.1));
+  color: var(--neon-purple);
+  border-color: rgba(178,102,255,0.3);
+}
+
 /* 养生修炼卡片样式 */
 .task-card.wellness {
   border-left: 4px solid var(--jade);
@@ -373,9 +513,64 @@ onMounted(() => {
   box-shadow: 0 0 18px rgba(54,255,208,0.6);
 }
 
+.advanced-btn {
+  background: linear-gradient(135deg, var(--gold), #b8902a);
+  color: #1a1208;
+  box-shadow: 0 0 12px rgba(212,175,55,0.4);
+}
+
+.advanced-btn:hover:not(:disabled) {
+  box-shadow: 0 0 18px rgba(212,175,55,0.6);
+}
+
+.challenge-btn {
+  background: linear-gradient(135deg, var(--neon-purple), #8a4bff);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(178,102,255,0.4);
+}
+
+.challenge-btn:hover:not(:disabled) {
+  box-shadow: 0 0 18px rgba(178,102,255,0.6);
+}
+
 .reward-merit {
   color: var(--gold-soft);
   font-family: 'Orbitron', sans-serif;
+}
+
+/* 境界说明 */
+.realm-notice {
+  margin: 24px 0;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(54,255,208,0.05));
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 8px;
+  border-left: 4px solid var(--gold);
+}
+
+.notice-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.notice-content i {
+  color: var(--gold);
+  font-size: 18px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.notice-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.notice-text strong {
+  color: var(--gold-soft);
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 1px;
 }
 
 /* 功法修炼样式 */
@@ -543,6 +738,11 @@ onMounted(() => {
   
   .section-desc {
     margin-left: 0;
+  }
+  
+  .notice-content {
+    flex-direction: column;
+    gap: 8px;
   }
 }
 </style>
