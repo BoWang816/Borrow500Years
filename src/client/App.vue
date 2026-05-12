@@ -70,6 +70,7 @@
     <!-- 模态框 -->
     <AuthModal />
     <OnboardingModal />
+    <CrisisOverlay />
   </div>
 </template>
 
@@ -79,6 +80,7 @@ import { useAuthStore } from './stores/auth'
 import { useStateStore } from './stores/state'
 import AuthModal from './components/AuthModal.vue'
 import OnboardingModal from './components/OnboardingModal.vue'
+import CrisisOverlay from './components/CrisisOverlay.vue'
 
 const authStore = useAuthStore()
 const stateStore = useStateStore()

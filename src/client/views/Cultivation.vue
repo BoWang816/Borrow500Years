@@ -129,7 +129,7 @@ const streak = ref(0)
 const extraTasks = ref<Task[]>([])
 
 const stepsReward = computed(() => {
-  const s = steps.value
+  const s = steps.value || 0
   let minutes = Math.floor(s / 1000) * 12
   if (s >= 10000) minutes += 120
   return `+${minutes} 分钟`

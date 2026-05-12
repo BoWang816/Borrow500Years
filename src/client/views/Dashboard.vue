@@ -1,88 +1,95 @@
 <template>
   <section id="dashboard" class="tab-pane active">
-    <div class="pulse-wrap">
-      <div class="pulse-rings">
-        <div class="ring ring1"></div>
-        <div class="ring ring2"></div>
-        <div class="ring ring3"></div>
-        <div class="ring-bagua"></div>
+    <div v-if="!stateStore.profile" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>加载中...</p>
+    </div>
+    
+    <template v-else>
+      <div class="pulse-wrap">
+        <div class="pulse-rings">
+          <div class="ring ring1"></div>
+          <div class="ring ring2"></div>
+          <div class="ring ring3"></div>
+          <div class="ring-bagua"></div>
+        </div>
+
+        <div class="pulse-core">
+          <div class="pulse-label">PULSE · 寿命倒计时</div>
+          <div class="pulse-time">
+            <span class="seg">{{ timeDisplay.years }}</span><em>年</em>
+            <span class="seg">{{ timeDisplay.days }}</span><em>日</em>
+            <span class="seg">{{ timeDisplay.hours }}</span><em>:</em>
+            <span class="seg">{{ timeDisplay.minutes }}</span><em>:</em>
+            <span class="seg">{{ timeDisplay.seconds }}</span>
+          </div>
+          <div class="pulse-seconds">{{ secondsDisplay }}</div>
+          <div class="pulse-meta">
+            <div class="meta-item">
+              <span class="meta-label">衰减速率</span>
+              <span class="meta-val">{{ decayRate }}x</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">境界</span>
+              <span class="meta-val realm">{{ stateStore.profile.realm || '凡胎肉身' }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">复活币</span>
+              <span class="meta-val coin">
+                <i class="fas fa-coins"></i> {{ stateStore.profile.coin || 0 }}
+              </span>
+            </div>
+          </div>
+          <div class="pulse-toggle">
+            <button 
+              :class="['t-btn', { active: displayMode === 'full' }]" 
+              @click="displayMode = 'full'"
+            >
+              岁·日·时·分·秒
+            </button>
+            <button 
+              :class="['t-btn', { active: displayMode === 'seconds' }]" 
+              @click="displayMode = 'seconds'"
+            >
+              精确秒
+            </button>
+            <button 
+              :class="['t-btn', { active: displayMode === 'days' }]" 
+              @click="displayMode = 'days'"
+            >
+              总天数
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="pulse-core">
-        <div class="pulse-label">PULSE · 寿命倒计时</div>
-        <div class="pulse-time">
-          <span class="seg">{{ timeDisplay.years }}</span><em>年</em>
-          <span class="seg">{{ timeDisplay.days }}</span><em>日</em>
-          <span class="seg">{{ timeDisplay.hours }}</span><em>:</em>
-          <span class="seg">{{ timeDisplay.minutes }}</span><em>:</em>
-          <span class="seg">{{ timeDisplay.seconds }}</span>
+      <div class="dash-cards">
+        <div class="card flux-card">
+          <h3><i class="fas fa-bolt"></i> 修正系数 (Modifier)</h3>
+          <ul class="modifier-list">
+            <li v-if="stateStore.modifiers.length === 0" class="empty">暂无修正项</li>
+            <li v-for="mod in stateStore.modifiers" :key="mod.id" class="mod-item">
+              <span class="mod-emoji">{{ mod.potionEmoji }}</span>
+              <span class="mod-label">{{ mod.modLabel }}</span>
+              <span class="mod-val">{{ mod.modValue > 0 ? '+' : '' }}{{ mod.modValue }}</span>
+              <span class="mod-expire">{{ formatExpire(mod.expireAt) }}</span>
+            </li>
+          </ul>
         </div>
-        <div class="pulse-seconds">{{ secondsDisplay }}</div>
-        <div class="pulse-meta">
-          <div class="meta-item">
-            <span class="meta-label">衰减速率</span>
-            <span class="meta-val">{{ decayRate }}x</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">境界</span>
-            <span class="meta-val realm">{{ stateStore.profile?.realm || '凡胎肉身' }}</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">复活币</span>
-            <span class="meta-val coin">
-              <i class="fas fa-coins"></i> {{ stateStore.profile?.coin || 0 }}
-            </span>
-          </div>
-        </div>
-        <div class="pulse-toggle">
-          <button 
-            :class="['t-btn', { active: displayMode === 'full' }]" 
-            @click="displayMode = 'full'"
-          >
-            岁·日·时·分·秒
-          </button>
-          <button 
-            :class="['t-btn', { active: displayMode === 'seconds' }]" 
-            @click="displayMode = 'seconds'"
-          >
-            精确秒
-          </button>
-          <button 
-            :class="['t-btn', { active: displayMode === 'days' }]" 
-            @click="displayMode = 'days'"
-          >
-            总天数
+        <div class="card event-card">
+          <h3><i class="fas fa-scroll"></i> 命运卷轴 · 事件日志</h3>
+          <ul class="event-log">
+            <li v-for="event in stateStore.events" :key="event.id" :class="['event-item', `event-${event.type}`]">
+              <span class="event-msg">{{ event.msg }}</span>
+              <span class="event-time">{{ formatTime(event.createdAt) }}</span>
+            </li>
+          </ul>
+          <button @click="triggerRandomEvent" class="ghost-btn">
+            <i class="fas fa-dice-d20"></i> 掷天骰 · 触发随机事件
           </button>
         </div>
       </div>
-    </div>
-
-    <div class="dash-cards">
-      <div class="card flux-card">
-        <h3><i class="fas fa-bolt"></i> 修正系数 (Modifier)</h3>
-        <ul class="modifier-list">
-          <li v-if="stateStore.modifiers.length === 0" class="empty">暂无修正项</li>
-          <li v-for="mod in stateStore.modifiers" :key="mod.id" class="mod-item">
-            <span class="mod-emoji">{{ mod.potionEmoji }}</span>
-            <span class="mod-label">{{ mod.modLabel }}</span>
-            <span class="mod-val">{{ mod.modValue > 0 ? '+' : '' }}{{ mod.modValue }}</span>
-            <span class="mod-expire">{{ formatExpire(mod.expireAt) }}</span>
-          </li>
-        </ul>
-      </div>
-      <div class="card event-card">
-        <h3><i class="fas fa-scroll"></i> 命运卷轴 · 事件日志</h3>
-        <ul class="event-log">
-          <li v-for="event in stateStore.events" :key="event.id" :class="['event-item', `event-${event.type}`]">
-            <span class="event-msg">{{ event.msg }}</span>
-            <span class="event-time">{{ formatTime(event.createdAt) }}</span>
-          </li>
-        </ul>
-        <button @click="triggerRandomEvent" class="ghost-btn">
-          <i class="fas fa-dice-d20"></i> 掷天骰 · 触发随机事件
-        </button>
-      </div>
-    </div>
+    </template>
   </section>
 </template>
 
@@ -99,11 +106,11 @@ const SEC_PER_YEAR = 31536000
 const SEC_PER_DAY = 86400
 
 const timeDisplay = computed(() => {
-  if (!stateStore.profile) {
+  if (!stateStore.profile || stateStore.profile.lifeSec === undefined) {
     return { years: '000', days: '000', hours: '00', minutes: '00', seconds: '00' }
   }
 
-  const lifeSec = stateStore.profile.lifeSec
+  const lifeSec = stateStore.profile.lifeSec || 0
   const years = Math.floor(lifeSec / SEC_PER_YEAR)
   const remainAfterYears = lifeSec % SEC_PER_YEAR
   const days = Math.floor(remainAfterYears / SEC_PER_DAY)
@@ -122,8 +129,8 @@ const timeDisplay = computed(() => {
 })
 
 const secondsDisplay = computed(() => {
-  if (!stateStore.profile) return '— · — 秒'
-  const lifeSec = stateStore.profile.lifeSec
+  if (!stateStore.profile || stateStore.profile.lifeSec === undefined) return '— · — 秒'
+  const lifeSec = stateStore.profile.lifeSec || 0
   
   if (displayMode.value === 'seconds') {
     return `${lifeSec.toLocaleString()} 秒`
@@ -191,3 +198,28 @@ onUnmounted(() => {
   if (timer) clearInterval(timer)
 })
 </script>
+
+<style scoped>
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: var(--gold);
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(212, 175, 55, 0.2);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+</style>
