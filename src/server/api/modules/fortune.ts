@@ -155,7 +155,38 @@ fortune.post('/checkin', authMiddleware, loadProfile, async (c) => {
 
   const msg = `【每日签到·${fortuneData.fortune_type}】寿命 +${formatLife(reward)}，功德 +5`
   await pushEvent(c.env.DB, userId, msg, 'good')
-  return c.json({ ok: true, reward, fortune: fortuneData.fortune_type })
+  return c.json({ ok: true, reward, fortune: fortuneData.fortune_type, msg })
+})
+
+// 获取修仙日志
+fortune.get('/logs', authMiddleware, async (c) => {
+  const userId = c.get('userId') as number
+  const logs = await c.env.DB.prepare(`
+    SELECT id, content, mood, type, created_at 
+    FROM cultivation_logs 
+    WHERE user_id = ? 
+    ORDER BY created_at DESC 
+    LIMIT 50
+  `).bind(userId).all<any>()
+  
+  return c.json({ logs: logs.results || [] })
+})
+
+// 添加修仙日志
+fortune.post('/logs', authMiddleware, async (c) => {
+  const userId = c.get('userId') as number
+  const body = await c.req.json<{ content: string; mood: string; type: string }>()
+  
+  if (!body.content || body.content.trim().length === 0) {
+    return c.json({ error: '日志内容不能为空' }, 400)
+  }
+  
+  await c.env.DB.prepare(`
+    INSERT INTO cultivation_logs (user_id, content, mood, type, created_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).bind(userId, body.content.trim(), body.mood || '平静', body.type || 'note', nowSeconds()).run()
+  
+  return c.json({ ok: true, msg: '日志已记录' })
 })
 
 export default fortune
