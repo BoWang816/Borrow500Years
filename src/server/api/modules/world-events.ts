@@ -72,12 +72,21 @@ worldEvents.post('/trigger', authMiddleware, async (c) => {
 
   const now = nowSeconds()
   
-  // 检查是否有正在进行的事件
+  // 自动清理过期的活跃事件
+  try {
+    await c.env.DB.prepare(`
+      UPDATE world_events SET is_active = 0 WHERE is_active = 1 AND end_at <= ?
+    `).bind(now).run()
+  } catch (err) {
+    console.error('Failed to cleanup expired events:', err)
+  }
+  
+  // 检查是否有正在进行的事件（最多允许10个并发）
   const activeEvents = await c.env.DB.prepare(`
     SELECT COUNT(*) as count FROM world_events WHERE is_active = 1 AND end_at > ?
   `).bind(now).first<{ count: number }>()
   
-  if (activeEvents && activeEvents.count >= 3) {
+  if (activeEvents && activeEvents.count >= 10) {
     return c.json({ error: '当前活跃事件过多，请稍后再试' }, 400)
   }
   
