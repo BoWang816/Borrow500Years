@@ -91,8 +91,9 @@ state.get('/', authMiddleware, loadProfile, async (c) => {
     },
     potions: potions.results,
     events: events.results.reverse().map((e: any) => ({
-      msg: e.msg, kind: e.kind,
-      time: new Date(e.created_at * 1000).toTimeString().slice(0, 8),
+      msg: e.msg, 
+      kind: e.kind,
+      created_at: e.created_at, // 返回秒级时间戳
     })),
     decayRate: currentDecayRate(profile, potions.results),
     serverNow: now,
