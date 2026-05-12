@@ -13,91 +13,61 @@
       </div>
       
       <div v-else class="fortune-container">
-        <!-- 运势主卡片 -->
+        <!-- 运势主卡片 - 紧凑版 -->
         <div :class="['fortune-main-card', getFortuneCssClass(fortune.type)]">
+          <!-- 头部：图标+标题 -->
           <div class="fortune-header">
             <div class="fortune-icon">{{ getFortuneIcon(fortune.type) }}</div>
-            <div class="fortune-title-section">
+            <div class="fortune-title-wrap">
               <h3 class="fortune-title">{{ fortune.title }}</h3>
-              <p class="fortune-description">{{ fortune.description }}</p>
+              <p class="fortune-desc">{{ fortune.description }}</p>
             </div>
           </div>
 
-          <!-- 天机诗 -->
-          <div class="fortune-poem-section">
-            <div class="poem-decoration">✦</div>
-            <p class="fortune-poem">{{ fortune.poem }}</p>
-            <div class="poem-decoration">✦</div>
-          </div>
+          <!-- 诗词 -->
+          <div class="fortune-poem">{{ fortune.poem }}</div>
 
-          <!-- 宜忌 -->
-          <div class="fortune-advice-section">
-            <div class="advice-item advice-do">
-              <div class="advice-icon">✓</div>
-              <div class="advice-content">
-                <div class="advice-label">宜</div>
-                <div class="advice-text">{{ fortune.advice }}</div>
-              </div>
+          <!-- 宜忌 + 吉祥元素 -->
+          <div class="fortune-info-grid">
+            <div class="info-item">
+              <span class="info-label good">✓ 宜</span>
+              <span class="info-value">{{ fortune.advice }}</span>
             </div>
-            <div class="advice-item advice-dont">
-              <div class="advice-icon">✗</div>
-              <div class="advice-content">
-                <div class="advice-label">忌</div>
-                <div class="advice-text">{{ fortune.avoid }}</div>
-              </div>
+            <div class="info-item">
+              <span class="info-label bad">✗ 忌</span>
+              <span class="info-value">{{ fortune.avoid }}</span>
             </div>
-          </div>
-
-          <!-- 吉祥元素 -->
-          <div class="fortune-lucky-section">
-            <div class="lucky-item">
-              <div class="lucky-icon">🧭</div>
-              <div class="lucky-label">吉方</div>
-              <div class="lucky-value">{{ fortune.luckyDirection }}</div>
+            <div class="info-item">
+              <span class="info-label">🧭 吉方</span>
+              <span class="info-value">{{ fortune.luckyDirection }}</span>
             </div>
-            <div class="lucky-item">
-              <div class="lucky-icon">⏰</div>
-              <div class="lucky-label">吉时</div>
-              <div class="lucky-value">{{ fortune.luckyTime }}</div>
+            <div class="info-item">
+              <span class="info-label">⏰ 吉时</span>
+              <span class="info-value">{{ fortune.luckyTime }}</span>
             </div>
-            <div class="lucky-item">
-              <div class="lucky-icon">🎨</div>
-              <div class="lucky-label">幸运色</div>
-              <div class="lucky-value">{{ fortune.luckyColor }}</div>
+            <div class="info-item">
+              <span class="info-label">🎨 幸运色</span>
+              <span class="info-value">{{ fortune.luckyColor }}</span>
             </div>
-          </div>
-
-          <!-- 加成显示 -->
-          <div class="fortune-bonus-section">
-            <div class="bonus-item">
-              <i class="fas fa-heart-pulse"></i>
-              <span>寿命加成</span>
-              <strong>{{ (fortune.lifeMultiplier * 100).toFixed(0) }}%</strong>
-            </div>
-            <div class="bonus-divider"></div>
-            <div class="bonus-item">
-              <i class="fas fa-yin-yang"></i>
-              <span>功德加成</span>
-              <strong>{{ (fortune.meritMultiplier * 100).toFixed(0) }}%</strong>
+            <div class="info-item bonus">
+              <span class="info-label">💫 加成</span>
+              <span class="info-value">寿命 {{ (fortune.lifeMultiplier * 100).toFixed(0) }}% · 功德 {{ (fortune.meritMultiplier * 100).toFixed(0) }}%</span>
             </div>
           </div>
         </div>
 
         <!-- 签到按钮 -->
-        <div class="fortune-action">
-          <button 
-            v-if="!checkedIn" 
-            @click="checkin" 
-            class="fortune-checkin-btn"
-            :disabled="loading"
-          >
-            <i class="fas fa-gift"></i>
-            <span>签到领取运势奖励</span>
-          </button>
-          <div v-else class="fortune-checked-badge">
-            <i class="fas fa-check-circle"></i>
-            <span>今日已签到</span>
-          </div>
+        <button 
+          v-if="!checkedIn" 
+          @click="checkin" 
+          class="fortune-checkin-btn"
+          :disabled="loading"
+        >
+          <i class="fas fa-gift"></i>
+          <span>签到领取运势奖励</span>
+        </button>
+        <div v-else class="fortune-checked">
+          <i class="fas fa-check-circle"></i> 今日已签到
         </div>
       </div>
     </div>
