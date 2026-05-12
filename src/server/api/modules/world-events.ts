@@ -72,7 +72,16 @@ worldEvents.post('/trigger', authMiddleware, async (c) => {
 
   const now = nowSeconds()
   
-  // 获取所有可用的事件模板
+  // 检查是否有正在进行的事件
+  const activeEvents = await c.env.DB.prepare(`
+    SELECT COUNT(*) as count FROM world_events WHERE is_active = 1 AND end_at > ?
+  `).bind(now).first<{ count: number }>()
+  
+  if (activeEvents && activeEvents.count >= 3) {
+    return c.json({ error: '当前活跃事件过多，请稍后再试' }, 400)
+  }
+  
+  // 获取所有可用的事件模板（非活跃状态）
   const templates = await c.env.DB.prepare(`
     SELECT * FROM world_events WHERE is_active = 0
   `).all<any>()
@@ -84,15 +93,32 @@ worldEvents.post('/trigger', authMiddleware, async (c) => {
   // 随机选择一个事件
   const template = templates.results[Math.floor(Math.random() * templates.results.length)]
   
-  // 创建新的活跃事件（持续24小时）
-  const duration = 24 * 3600 // 24小时
+  // 根据事件类型决定持续时间
+  let duration = 24 * 3600 // 默认24小时
+  
+  // 正面事件持续时间较长
+  if (template.effect_type === 'global_life' && template.effect_value > 0) {
+    duration = 48 * 3600 // 48小时
+  } else if (template.effect_type === 'global_merit' && template.effect_value > 1) {
+    duration = 36 * 3600 // 36小时
+  } else if (template.effect_type === 'global_decay' && template.effect_value < 0) {
+    duration = 48 * 3600 // 48小时
+  }
+  // 负面事件持续时间较短
+  else if (template.effect_type === 'global_life' && template.effect_value < 0) {
+    duration = 12 * 3600 // 12小时
+  } else if (template.effect_type === 'global_decay' && template.effect_value > 0) {
+    duration = 12 * 3600 // 12小时
+  }
+  
   const endAt = now + duration
   
-  await c.env.DB.prepare(`
+  // 创建新的活跃事件
+  const result = await c.env.DB.prepare(`
     INSERT INTO world_events (event_key, name, emoji, description, effect_type, effect_value, start_at, end_at, is_active)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
   `).bind(
-    template.event_key,
+    `${template.event_key}_${now}`, // 添加时间戳确保唯一性
     template.name,
     template.emoji,
     template.description,
@@ -106,16 +132,20 @@ worldEvents.post('/trigger', authMiddleware, async (c) => {
   await c.env.DB.prepare(`
     INSERT INTO admin_logs (admin_username, action, target_type, target_id, details)
     VALUES (?, 'trigger', 'world_event', ?, ?)
-  `).bind(user.username, template.id, `触发全服事件: ${template.name}`).run()
+  `).bind(user.username, result.meta.last_row_id, `触发全服事件: ${template.name}`).run()
   
   return c.json({ 
     ok: true, 
     msg: `已触发全服事件：${template.name}`,
     event: {
+      id: result.meta.last_row_id,
       name: template.name,
       emoji: template.emoji,
       description: template.description,
-      endAt: endAt * 1000
+      effectType: template.effect_type,
+      effectValue: template.effect_value,
+      endAt: endAt * 1000,
+      duration: Math.floor(duration / 3600) // 小时数
     }
   })
 })

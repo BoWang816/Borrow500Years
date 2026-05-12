@@ -64,32 +64,28 @@
       </div>
 
       <div class="dash-cards">
-        <div class="card flux-card">
-          <h3><i class="fas fa-bolt"></i> 修正系数 (Modifier)</h3>
-          <ul class="modifier-list">
-            <li v-if="stateStore.modifiers.length === 0" class="empty">暂无修正项</li>
-            <li v-for="mod in stateStore.modifiers" :key="mod.id">
-              <span class="mod-name">{{ mod.potionEmoji }} {{ mod.modLabel }}</span>
-              <span :class="['mod-val', mod.modValue > 0 ? 'good' : 'bad']">
-                {{ mod.modValue > 0 ? '+' : '' }}{{ mod.modValue }}
-              </span>
-            </li>
-          </ul>
-        </div>
-        <div class="card event-card">
-          <h3><i class="fas fa-scroll"></i> 命运卷轴 · 事件日志</h3>
+        <div class="card event-card full-width">
+          <div class="card-header-row">
+            <h3><i class="fas fa-scroll"></i> 命运卷轴 · 事件日志</h3>
+            <button @click="triggerRandomEvent" class="trigger-btn" :disabled="triggerLoading">
+              <i class="fas fa-dice-d20"></i> 
+              <span v-if="!triggerLoading">掷天骰 · 触发随机事件</span>
+              <span v-else>触发中...</span>
+            </button>
+          </div>
           <ul class="event-log">
-            <li v-if="stateStore.events.length === 0" class="empty">暂无事件</li>
-            <li v-for="event in stateStore.events" :key="event.id">
-              <time>{{ formatTime(event.createdAt) }}</time>
-              <span :class="event.type === 'good' ? 'ev-good' : event.type === 'bad' ? 'ev-bad' : ''">
-                {{ event.msg }}
-              </span>
+            <li v-if="stateStore.events.length === 0" class="empty">
+              <i class="fas fa-yin-yang"></i>
+              <p>命运长河静谧无波，等待天机显现...</p>
+            </li>
+            <li v-for="event in stateStore.events" :key="event.id" class="event-item">
+              <div class="event-time">{{ formatTime(event.createdAt) }}</div>
+              <div :class="['event-content', event.type === 'good' ? 'ev-good' : event.type === 'bad' ? 'ev-bad' : '']">
+                <i :class="['event-icon', event.type === 'good' ? 'fas fa-arrow-up' : event.type === 'bad' ? 'fas fa-arrow-down' : 'fas fa-circle']"></i>
+                <span class="event-msg">{{ event.msg }}</span>
+              </div>
             </li>
           </ul>
-          <button @click="triggerRandomEvent" class="ghost-btn">
-            <i class="fas fa-dice-d20"></i> 掷天骰 · 触发随机事件
-          </button>
         </div>
       </div>
     </template>
@@ -106,6 +102,7 @@ const displayMode = ref<'full' | 'seconds' | 'days'>('full')
 const currentTime = ref(Date.now())
 const serverLifeSec = ref(0)
 const serverFetchTime = ref(Date.now())
+const triggerLoading = ref(false)
 let timer: number | null = null
 let countdownTimer: number | null = null
 
@@ -193,12 +190,27 @@ function formatTime(timestamp: number): string {
 }
 
 async function triggerRandomEvent() {
+  if (triggerLoading.value) return
+  
+  triggerLoading.value = true
   try {
     const res = await api('/world-events/trigger', { method: 'POST' })
-    toast(res.msg || '事件已触发', 'gold')
+    
+    if (res.event) {
+      toast(`✨ ${res.event.emoji} ${res.event.name}`, 'gold')
+      // 显示事件详情
+      setTimeout(() => {
+        toast(res.event.description, 'good')
+      }, 500)
+    } else {
+      toast(res.msg || '事件已触发', 'gold')
+    }
+    
     await stateStore.fetchState(true)
   } catch (err: any) {
-    toast(err.message, 'bad')
+    toast(err.message || '触发失败', 'bad')
+  } finally {
+    triggerLoading.value = false
   }
 }
 
@@ -254,5 +266,227 @@ onUnmounted(() => {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* 事件卡片优化 */
+.dash-cards {
+  display: grid;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.event-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  position: relative;
+}
+
+.card-header-row::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--jade), transparent);
+  box-shadow: 0 0 8px var(--jade);
+}
+
+.card-header-row h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 2px;
+  color: var(--gold-soft);
+  text-shadow: 0 0 10px rgba(212,175,55,0.3);
+}
+
+.trigger-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(54,255,208,0.1));
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  color: var(--gold-soft);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Noto Sans SC', sans-serif;
+  letter-spacing: 1px;
+  box-shadow: 0 0 15px rgba(212,175,55,0.2);
+}
+
+.trigger-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(54,255,208,0.15));
+  box-shadow: 0 0 25px rgba(212,175,55,0.4), 0 0 15px rgba(54,255,208,0.2);
+  transform: translateY(-2px);
+}
+
+.trigger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.trigger-btn i {
+  animation: dice-roll 2s ease-in-out infinite;
+}
+
+@keyframes dice-roll {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(90deg); }
+  50% { transform: rotate(180deg); }
+  75% { transform: rotate(270deg); }
+}
+
+.trigger-btn:hover i {
+  animation-duration: 0.5s;
+}
+
+.event-log {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.event-log .empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ink-dim);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.event-log .empty i {
+  font-size: 48px;
+  color: var(--gold);
+  opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.event-log .empty p {
+  margin: 0;
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 2px;
+  font-size: 14px;
+}
+
+.event-item {
+  padding: 16px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, rgba(10,14,26,0.6), rgba(20,24,38,0.4));
+  border: 1px solid rgba(212,175,55,0.15);
+  border-left: 3px solid var(--gold);
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.event-item:hover {
+  background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(54,255,208,0.05));
+  border-color: var(--gold);
+  transform: translateX(4px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 20px rgba(212,175,55,0.1);
+}
+
+.event-time {
+  font-size: 11px;
+  color: var(--ink-dim);
+  margin-bottom: 8px;
+  font-family: 'Orbitron', sans-serif;
+  opacity: 0.7;
+}
+
+.event-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.event-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 12px;
+}
+
+.event-content.ev-good {
+  color: var(--jade);
+}
+
+.event-content.ev-good .event-icon {
+  background: rgba(54,255,208,0.15);
+  color: var(--jade);
+  box-shadow: 0 0 10px rgba(54,255,208,0.3);
+}
+
+.event-content.ev-bad {
+  color: var(--crimson);
+}
+
+.event-content.ev-bad .event-icon {
+  background: rgba(255,77,109,0.15);
+  color: var(--crimson);
+  box-shadow: 0 0 10px rgba(255,77,109,0.3);
+}
+
+.event-content:not(.ev-good):not(.ev-bad) {
+  color: var(--ink);
+}
+
+.event-content:not(.ev-good):not(.ev-bad) .event-icon {
+  background: rgba(128,128,128,0.15);
+  color: var(--ink-dim);
+}
+
+.event-msg {
+  flex: 1;
+  font-family: 'Noto Serif SC', serif;
+}
+
+/* 滚动条样式 */
+.event-log::-webkit-scrollbar {
+  width: 6px;
+}
+
+.event-log::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+.event-log::-webkit-scrollbar-thumb {
+  background: rgba(212,175,55,0.3);
+  border-radius: 3px;
+}
+
+.event-log::-webkit-scrollbar-thumb:hover {
+  background: rgba(212,175,55,0.5);
 }
 </style>
