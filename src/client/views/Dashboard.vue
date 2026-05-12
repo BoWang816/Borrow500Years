@@ -545,8 +545,8 @@ onUnmounted(() => {
 
 .detail-row {
   display: flex;
-  flex-direction: column;
   gap: 12px;
+  justify-content: space-around;
   margin-bottom: 12px;
 }
 
