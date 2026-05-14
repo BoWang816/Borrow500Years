@@ -96,3 +96,32 @@ export function formatLife(sec: number): string {
 export function nowSeconds(): number {
   return Math.floor(Date.now() / 1000);
 }
+
+// 根据总年龄从数据库获取境界（异步版本）
+export async function getRealmByAge(db: D1Database, totalAge: number): Promise<{ id: number; name: string }> {
+  // 查询所有境界，按sort_order排序
+  const realms = await db.prepare(`
+    SELECT id, name, breakthrough_age_min, breakthrough_age_max
+    FROM realms
+    WHERE breakthrough_age_min IS NOT NULL
+    ORDER BY sort_order ASC
+  `).all<{ id: number; name: string; breakthrough_age_min: number; breakthrough_age_max: number }>()
+
+  if (!realms.results || realms.results.length === 0) {
+    return { id: 1, name: '炼气期' } // 默认境界
+  }
+
+  // 将总年龄转换为秒
+  const totalAgeSec = totalAge * SEC_PER_YEAR
+
+  // 从高到低查找匹配的境界
+  for (let i = realms.results.length - 1; i >= 0; i--) {
+    const realm = realms.results[i]
+    if (totalAgeSec >= realm.breakthrough_age_min) {
+      return { id: realm.id, name: realm.name }
+    }
+  }
+
+  // 如果没有匹配，返回第一个境界
+  return { id: realms.results[0].id, name: realms.results[0].name }
+}

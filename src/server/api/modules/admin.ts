@@ -1,7 +1,7 @@
 // 后台管理模块
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables } from '../../types'
-import { currentLifeSec, SEC_PER_YEAR, todayStr, getRealmTitle, formatLife, nowSeconds } from '../../lib'
+import { currentLifeSec, SEC_PER_YEAR, todayStr, getRealmByAge, formatLife, nowSeconds } from '../../lib'
 import { adminMiddleware, pushEvent } from '../middleware'
 import { loadPotions } from './potions'
 
@@ -29,10 +29,20 @@ admin.get('/users', adminMiddleware, async (c) => {
   const countResult = await c.env.DB.prepare('SELECT COUNT(*) as total FROM users').first<{ total: number }>()
 
   const now = Date.now()
-  const users = (all.results || []).map((r: any) => {
+  const users = await Promise.all((all.results || []).map(async (r: any) => {
     const hasProfile = !!r.start_timestamp
     const lifeSec = hasProfile ? currentLifeSec(r) : 0
     const totalAge = hasProfile ? r.age + (now - r.start_timestamp) / 1000 / SEC_PER_YEAR + r.bonus_sec / SEC_PER_YEAR : 0
+    
+    // 从数据库获取境界
+    let realm = null
+    let realmId = r.current_realm_id
+    if (hasProfile) {
+      const realmData = await getRealmByAge(c.env.DB, totalAge)
+      realm = realmData.name
+      realmId = realmData.id
+    }
+    
     return {
       userId: r.id,
       username: r.username,
@@ -46,8 +56,8 @@ admin.get('/users', adminMiddleware, async (c) => {
       bmi: r.weight && r.height ? (r.weight / Math.pow(r.height / 100, 2)).toFixed(1) : null,
       lifeSec,
       totalAge,
-      realm: hasProfile ? getRealmTitle(totalAge) : null,
-      realmId: r.current_realm_id,
+      realm,
+      realmId,
       coin: r.coin || 0,
       shard: r.shard || 0,
       merit: r.merit || 0,
@@ -58,7 +68,7 @@ admin.get('/users', adminMiddleware, async (c) => {
       initialLifeSec: r.initial_life_sec || 0,
       isAdmin: r.username === 'admin' // 简单判断：用户名为admin的是管理员
     }
-  })
+  }))
 
   const total = countResult?.total || 0
   const active = users.filter((u: any) => u.hasProfile).length

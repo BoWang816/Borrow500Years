@@ -1,7 +1,7 @@
 // 状态模块 - 获取用户完整状态
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile, ActivePotion } from '../../types'
-import { todayStr, currentDecayRate, currentLifeSec, SEC_PER_YEAR, getRealmTitle } from '../../lib'
+import { todayStr, currentDecayRate, currentLifeSec, SEC_PER_YEAR, getRealmByAge } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 const state = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
@@ -51,7 +51,12 @@ state.get('/', authMiddleware, loadProfile, async (c) => {
   // 计算总年龄和境界
   const elapsed = (now - profile.start_timestamp) / 1000
   const totalAge = profile.age + elapsed / SEC_PER_YEAR + profile.bonus_sec / SEC_PER_YEAR
-  const realm = getRealmTitle(totalAge)
+  
+  // 从数据库获取境界
+  const realmData = await getRealmByAge(c.env.DB, totalAge)
+  const realm = realmData.name
+  const realmId = realmData.id
+  
   const bmi = profile.weight / Math.pow(profile.height / 100, 2)
   
   return c.json({
@@ -82,6 +87,7 @@ state.get('/', authMiddleware, loadProfile, async (c) => {
       lifeSec: life,
       totalAge,
       realm,
+      realmId,
       bmi,
     },
     today,

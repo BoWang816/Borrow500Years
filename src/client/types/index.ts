@@ -24,6 +24,7 @@ export interface Profile {
   lifeSec: number
   totalAge: number
   realm: string
+  realmId: number
   bmi: number
 }
 

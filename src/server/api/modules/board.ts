@@ -1,7 +1,7 @@
 // 排行榜模块
 import { Hono } from 'hono'
 import type { Bindings } from '../../types'
-import { baseDecayMultiplier, SEC_PER_YEAR, getRealmTitle } from '../../lib'
+import { baseDecayMultiplier, SEC_PER_YEAR, getRealmByAge } from '../../lib'
 
 const board = new Hono<{ Bindings: Bindings }>()
 
@@ -19,22 +19,32 @@ board.get('/:type', async (c) => {
   `).all<any>()
 
   const now = Date.now()
-  const rows = all.results.map((r: any) => {
+  const rows = await Promise.all(all.results.map(async (r: any) => {
     const elapsed = (now - r.start_timestamp) / 1000
     const base = baseDecayMultiplier(r)
     const lifeSec = Math.max(0, r.initial_life_sec + r.bonus_sec - elapsed * base)
     const totalAge = r.age + elapsed / SEC_PER_YEAR + r.bonus_sec / SEC_PER_YEAR
+    
+    // 从数据库获取境界
+    let realm = r.realm_name
+    let realmId = r.current_realm_id || 1
+    if (!realm) {
+      const realmData = await getRealmByAge(c.env.DB, totalAge)
+      realm = realmData.name
+      realmId = realmData.id
+    }
+    
     return {
       userId: r.id,
       name: r.name,
       age: totalAge,
       lifeSec,
       meritGained: r.merit || 0,
-      realm: r.realm_name || getRealmTitle(totalAge),
-      realmId: r.current_realm_id || 1,
+      realm,
+      realmId,
       majorRealm: r.major_realm || 1,
     }
-  })
+  }))
 
   const key = type === 'merit' ? 'meritGained' : 'lifeSec'
   rows.sort((a: any, b: any) => b[key] - a[key])
