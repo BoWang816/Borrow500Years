@@ -32,6 +32,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, title: '养生修炼 · Cultivation' }
   },
   {
+    path: '/cultivation-practices',
+    name: 'CultivationPractices',
+    component: () => import('../views/CultivationPractices.vue'),
+    meta: { requiresAuth: true, title: '修炼项目 · Practices' }
+  },
+  {
     path: '/inventory',
     name: 'Inventory',
     component: () => import('../views/Inventory.vue'),
