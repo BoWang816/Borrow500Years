@@ -108,7 +108,7 @@
           <i class="fas fa-info-circle"></i>
           <div class="notice-text">
             <strong>修仙之道：</strong>
-            <span v-if="isLowRealm">凡胎肉身阶段需要基础养生维持生机，随着境界提升将逐渐脱离凡俗需求</span>
+            <span v-if="isLowRealm">低境界修士需要基础养生维持生机，随着境界提升将逐渐脱离凡俗需求</span>
             <span v-else-if="isHighRealm">已达高深境界，无需凡人养生，可直接吸纳天地灵气</span>
             <span v-else>正处修炼关键期，部分凡俗养生仍有助益</span>
           </div>
@@ -203,10 +203,10 @@ const wellnessTasks = ref<any[]>([])
 const manuals = ref<any[]>([])
 const showAllExtraTasks = ref(false)
 
-// 境界等级判断 - 使用数据库中的境界数据
+// 境界等级判断 - 使用数据库中的境界ID
 const realmLevel = computed(() => {
   if (!stateStore.profile) return 0
-  return stateStore.profile.realm || 1
+  return stateStore.profile.realmId || 1
 })
 
 // 是否为低境界（需要凡俗养生）- 境界ID <= 8
@@ -275,7 +275,7 @@ function getTaskButtonText(taskKey: string): string {
 async function doTask(taskKey: string) {
   loading.value = true
   try {
-    const res = await api(`/tasks/${taskKey}`, { method: 'POST' })
+    const res = await api(`/tasks/${taskKey}`, { method: 'POST' }) as { msg?: string }
     toast(res.msg || '修炼完成', 'good')
     await stateStore.fetchState(true)
   } catch (err: any) {
@@ -291,7 +291,7 @@ async function submitSteps() {
     const res = await api('/tasks/steps', {
       method: 'POST',
       body: JSON.stringify({ steps: steps.value })
-    })
+    }) as { msg?: string }
     toast(res.msg || '步数已提交', 'good')
     await stateStore.fetchState(true)
     steps.value = 0
@@ -304,7 +304,7 @@ async function submitSteps() {
 
 async function loadExtraTasks() {
   try {
-    const res = await api('/extra-tasks/config')
+    const res = await api('/extra-tasks/config') as { tasks?: any[] }
     extraTasks.value = res.tasks || []
   } catch (err: any) {
     console.error('Failed to load extra tasks:', err)
@@ -313,7 +313,7 @@ async function loadExtraTasks() {
 
 async function loadWellnessTasks() {
   try {
-    const res = await api('/tasks/wellness/config')
+    const res = await api('/tasks/wellness/config') as { tasks?: any[] }
     wellnessTasks.value = res.tasks || []
   } catch (err: any) {
     console.error('Failed to load wellness tasks:', err)
@@ -322,7 +322,7 @@ async function loadWellnessTasks() {
 
 async function loadManuals() {
   try {
-    const res = await api('/manuals')
+    const res = await api('/manuals') as { manuals?: any[] }
     manuals.value = res.manuals || []
   } catch (err: any) {
     console.error('Failed to load manuals:', err)
@@ -342,7 +342,7 @@ async function upgradeManual(key: string) {
   
   loading.value = true
   try {
-    const res = await api(`/manuals/${key}/practice`, { method: 'POST' })
+    const res = await api(`/manuals/${key}/practice`, { method: 'POST' }) as { msg?: string }
     toast(res.msg || '修炼成功，境界提升！', 'gold')
     await loadManuals()
     await stateStore.fetchState(true)

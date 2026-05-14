@@ -14,8 +14,8 @@ const ACHIEVEMENTS = [
   { id: 'event_10', name: '命运多舛', desc: '触发 10 次随机事件', merit: 20, coin: 0 },
   { id: 'revive_1', name: '起死回生', desc: '首次使用复活币续命', merit: 10, coin: 0 },
   { id: 'potion_5', name: '丹道入门', desc: '累计服用 5 次丹药', merit: 15, coin: 0 },
-  { id: 'elder_100', name: '期颐之寿', desc: '境界达到寿比南山（100岁）', merit: 50, coin: 1 },
-  { id: 'elder_200', name: '地仙临世', desc: '境界达到地仙之姿（200岁）', merit: 100, coin: 2 },
+  { id: 'elder_100', name: '期颐之寿', desc: '总寿命达到 100 岁', merit: 50, coin: 1 },
+  { id: 'elder_200', name: '地仙临世', desc: '总寿命达到 200 岁', merit: 100, coin: 2 },
   { id: 'explorer_10', name: '秘境行者', desc: '进行 10 次秘境探险', merit: 30, coin: 0 },
   { id: 'tribulation_1', name: '渡劫初成', desc: '首次成功渡过天劫', merit: 50, coin: 1 },
 ] as const

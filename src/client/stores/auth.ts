@@ -14,13 +14,13 @@ export const useAuthStore = defineStore('auth', () => {
     const res = await api('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ username: user, password })
-    })
+    }) as { token?: string; name?: string }
     
     if (res.token) {
       token.value = res.token
-      username.value = res.username || user
+      username.value = res.name || user
       localStorage.setItem('token', res.token)
-      localStorage.setItem('username', res.username || user)
+      localStorage.setItem('username', res.name || user)
       
       await checkAdmin()
       return true
@@ -32,7 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
     const res = await api('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ username: user, password })
-    })
+    }) as { token?: string; username?: string }
     
     if (res.token) {
       token.value = res.token
@@ -74,7 +74,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
     
     try {
-      const res = await api('/admin/me')
+      const res = await api('/admin/me') as { admin?: boolean }
       isAdmin.value = res.admin || false
       adminChecked.value = true
       return isAdmin.value

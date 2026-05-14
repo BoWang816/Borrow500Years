@@ -71,19 +71,6 @@ export function currentLifeSec(p: any): number {
   return p.initial_life_sec + p.bonus_sec - elapsed * base;
 }
 
-const TITLES = [
-  { min: 0,    name: '凡胎肉身' },
-  { min: 80,   name: '寿比南山' },
-  { min: 120,  name: '地仙之姿' },
-  { min: 200,  name: '与天同寿' },
-];
-
-export function getRealmTitle(totalAge: number): string {
-  let title = TITLES[0].name;
-  for (const t of TITLES) if (totalAge >= t.min) title = t.name;
-  return title;
-}
-
 export function formatLife(sec: number): string {
   if (sec >= SEC_PER_YEAR) return (sec / SEC_PER_YEAR).toFixed(1) + ' 年';
   if (sec >= SEC_PER_DAY) return (sec / SEC_PER_DAY).toFixed(1) + ' 天';
