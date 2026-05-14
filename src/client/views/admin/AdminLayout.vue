@@ -15,10 +15,7 @@
       <router-link to="/admin/potions-config" class="admin-nav-item" active-class="active">
         丹药配置
       </router-link>
-      <router-link to="/admin/manuals" class="admin-nav-item" active-class="active">
-        功法管理
-      </router-link>
-      <router-link to="/admin/tasks" class="admin-nav-item" active-class="active">
+      <router-link to="/admin/cultivation-practices" class="admin-nav-item" active-class="active">
         修炼项目
       </router-link>
       <router-link to="/admin/wellness-tasks" class="admin-nav-item" active-class="active">

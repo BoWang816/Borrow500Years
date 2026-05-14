@@ -97,19 +97,14 @@ const routes: RouteRecordRaw[] = [
         component: () => import('../views/admin/AdminEvents.vue')
       },
       {
-        path: 'manuals',
-        name: 'AdminManuals',
-        component: () => import('../views/admin/AdminManuals.vue')
-      },
-      {
-        path: 'tasks',
-        name: 'AdminTasks',
-        component: () => import('../views/admin/AdminTasks.vue')
+        path: 'cultivation-practices',
+        name: 'AdminCultivationPractices',
+        component: () => import('../views/admin/AdminCultivationPractices.vue')
       },
       {
         path: 'wellness-tasks',
         name: 'AdminWellnessTasks',
-        component: () => import('../views/admin/AdminWellnessTasks.vue')
+        component: () => import('../views/admin/AdminWellnessTasksUnified.vue')
       },
       {
         path: 'explore',

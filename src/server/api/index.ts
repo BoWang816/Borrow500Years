@@ -14,7 +14,6 @@ import explore from './modules/explore'
 import tribulation from './modules/tribulation'
 import revive from './modules/revive'
 import fortune from './modules/fortune'
-import manuals from './modules/manuals'
 import cultivation from './modules/cultivation'
 import extraTasks from './modules/extra-tasks'
 import worldEvents from './modules/world-events'
@@ -36,7 +35,6 @@ api.route('/explore', explore)
 api.route('/tribulation', tribulation)
 api.route('/revive', revive)
 api.route('/fortune', fortune)
-api.route('/manuals', manuals)
 api.route('/cultivation', cultivation)
 api.route('/extra-tasks', extraTasks)
 api.route('/world-events', worldEvents)

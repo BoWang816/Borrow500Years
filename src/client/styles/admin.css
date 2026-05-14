@@ -98,7 +98,6 @@
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 24px;
   min-height: 400px;
 }
 
@@ -412,7 +411,6 @@
 .admin-potions,
 .admin-events,
 .admin-logs,
-.admin-manuals,
 .admin-tasks,
 .admin-explore {
   min-height: 400px;
@@ -518,6 +516,20 @@
   font-family: 'ZCOOL XiaoWei', serif;
 }
 
+.item-desc {
+  font-size: 12px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+  margin: 4px 0;
+}
+
+.item-id {
+  font-size: 11px;
+  color: var(--ink-dim);
+  font-family: 'Courier New', monospace;
+  opacity: 0.7;
+}
+
 .item-badge {
   font-size: 10px;
   padding: 2px 6px;
@@ -528,9 +540,77 @@
   color: var(--jade);
 }
 
+.item-badge.active {
+  background: rgba(54,255,208,0.2);
+  color: var(--jade);
+}
+
 .item-badge.expired {
   background: rgba(255,77,109,0.2);
   color: var(--crimson);
+}
+
+/* 稀有度徽章 */
+.rarity-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.rarity-badge.common {
+  background: rgba(168,160,138,0.2);
+  color: #a8a08a;
+  border: 1px solid rgba(168,160,138,0.3);
+}
+
+.rarity-badge.rare {
+  background: rgba(54,162,235,0.2);
+  color: #36a2eb;
+  border: 1px solid rgba(54,162,235,0.3);
+}
+
+.rarity-badge.epic {
+  background: rgba(153,102,255,0.2);
+  color: #9966ff;
+  border: 1px solid rgba(153,102,255,0.3);
+}
+
+.rarity-badge.legendary {
+  background: rgba(255,206,86,0.2);
+  color: #ffce56;
+  border: 1px solid rgba(255,206,86,0.3);
+  text-shadow: 0 0 8px rgba(255,206,86,0.4);
+}
+
+/* 类别徽章 */
+.category-badge {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-weight: 600;
+}
+
+.category-badge.recovery {
+  background: rgba(54,255,208,0.2);
+  color: var(--jade);
+  border: 1px solid rgba(54,255,208,0.3);
+}
+
+.category-badge.buff {
+  background: rgba(255,159,64,0.2);
+  color: #ff9f40;
+  border: 1px solid rgba(255,159,64,0.3);
+}
+
+.category-badge.special {
+  background: rgba(255,99,132,0.2);
+  color: #ff6384;
+  border: 1px solid rgba(255,99,132,0.3);
 }
 
 .item-meta {
@@ -539,6 +619,40 @@
   font-size: 12px;
   color: var(--ink-dim);
   flex-wrap: wrap;
+}
+
+.meta-highlight {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.meta-success {
+  color: var(--jade);
+  font-weight: 600;
+}
+
+.meta-info {
+  color: #36a2eb;
+  font-weight: 600;
+}
+
+.meta-warning {
+  color: #ff9f40;
+  font-weight: 600;
+}
+
+.meta-special {
+  color: #ff6384;
+  font-weight: 600;
+}
+
+.meta-realm {
+  color: var(--jade);
+  font-weight: 600;
+  background: rgba(54, 255, 208, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(54, 255, 208, 0.3);
 }
 
 .item-actions {
@@ -563,6 +677,25 @@
 
 .btn-delete:hover {
   background: rgba(255,77,109,0.2);
+  transform: scale(1.1);
+}
+
+.btn-edit {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(54,255,208,0.1);
+  border: 1px solid rgba(54,255,208,0.3);
+  border-radius: 6px;
+  color: var(--jade);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-edit:hover {
+  background: rgba(54,255,208,0.2);
   transform: scale(1.1);
 }
 
@@ -741,4 +874,93 @@
 
 .user-date {
   color: var(--ink-dim);
+}
+
+/* 难度徽章 */
+.difficulty-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid;
+  display: inline-block;
+}
+
+.difficulty-easy {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  border-color: #4caf50;
+}
+
+.difficulty-normal {
+  background: rgba(33, 150, 243, 0.1);
+  color: #2196f3;
+  border-color: #2196f3;
+}
+
+.difficulty-hard {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ff9800;
+  border-color: #ff9800;
+}
+
+.difficulty-extreme {
+  background: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+  border-color: #f44336;
+}
+
+/* 品质徽章（历练项目） */
+.category-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid;
+  display: inline-block;
+}
+
+.category-common {
+  background: rgba(128, 128, 128, 0.1);
+  color: #808080;
+  border-color: #808080;
+}
+
+.category-rare {
+  background: rgba(54, 255, 208, 0.1);
+  color: #36ffd0;
+  border-color: #36ffd0;
+}
+
+.category-epic {
+  background: rgba(138, 43, 226, 0.1);
+  color: #8a2be2;
+  border-color: #8a2be2;
+}
+
+.category-legendary {
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  border-color: #d4af37;
+}
+
+/* 历练项目特定样式 */
+.admin-explore .item-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-explore .meta-realm {
+  color: #36ffd0;
+  font-weight: 600;
+}
+
+.admin-explore .meta-reward {
+  color: #999;
+}
+
+.admin-explore .meta-reward i {
+  margin-right: 4px;
 }
