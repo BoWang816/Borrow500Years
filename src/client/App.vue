@@ -19,8 +19,11 @@
         <router-link to="/dashboard" class="nav-item" active-class="active">
           <i class="fas fa-heart-pulse"></i><span>命脉</span>
         </router-link>
+        <router-link to="/cultivation-practices" class="nav-item" active-class="active">
+          <i class="fas fa-fire"></i><span>修炼</span>
+        </router-link>
         <router-link to="/cultivation" class="nav-item" active-class="active">
-          <i class="fas fa-leaf"></i><span>修炼</span>
+          <i class="fas fa-leaf"></i><span>养生</span>
         </router-link>
         <router-link to="/inventory" class="nav-item" active-class="active">
           <i class="fas fa-flask-vial"></i><span>丹房</span>
