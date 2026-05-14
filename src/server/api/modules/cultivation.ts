@@ -11,23 +11,38 @@ cultivation.get('/practices', authMiddleware, loadProfile, async (c) => {
   const userId = c.get('userId') as number
   const profile = c.get('profile') as Profile
   
-  // 计算用户当前境界
-  const now = Date.now()
-  const elapsed = (now - (profile.start_timestamp || 0)) / 1000
-  const totalAge = (profile.age || 0) + elapsed / SEC_PER_YEAR + (profile.bonus_sec || 0) / SEC_PER_YEAR
-  const realmData = await getRealmByAge(c.env.DB, totalAge)
-  const currentRealmId = realmData.id
-  
-  // 获取当前境界及之前境界的所有修炼项目
-  const practices = await c.env.DB.prepare(`
-    SELECT * FROM cultivation_practices 
-    WHERE realm_id <= ? AND is_active = 1
-    ORDER BY realm_id ASC, sort_order ASC
-  `).bind(currentRealmId).all<any>()
-  
-  // 获取用户的修炼进度
-  const userProgress = await c.env.DB.prepare(`
-    SELECT * FROM user_cultivation_progress WHERE user_id = ?
+  try {
+    // 计算用户当前境界
+    const now = Date.now()
+    const elapsed = (now - (profile.start_timestamp || 0)) / 1000
+    const totalAge = (profile.age || 0) + elapsed / SEC_PER_YEAR + (profile.bonus_sec || 0) / SEC_PER_YEAR
+    const realmData = await getRealmByAge(c.env.DB, totalAge)
+    const currentRealmId = realmData.id
+    
+    // 检查表是否存在
+    const tableCheck = await c.env.DB.prepare(`
+      SELECT name FROM sqlite_master WHERE type='table' AND name='cultivation_practices'
+    `).first()
+    
+    if (!tableCheck) {
+      return c.json({ 
+        error: '修炼项目表不存在，请先运行数据库迁移脚本',
+        practices: [],
+        currentRealmId,
+        currentRealmName: realmData.name
+      })
+    }
+    
+    // 获取当前境界及之前境界的所有修炼项目
+    const practices = await c.env.DB.prepare(`
+      SELECT * FROM cultivation_practices 
+      WHERE realm_id <= ? AND is_active = 1
+      ORDER BY realm_id ASC, sort_order ASC
+    `).bind(currentRealmId).all<any>()
+    
+    // 获取用户的修炼进度
+    const userProgress = await c.env.DB.prepare(`
+      SELECT * FROM user_cultivation_progress WHERE user_id = ?
   `).bind(userId).all<any>()
   
   const progressMap = new Map(
@@ -94,6 +109,15 @@ cultivation.get('/practices', authMiddleware, loadProfile, async (c) => {
     currentRealmId,
     currentRealmName: realmData.name
   })
+  } catch (error: any) {
+    console.error('Error fetching cultivation practices:', error)
+    return c.json({ 
+      error: error.message || '获取修炼项目失败',
+      practices: [],
+      currentRealmId: 1,
+      currentRealmName: '未知'
+    }, 500)
+  }
 })
 
 // 修炼功法

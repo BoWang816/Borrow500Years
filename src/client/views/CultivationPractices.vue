@@ -51,6 +51,19 @@
       </div>
 
       <template v-else>
+        <!-- 空状态提示 -->
+        <div v-if="practices.length === 0" class="empty-state">
+          <i class="fas fa-database"></i>
+          <h3>暂无修炼项目</h3>
+          <p>请先运行数据库迁移脚本初始化修炼项目数据</p>
+          <div class="migration-commands">
+            <code>wrangler d1 execute DB --local --file=./migrations/0015_realm_cultivation_system.sql</code>
+            <code>wrangler d1 execute DB --local --file=./migrations/0016_cultivation_practices_expansion.sql</code>
+            <code>wrangler d1 execute DB --local --file=./migrations/0017_cultivation_practices_realms_11_15.sql</code>
+            <code>wrangler d1 execute DB --local --file=./migrations/0018_cultivation_practices_realms_16_20.sql</code>
+          </div>
+        </div>
+
         <!-- 按境界分组显示 -->
         <div v-for="realmGroup in groupedPractices" :key="realmGroup.realmId" class="realm-group">
           <div class="realm-header" @click="toggleRealm(realmGroup.realmId)">
@@ -237,6 +250,15 @@ async function loadPractices() {
   loading.value = true
   try {
     const res = await api('/cultivation/practices') as any
+    
+    if (res.error) {
+      toast(res.error, 'bad')
+      practices.value = []
+      currentRealmId.value = res.currentRealmId || 0
+      currentRealmName.value = res.currentRealmName || ''
+      return
+    }
+    
     practices.value = res.practices || []
     currentRealmId.value = res.currentRealmId || 0
     currentRealmName.value = res.currentRealmName || ''
@@ -608,5 +630,53 @@ onMounted(async () => {
   color: var(--gold);
   font-size: 18px;
   gap: 12px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.empty-state i {
+  font-size: 64px;
+  color: var(--gold);
+  opacity: 0.3;
+  margin-bottom: 24px;
+}
+
+.empty-state h3 {
+  font-size: 24px;
+  color: var(--gold-soft);
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  font-size: 16px;
+  color: var(--ink-dim);
+  margin-bottom: 24px;
+}
+
+.migration-commands {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 800px;
+  width: 100%;
+}
+
+.migration-commands code {
+  padding: 12px 16px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--jade);
+  text-align: left;
+  overflow-x: auto;
 }
 </style>
