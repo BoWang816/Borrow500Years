@@ -3,12 +3,25 @@ import { ref } from 'vue'
 import { api } from '../utils/api'
 import type { Profile, Modifier, Event } from '../types'
 
+interface Realm {
+  id: number
+  name: string
+  major_realm: number
+  sub_realm: number
+  major_realm_name: string
+  lifespan_max: number
+  description: string
+  sort_order: number
+}
+
 export const useStateStore = defineStore('state', () => {
   const profile = ref<Profile | null>(null)
   const modifiers = ref<Modifier[]>([])
   const events = ref<Event[]>([])
+  const realms = ref<Realm[]>([])
   const loading = ref<boolean>(false)
   const lastFetch = ref<number>(0)
+  const realmsLoaded = ref<boolean>(false)
 
   async function fetchState(force = false) {
     // 防抖：30秒内不重复请求（除非强制刷新）
@@ -44,6 +57,23 @@ export const useStateStore = defineStore('state', () => {
     }
   }
 
+  async function fetchRealms() {
+    if (realmsLoaded.value) return
+    
+    try {
+      const res = await api('/realms/list') as any
+      realms.value = res.realms || []
+      realmsLoaded.value = true
+    } catch (err) {
+      console.error('Failed to fetch realms:', err)
+    }
+  }
+
+  function getRealmName(realmId: number): string {
+    const realm = realms.value.find(r => r.id === realmId)
+    return realm?.name || '未知境界'
+  }
+
   function updateProfile(updates: Partial<Profile>) {
     if (profile.value) {
       profile.value = { ...profile.value, ...updates }
@@ -54,8 +84,11 @@ export const useStateStore = defineStore('state', () => {
     profile,
     modifiers,
     events,
+    realms,
     loading,
     fetchState,
+    fetchRealms,
+    getRealmName,
     updateProfile
   }
 })

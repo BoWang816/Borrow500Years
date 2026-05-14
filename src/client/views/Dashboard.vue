@@ -32,12 +32,18 @@
             </div>
             <div class="meta-item">
               <span class="meta-label">境界</span>
-              <span class="meta-val realm">{{ stateStore.profile.realm || '凡胎肉身' }}</span>
+              <span class="meta-val realm">{{ realmName }}</span>
             </div>
             <div class="meta-item">
-              <span class="meta-label">复活币</span>
-              <span class="meta-val coin">
-                <i class="fas fa-coins"></i> {{ stateStore.profile.coin || 0 }}
+              <span class="meta-label">功德</span>
+              <span class="meta-val merit">
+                <i class="fas fa-gem"></i> {{ (stateStore.profile.merit || 0).toLocaleString() }}
+              </span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">总寿命</span>
+              <span class="meta-val life">
+                <i class="fas fa-hourglass-half"></i> {{ formatTotalLife(stateStore.profile.lifeSec || 0) }}
               </span>
             </div>
           </div>
@@ -67,7 +73,7 @@
       <div class="dash-cards">
         <!-- 今日运势 -->
         <div class="card fortune-card">
-          <h3><i class="fas fa-yin-yang"></i> 今日运势</h3>
+          <h3><i class="fas fa-yin-yang"></i> 今日运势 <span v-if="fortuneData?.zodiac" class="zodiac-tag">{{ fortuneData.zodiac }}</span></h3>
           <div v-if="fortuneData" class="fortune-content">
             <div :class="['fortune-result', `fortune-${fortuneData.fortune.toLowerCase()}`]">
               {{ fortuneData.title }}
@@ -89,18 +95,66 @@
                   <span>{{ fortuneData.avoid }}</span>
                 </div>
               </div>
-              <div class="fortune-meta">
-                <div class="meta-row">
-                  <span class="meta-label">吉方：</span>
-                  <span class="meta-value">{{ fortuneData.luckyDirection }}</span>
+              
+              <!-- 运势指数（如果有API数据） -->
+              <div v-if="fortuneData.indexes" class="fortune-indexes">
+                <div class="index-item">
+                  <span class="index-label">综合</span>
+                  <div class="index-bar">
+                    <div class="index-fill" :style="{ width: fortuneData.indexes.all }"></div>
+                  </div>
+                  <span class="index-value">{{ fortuneData.indexes.all }}</span>
                 </div>
-                <div class="meta-row">
-                  <span class="meta-label">吉时：</span>
-                  <span class="meta-value">{{ fortuneData.luckyTime }}</span>
+                <div class="index-item">
+                  <span class="index-label">健康</span>
+                  <div class="index-bar">
+                    <div class="index-fill" :style="{ width: fortuneData.indexes.health }"></div>
+                  </div>
+                  <span class="index-value">{{ fortuneData.indexes.health }}</span>
+                </div>
+                <div class="index-item">
+                  <span class="index-label">爱情</span>
+                  <div class="index-bar">
+                    <div class="index-fill" :style="{ width: fortuneData.indexes.love }"></div>
+                  </div>
+                  <span class="index-value">{{ fortuneData.indexes.love }}</span>
+                </div>
+                <div class="index-item">
+                  <span class="index-label">财运</span>
+                  <div class="index-bar">
+                    <div class="index-fill" :style="{ width: fortuneData.indexes.money }"></div>
+                  </div>
+                  <span class="index-value">{{ fortuneData.indexes.money }}</span>
+                </div>
+                <div class="index-item">
+                  <span class="index-label">工作</span>
+                  <div class="index-bar">
+                    <div class="index-fill" :style="{ width: fortuneData.indexes.work }"></div>
+                  </div>
+                  <span class="index-value">{{ fortuneData.indexes.work }}</span>
+                </div>
+              </div>
+              
+              <div class="fortune-meta">
+                <div class="meta-row" v-if="fortuneData.luckyConstellation">
+                  <span class="meta-label">幸运星座：</span>
+                  <span class="meta-value">{{ fortuneData.luckyConstellation }}</span>
+                </div>
+                <div class="meta-row" v-if="fortuneData.luckyNumber">
+                  <span class="meta-label">幸运数字：</span>
+                  <span class="meta-value">{{ fortuneData.luckyNumber }}</span>
                 </div>
                 <div class="meta-row">
                   <span class="meta-label">幸运色：</span>
                   <span class="meta-value">{{ fortuneData.luckyColor }}</span>
+                </div>
+                <div class="meta-row" v-if="fortuneData.luckyDirection">
+                  <span class="meta-label">吉方：</span>
+                  <span class="meta-value">{{ fortuneData.luckyDirection }}</span>
+                </div>
+                <div class="meta-row" v-if="fortuneData.luckyTime">
+                  <span class="meta-label">吉时：</span>
+                  <span class="meta-value">{{ fortuneData.luckyTime }}</span>
                 </div>
               </div>
             </div>
@@ -226,6 +280,25 @@ const decayRate = computed(() => {
   return rate.toFixed(2)
 })
 
+const realmName = computed(() => {
+  if (!stateStore.profile) return '未知境界'
+  return stateStore.getRealmName(stateStore.profile.realm)
+})
+
+function formatTotalLife(seconds: number): string {
+  const years = Math.floor(seconds / SEC_PER_YEAR)
+  const days = Math.floor((seconds % SEC_PER_YEAR) / SEC_PER_DAY)
+  
+  if (years > 0) {
+    return `${years}年${days}天`
+  } else if (days > 0) {
+    return `${days}天`
+  } else {
+    const hours = Math.floor(seconds / 3600)
+    return `${hours}小时`
+  }
+}
+
 function formatTime(timestamp: number): string {
   // timestamp是秒级时间戳
   const date = new Date(timestamp * 1000)
@@ -274,7 +347,7 @@ async function triggerRandomEvent() {
 
 async function loadFortune() {
   try {
-    const res = await api('/fortune')
+    const res = await api('/fortune') as any
     fortuneData.value = res
   } catch (err: any) {
     console.error('Failed to load fortune:', err)
@@ -286,7 +359,7 @@ async function checkin() {
   
   checkinLoading.value = true
   try {
-    const res = await api('/fortune/checkin', { method: 'POST' })
+    const res = await api('/fortune/checkin', { method: 'POST' }) as any
     toast(res.msg || '签到成功', 'gold')
     await loadFortune()
     await stateStore.fetchState(true)
@@ -298,6 +371,7 @@ async function checkin() {
 }
 
 onMounted(async () => {
+  await stateStore.fetchRealms() // 先加载境界数据
   await stateStore.fetchState(true)
   await loadFortune()
   

@@ -143,3 +143,120 @@
   color: var(--gold-soft);
   font-family: 'Chinese-Sans', sans-serif;
 }
+
+
+/* 星座标签 */
+.zodiac-tag {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-left: 0.5rem;
+}
+
+/* 运势指数 */
+.fortune-indexes {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.index-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.index-item:last-child {
+  margin-bottom: 0;
+}
+
+.index-label {
+  min-width: 50px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.index-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.index-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.index-value {
+  min-width: 45px;
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* 运势详情行 */
+.meta-row {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.meta-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.meta-value {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* 建议项 */
+.advice-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.advice-item.good {
+  border-left: 3px solid #4ecdc4;
+}
+
+.advice-item.bad {
+  border-left: 3px solid #ff6b6b;
+}
+
+.advice-item i {
+  margin-top: 0.2rem;
+  font-size: 1rem;
+}
+
+.advice-item.good i {
+  color: #4ecdc4;
+}
+
+.advice-item.bad i {
+  color: #ff6b6b;
+}
+
+.advice-item span {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}

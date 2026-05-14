@@ -8,11 +8,14 @@ const board = new Hono<{ Bindings: Bindings }>()
 board.get('/:type', async (c) => {
   const type = c.req.param('type') // longevity | merit
   const all = await c.env.DB.prepare(`
-    SELECT id, username, name, gender, age, height, weight,
-           smoke, alcohol, stayup, exercise, meditate,
-           initial_life_sec, bonus_sec, start_timestamp, total_gained_sec, merit
-    FROM users
-    WHERE name IS NOT NULL
+    SELECT u.id, u.username, u.name, u.gender, u.age, u.height, u.weight,
+           u.smoke, u.alcohol, u.stayup, u.exercise, u.meditate,
+           u.initial_life_sec, u.bonus_sec, u.start_timestamp, u.total_gained_sec, u.merit,
+           ur.current_realm_id, r.name as realm_name, r.major_realm
+    FROM users u
+    LEFT JOIN user_realms ur ON u.id = ur.user_id
+    LEFT JOIN realms r ON ur.current_realm_id = r.id
+    WHERE u.name IS NOT NULL
   `).all<any>()
 
   const now = Date.now()
@@ -27,7 +30,9 @@ board.get('/:type', async (c) => {
       age: totalAge,
       lifeSec,
       meritGained: r.merit || 0,
-      realm: getRealmTitle(totalAge),
+      realm: r.realm_name || getRealmTitle(totalAge),
+      realmId: r.current_realm_id || 1,
+      majorRealm: r.major_realm || 1,
     }
   })
 
@@ -42,8 +47,9 @@ board.get('/:type', async (c) => {
     if (u) myUserId = u.id
   }
   return c.json({
-    rows: rows.slice(0, 20).map((r: any) => ({ ...r, isMe: r.userId === myUserId })),
+    rows: rows.map((r: any) => ({ ...r, isMe: r.userId === myUserId })),
     myRank: myUserId ? rows.findIndex((r: any) => r.userId === myUserId) + 1 : 0,
+    total: rows.length,
   })
 })
 

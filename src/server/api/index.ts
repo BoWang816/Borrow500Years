@@ -19,6 +19,7 @@ import extraTasks from './modules/extra-tasks'
 import worldEvents from './modules/world-events'
 import admin from './modules/admin'
 import realms from './modules/realms'
+import adminFortune from './modules/admin-fortune'
 
 const api = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
 
@@ -39,6 +40,7 @@ api.route('/extra-tasks', extraTasks)
 api.route('/world-events', worldEvents)
 api.route('/admin', admin)
 api.route('/realms', realms)
+api.route('/admin/fortune', adminFortune)
 
 // 管理员检查接口
 api.get('/admin/me', async (c) => {

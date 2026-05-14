@@ -2,6 +2,51 @@
    管理后台样式
    ========================================================== */
 
+/* 管理页面头部 */
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--line);
+}
+
+.admin-header h2 {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 28px;
+  color: var(--gold-soft);
+  letter-spacing: 3px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-header h2 i {
+  color: var(--gold);
+  font-size: 24px;
+}
+
+.admin-header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .admin-header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
 /* 管理员链接 */
 .admin-link {
   width: 36px;

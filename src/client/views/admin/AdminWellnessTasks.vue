@@ -1,134 +1,151 @@
 <template>
-  <div class="admin-section">
-    <div class="section-header">
-      <h3>养生任务管理</h3>
-      <button @click="showCreateForm = true" class="btn-primary">+ 新建任务</button>
-    </div>
+  <div class="admin-wellness-tasks">
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="fas fa-spa"></i> 养生任务管理</h3>
+        <button @click="openCreateModal" class="btn-primary">
+          <i class="fas fa-plus"></i> 新建任务
+        </button>
+      </div>
 
-    <div v-if="loading" class="loading">加载中...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else class="tasks-list">
-      <div v-for="task in tasks" :key="task.id" class="task-item">
-        <div class="task-info">
-          <span class="task-emoji">{{ task.emoji }}</span>
-          <div class="task-details">
-            <div class="task-name">{{ task.name }} <span class="task-key">({{ task.task_key }})</span></div>
-            <div class="task-desc">{{ task.description }}</div>
-            <div class="task-rewards">
-              <span v-if="task.life_reward">寿命: {{ formatLife(task.life_reward) }}</span>
-              <span v-if="task.merit_reward">功德: {{ task.merit_reward }}</span>
-              <span v-if="task.shard_reward">碎片: {{ task.shard_reward }}</span>
-              <span v-if="task.coin_reward">复活币: {{ task.coin_reward }}</span>
+      <div v-if="loading" class="loading">加载中...</div>
+      <div v-else-if="error" class="error">{{ error }}</div>
+      <div v-else class="admin-list">
+        <div v-if="tasks.length === 0" class="empty">暂无养生任务</div>
+        <div v-for="task in tasks" :key="task.id" class="admin-item">
+          <span class="item-emoji">{{ task.emoji }}</span>
+          <div class="item-content">
+            <div class="item-header">
+              <span class="item-name">{{ task.name }}</span>
+              <span class="item-badge" :class="{ active: task.is_active }">
+                {{ task.is_active ? '启用' : '禁用' }}
+              </span>
+              <span class="item-id">({{ task.task_key }})</span>
             </div>
-            <div class="task-meta">
+            <div class="item-desc">{{ task.description }}</div>
+            <div class="item-meta">
+              <span v-if="task.life_reward" class="meta-success">
+                <i class="fas fa-hourglass"></i>
+                寿命: {{ formatLife(task.life_reward) }}
+              </span>
+              <span v-if="task.merit_reward" class="meta-info">
+                <i class="fas fa-gem"></i>
+                功德: {{ task.merit_reward }}
+              </span>
+              <span v-if="task.shard_reward" class="meta-warning">
+                <i class="fas fa-star"></i>
+                碎片: {{ task.shard_reward }}
+              </span>
+              <span v-if="task.coin_reward" class="meta-special">
+                <i class="fas fa-coins"></i>
+                复活币: {{ task.coin_reward }}
+              </span>
               <span>类型: {{ rewardTypeLabel(task.reward_type) }}</span>
               <span>境界: {{ realmLabel(task.realm_requirement) }}</span>
               <span>排序: {{ task.sort_order }}</span>
-              <span :class="task.is_active ? 'status-active' : 'status-inactive'">
-                {{ task.is_active ? '启用' : '禁用' }}
-              </span>
             </div>
           </div>
-        </div>
-        <div class="task-actions">
-          <button @click="editTask(task)" class="btn-edit">编辑</button>
-          <button @click="deleteTask(task.id)" class="btn-delete">删除</button>
+          <div class="item-actions">
+            <button @click="openEditModal(task)" class="btn-edit" title="编辑">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button @click="deleteTask(task.id)" class="btn-delete" title="删除">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- 创建/编辑表单 -->
-    <div v-if="showCreateForm || editingTask" class="modal-overlay" @click.self="closeForm">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>{{ editingTask ? '编辑任务' : '新建任务' }}</h3>
-          <button @click="closeForm" class="btn-close">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form @submit.prevent="submitForm" class="task-form">
-            <div class="form-row">
-              <label>任务键名 *</label>
-              <input v-model="formData.taskKey" required placeholder="例如: ziwu" />
-            </div>
-            <div class="form-row">
-              <label>任务名称 *</label>
-            <input v-model="formData.name" required placeholder="例如: 子午流注" />
+    <Modal v-model="showModal" :title="editingTask ? '编辑养生任务' : '新建养生任务'" size="large">
+      <div class="modal-form">
+        <div class="form-grid">
+          <div class="form-item">
+            <label>任务键名 *</label>
+            <input v-model="formData.taskKey" placeholder="例如: ziwu" />
           </div>
-          <div class="form-row">
+          <div class="form-item">
+            <label>任务名称 *</label>
+            <input v-model="formData.name" placeholder="例如: 子午流注" />
+          </div>
+          <div class="form-item">
             <label>图标 *</label>
-            <input v-model="formData.emoji" required placeholder="例如: 🌙" />
+            <input v-model="formData.emoji" placeholder="例如: 🌙" maxlength="2" />
           </div>
-          <div class="form-row">
-            <label>描述 *</label>
-            <textarea v-model="formData.description" required placeholder="任务描述"></textarea>
-          </div>
-          <div class="form-row">
+          <div class="form-item">
             <label>奖励类型 *</label>
-            <select v-model="formData.rewardType" required>
+            <select v-model="formData.rewardType">
               <option value="fixed">固定奖励</option>
               <option value="variable">可变奖励</option>
               <option value="input">输入型奖励</option>
             </select>
           </div>
-          <div class="form-row">
+          <div class="form-item">
             <label>寿命奖励（秒）</label>
             <input v-model.number="formData.lifeReward" type="number" min="0" />
           </div>
-          <div class="form-row">
+          <div class="form-item">
             <label>功德奖励</label>
             <input v-model.number="formData.meritReward" type="number" min="0" />
           </div>
-          <div class="form-row">
+          <div class="form-item">
             <label>碎片奖励</label>
             <input v-model.number="formData.shardReward" type="number" min="0" />
           </div>
-          <div class="form-row">
+          <div class="form-item">
             <label>复活币奖励</label>
             <input v-model.number="formData.coinReward" type="number" min="0" />
           </div>
-          <div class="form-row">
+          <div class="form-item">
             <label>修饰值</label>
             <input v-model.number="formData.modifierValue" type="number" step="0.01" />
           </div>
-          <div class="form-row">
+          <div class="form-item">
             <label>境界要求 *</label>
-            <select v-model="formData.realmRequirement" required>
+            <select v-model="formData.realmRequirement">
               <option value="basic">基础</option>
               <option value="mortal">凡人</option>
               <option value="advanced">进阶</option>
               <option value="challenge">挑战</option>
             </select>
           </div>
-          <div class="form-row">
+          <div class="form-item">
             <label>排序</label>
             <input v-model.number="formData.sortOrder" type="number" min="0" />
           </div>
-          <div class="form-row">
-            <label>输入配置（JSON）</label>
-            <textarea v-model="formData.inputConfig" placeholder='例如: {"type":"slider","min":1000,"max":50000}'></textarea>
-          </div>
-          <div class="form-row">
-            <label>
-              <input v-model="formData.isActive" type="checkbox" />
-              启用
+          <div class="form-item">
+            <label style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" v-model="formData.isActive" />
+              <span>启用</span>
             </label>
           </div>
-          <div class="form-actions">
-            <button type="button" @click="closeForm" class="btn-cancel">取消</button>
-            <button type="submit" class="btn-submit">{{ editingTask ? '更新' : '创建' }}</button>
-          </div>
-        </form>
+        </div>
+        <div class="form-item full-width">
+          <label>任务描述 *</label>
+          <textarea v-model="formData.description" placeholder="任务描述" rows="3"></textarea>
+        </div>
+        <div class="form-item full-width">
+          <label>输入配置（JSON）</label>
+          <textarea v-model="formData.inputConfig" placeholder='例如: {"type":"slider","min":1000,"max":50000}' rows="2"></textarea>
         </div>
       </div>
-    </div>
+      
+      <template #footer>
+        <button @click="showModal = false" class="btn-secondary">
+          <i class="fas fa-times"></i> 取消
+        </button>
+        <button @click="saveTask" class="btn-success" :disabled="loading">
+          <i class="fas fa-save"></i> {{ editingTask ? '保存' : '创建' }}
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { api } from '../../utils/api'
+import { api, toast } from '../../utils/api'
+import Modal from '../../components/Modal.vue'
 
 interface WellnessTask {
   id: number
@@ -149,9 +166,9 @@ interface WellnessTask {
 }
 
 const tasks = ref<WellnessTask[]>([])
-const loading = ref(true)
+const loading = ref(false)
 const error = ref('')
-const showCreateForm = ref(false)
+const showModal = ref(false)
 const editingTask = ref<WellnessTask | null>(null)
 
 const formData = ref({
@@ -195,42 +212,7 @@ const realmLabel = (realm: string) => {
   return labels[realm] || realm
 }
 
-const loadTasks = async () => {
-  loading.value = true
-  error.value = ''
-  try {
-    const res = await api('/admin/wellness-tasks') as { tasks: WellnessTask[] }
-    tasks.value = res.tasks || []
-  } catch (err: any) {
-    error.value = err.message || '加载失败'
-  } finally {
-    loading.value = false
-  }
-}
-
-const editTask = (task: WellnessTask) => {
-  editingTask.value = task
-  formData.value = {
-    taskKey: task.task_key,
-    name: task.name,
-    emoji: task.emoji,
-    description: task.description,
-    rewardType: task.reward_type,
-    lifeReward: task.life_reward,
-    meritReward: task.merit_reward,
-    shardReward: task.shard_reward,
-    coinReward: task.coin_reward,
-    modifierValue: task.modifier_value,
-    realmRequirement: task.realm_requirement,
-    sortOrder: task.sort_order,
-    inputConfig: task.input_config || '',
-    isActive: task.is_active === 1
-  }
-}
-
-const closeForm = () => {
-  showCreateForm.value = false
-  editingTask.value = null
+function resetForm() {
   formData.value = {
     taskKey: '',
     name: '',
@@ -247,9 +229,56 @@ const closeForm = () => {
     inputConfig: '',
     isActive: true
   }
+  editingTask.value = null
 }
 
-const submitForm = async () => {
+function openCreateModal() {
+  resetForm()
+  showModal.value = true
+}
+
+function openEditModal(task: WellnessTask) {
+  formData.value = {
+    taskKey: task.task_key,
+    name: task.name,
+    emoji: task.emoji,
+    description: task.description,
+    rewardType: task.reward_type,
+    lifeReward: task.life_reward,
+    meritReward: task.merit_reward,
+    shardReward: task.shard_reward,
+    coinReward: task.coin_reward,
+    modifierValue: task.modifier_value,
+    realmRequirement: task.realm_requirement,
+    sortOrder: task.sort_order,
+    inputConfig: task.input_config || '',
+    isActive: task.is_active === 1
+  }
+  editingTask.value = task
+  showModal.value = true
+}
+
+async function loadTasks() {
+  loading.value = true
+  error.value = ''
+  try {
+    const res = await api('/admin/wellness-tasks') as { tasks: WellnessTask[] }
+    tasks.value = res.tasks || []
+  } catch (err: any) {
+    error.value = err.message || '加载失败'
+    toast(error.value, 'bad')
+  } finally {
+    loading.value = false
+  }
+}
+
+async function saveTask() {
+  if (!formData.value.taskKey || !formData.value.name || !formData.value.description) {
+    toast('请填写必填字段', 'bad')
+    return
+  }
+
+  loading.value = true
   try {
     const payload = {
       taskKey: formData.value.taskKey,
@@ -273,27 +302,37 @@ const submitForm = async () => {
         method: 'PUT',
         body: JSON.stringify(payload)
       })
+      toast('养生任务更新成功', 'good')
     } else {
       await api('/admin/wellness-tasks', {
         method: 'POST',
         body: JSON.stringify(payload)
       })
+      toast('养生任务创建成功', 'good')
     }
 
-    closeForm()
+    showModal.value = false
+    resetForm()
     await loadTasks()
   } catch (err: any) {
-    alert(err.message || '操作失败')
+    toast(err.message || '操作失败', 'bad')
+  } finally {
+    loading.value = false
   }
 }
 
-const deleteTask = async (id: number) => {
+async function deleteTask(id: number) {
   if (!confirm('确定删除此任务？')) return
+  
+  loading.value = true
   try {
     await api(`/admin/wellness-tasks/${id}`, { method: 'DELETE' })
+    toast('养生任务删除成功', 'good')
     await loadTasks()
   } catch (err: any) {
-    alert(err.message || '删除失败')
+    toast(err.message || '删除失败', 'bad')
+  } finally {
+    loading.value = false
   }
 }
 
@@ -302,6 +341,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
-@import './admin-form-styles.css';
-</style>
+<style scoped src="./admin-form-styles.css"></style>

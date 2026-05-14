@@ -8,7 +8,6 @@
         </button>
       </div>
 
-      <!-- 功法列表 -->
       <div class="admin-list">
         <div v-if="paginatedManuals.length === 0" class="empty">暂无功法</div>
         <div v-for="manual in paginatedManuals" :key="manual.id" class="admin-item">
@@ -36,7 +35,6 @@
         </div>
       </div>
 
-      <!-- 分页 -->
       <Pagination
         v-model:current-page="currentPage"
         :page-size="pageSize"
@@ -44,7 +42,6 @@
       />
     </div>
 
-    <!-- Modal弹框 -->
     <Modal v-model="showModal" :title="editingId ? '编辑功法' : '新建功法'" size="large">
       <div class="modal-form">
         <div class="form-grid">
@@ -174,7 +171,7 @@ function openEditModal(manual: any) {
 
 async function loadManuals() {
   try {
-    const res = await api('/admin/manuals')
+    const res = await api('/admin/manuals') as any
     manuals.value = res.manuals || []
   } catch (err: any) {
     toast(err.message, 'bad')

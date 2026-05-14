@@ -47,7 +47,7 @@
         <span class="user-tag">
           <i class="fas fa-user"></i> <span>{{ authStore.username }}</span>
         </span>
-        <span class="title-badge">{{ stateStore.profile?.realm || '凡胎肉身' }}</span>
+        <span class="title-badge">{{ realmName }}</span>
         <button 
           @click="handleLogout" 
           class="reset-btn" 
@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { useStateStore } from './stores/state'
@@ -81,12 +81,18 @@ const router = useRouter()
 const authStore = useAuthStore()
 const stateStore = useStateStore()
 
+const realmName = computed(() => {
+  if (!stateStore.profile) return '未知境界'
+  return stateStore.getRealmName(stateStore.profile.realm)
+})
+
 onMounted(async () => {
   const isAuth = await authStore.checkAuth()
   
   // 如果已认证，加载用户状态
   if (isAuth) {
     try {
+      await stateStore.fetchRealms() // 先加载境界数据
       await stateStore.fetchState(true)
     } catch (err) {
       console.error('Failed to fetch state:', err)

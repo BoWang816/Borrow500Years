@@ -633,10 +633,14 @@
   flex-shrink: 0;
 }
 
-.btn-edit,
-.btn-delete {
-  padding: 8px 16px;
-  border: none;
+.task-actions .btn-edit,
+.task-actions .btn-delete {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
@@ -644,26 +648,28 @@
   font-size: 14px;
 }
 
-.btn-edit {
-  background: rgba(100, 255, 218, 0.2);
+.task-actions .btn-edit {
+  background: rgba(54, 255, 208, 0.1);
   color: var(--jade);
-  border: 1px solid var(--jade);
+  border: 1px solid rgba(54, 255, 208, 0.3);
 }
 
-.btn-edit:hover {
-  background: var(--jade);
-  color: #000;
+.task-actions .btn-edit:hover {
+  background: rgba(54, 255, 208, 0.2);
+  border-color: var(--jade);
+  box-shadow: 0 0 15px rgba(54, 255, 208, 0.3);
 }
 
-.btn-delete {
-  background: rgba(255, 71, 87, 0.2);
-  color: #ff4757;
-  border: 1px solid #ff4757;
+.task-actions .btn-delete {
+  background: rgba(255, 77, 109, 0.1);
+  color: var(--crimson);
+  border: 1px solid rgba(255, 77, 109, 0.3);
 }
 
-.btn-delete:hover {
-  background: #ff4757;
-  color: #fff;
+.task-actions .btn-delete:hover {
+  background: rgba(255, 77, 109, 0.2);
+  border-color: var(--crimson);
+  box-shadow: 0 0 15px rgba(255, 77, 109, 0.3);
 }
 
 /* 表单样式 */
@@ -756,4 +762,207 @@
     flex-direction: column;
     gap: 8px;
   }
+}
+
+/* ==================== 通用按钮样式 ==================== */
+
+.btn-edit,
+.btn-warning,
+.btn-delete {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.btn-edit {
+  background: rgba(54, 255, 208, 0.1);
+  border-color: rgba(54, 255, 208, 0.3);
+  color: var(--jade);
+}
+
+.btn-edit:hover {
+  background: rgba(54, 255, 208, 0.2);
+  border-color: var(--jade);
+  box-shadow: 0 0 15px rgba(54, 255, 208, 0.3);
+}
+
+.btn-warning {
+  background: rgba(255, 165, 0, 0.1);
+  border-color: rgba(255, 165, 0, 0.3);
+  color: #ffa500;
+}
+
+.btn-warning:hover {
+  background: rgba(255, 165, 0, 0.2);
+  border-color: #ffa500;
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
+}
+
+.btn-delete {
+  background: rgba(255, 77, 109, 0.1);
+  border-color: rgba(255, 77, 109, 0.3);
+  color: var(--crimson);
+}
+
+.btn-delete:hover {
+  background: rgba(255, 77, 109, 0.2);
+  border-color: var(--crimson);
+  box-shadow: 0 0 15px rgba(255, 77, 109, 0.3);
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: rgba(168, 160, 138, 0.1);
+  border: 1px solid rgba(168, 160, 138, 0.3);
+  border-radius: 6px;
+  color: var(--ink-dim);
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-secondary:hover {
+  background: rgba(168, 160, 138, 0.2);
+  color: var(--ink);
+}
+
+.btn-success {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--jade), var(--gold));
+  border: none;
+  border-radius: 6px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-success:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(54, 255, 208, 0.5);
+}
+
+.btn-success:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 卡片头部样式 */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.card-header h3 {
+  margin: 0;
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: var(--gold-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-header h3 i {
+  color: var(--jade);
+}
+
+/* 空状态 */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--ink-dim);
+  font-style: italic;
+}
+
+/* item-id 样式 */
+.item-id {
+  font-size: 11px;
+  color: var(--ink-dim);
+  font-family: 'Courier New', monospace;
+}
+
+/* item-desc 样式 */
+.item-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+
+/* ==================== 统计卡片样式 ==================== */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--jade);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(54, 255, 208, 0.2);
+  border-color: var(--gold);
+}
+
+.stat-icon {
+  font-size: 32px;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--jade);
+  margin-bottom: 8px;
+  font-family: 'Orbitron', 'Courier New', monospace;
+  text-shadow: 0 0 10px rgba(54, 255, 208, 0.3);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'ZCOOL XiaoWei', 'Noto Sans SC', sans-serif;
+  letter-spacing: 1px;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

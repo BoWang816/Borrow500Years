@@ -203,26 +203,20 @@ const wellnessTasks = ref<any[]>([])
 const manuals = ref<any[]>([])
 const showAllExtraTasks = ref(false)
 
-// 境界等级判断
+// 境界等级判断 - 使用数据库中的境界数据
 const realmLevel = computed(() => {
-  const realm = stateStore.profile?.realm || '凡胎肉身'
-  const realmLevels = [
-    '凡胎肉身', '练气初期', '练气中期', '练气后期', '练气大圆满',
-    '筑基初期', '筑基中期', '筑基后期', '筑基大圆满',
-    '金丹初期', '金丹中期', '金丹后期', '金丹大圆满',
-    '元婴初期', '元婴中期', '元婴后期', '元婴大圆满'
-  ]
-  return realmLevels.indexOf(realm)
+  if (!stateStore.profile) return 0
+  return stateStore.profile.realm || 1
 })
 
-// 是否为低境界（需要凡俗养生）
+// 是否为低境界（需要凡俗养生）- 境界ID <= 8
 const isLowRealm = computed(() => {
-  return realmLevel.value <= 7 // 筑基大圆满及以下
+  return realmLevel.value <= 8
 })
 
-// 是否为高境界（可以高阶修炼）
+// 是否为高境界（可以高阶修炼）- 境界ID >= 9
 const isHighRealm = computed(() => {
-  return realmLevel.value >= 8 // 金丹初期及以上
+  return realmLevel.value >= 9
 })
 
 const stepsReward = computed(() => {

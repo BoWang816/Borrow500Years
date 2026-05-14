@@ -159,7 +159,7 @@ function openEditModal(task: any) {
 
 async function loadTasks() {
   try {
-    const res = await api('/admin/extra-tasks')
+    const res = await api('/admin/extra-tasks') as any
     tasks.value = res.tasks || []
   } catch (err: any) {
     toast(err.message, 'bad')

@@ -151,7 +151,7 @@ function openEditModal(loot: any) {
 
 async function loadLoots() {
   try {
-    const res = await api('/admin/explore-loot')
+    const res = await api('/admin/explore-loot') as any
     loots.value = res.loots || []
   } catch (err: any) {
     toast(err.message, 'bad')

@@ -9,14 +9,24 @@ const admin = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
 
 // 用户列表
 admin.get('/users', adminMiddleware, async (c) => {
+  const page = parseInt(c.req.query('page') || '1')
+  const limit = parseInt(c.req.query('limit') || '1000')
+  const offset = (page - 1) * limit
+
   const all = await c.env.DB.prepare(`
-    SELECT id, username, created_at, name, gender, age, height, weight,
-           smoke, alcohol, stayup, exercise, meditate,
-           initial_life_sec, bonus_sec, start_timestamp, total_gained_sec,
-           coin, shard, merit, streak, dying, dying_start_at
-    FROM users
-    ORDER BY id DESC
-  `).all<any>()
+    SELECT u.id, u.username, u.created_at,
+           u.name, u.gender, u.age, u.height, u.weight,
+           u.smoke, u.alcohol, u.stayup, u.exercise, u.meditate,
+           u.initial_life_sec, u.bonus_sec, u.start_timestamp, u.total_gained_sec,
+           u.coin, u.shard, u.merit, u.streak, u.dying, u.dying_start_at,
+           ur.current_realm_id
+    FROM users u
+    LEFT JOIN user_realms ur ON u.id = ur.user_id
+    ORDER BY u.id DESC
+    LIMIT ? OFFSET ?
+  `).bind(limit, offset).all<any>()
+
+  const countResult = await c.env.DB.prepare('SELECT COUNT(*) as total FROM users').first<{ total: number }>()
 
   const now = Date.now()
   const users = (all.results || []).map((r: any) => {
@@ -31,10 +41,13 @@ admin.get('/users', adminMiddleware, async (c) => {
       name: r.name,
       gender: r.gender,
       age: r.age,
-      bmi: r.weight ? (r.weight / Math.pow(r.height / 100, 2)).toFixed(1) : null,
+      height: r.height,
+      weight: r.weight,
+      bmi: r.weight && r.height ? (r.weight / Math.pow(r.height / 100, 2)).toFixed(1) : null,
       lifeSec,
       totalAge,
       realm: hasProfile ? getRealmTitle(totalAge) : null,
+      realmId: r.current_realm_id,
       coin: r.coin || 0,
       shard: r.shard || 0,
       merit: r.merit || 0,
@@ -42,16 +55,183 @@ admin.get('/users', adminMiddleware, async (c) => {
       dying: !!r.dying,
       bonusSec: r.bonus_sec || 0,
       totalGained: r.total_gained_sec || 0,
+      initialLifeSec: r.initial_life_sec || 0,
+      isAdmin: r.username === 'admin' // 简单判断：用户名为admin的是管理员
     }
   })
 
-  const total = users.length
+  const total = countResult?.total || 0
   const active = users.filter((u: any) => u.hasProfile).length
   const avgLife = active > 0 ? users.filter((u: any) => u.hasProfile).reduce((s: number, u: any) => s + u.lifeSec, 0) / active : 0
   const totalMerit = users.reduce((s: number, u: any) => s + u.merit, 0)
   const dyingCount = users.filter((u: any) => u.dying).length
 
-  return c.json({ users, stats: { total, active, avgLifeYears: avgLife / SEC_PER_YEAR, totalMerit, dyingCount } })
+  return c.json({ 
+    users, 
+    stats: { total, active, avgLifeYears: avgLife / SEC_PER_YEAR, totalMerit, dyingCount },
+    pagination: { page, limit, total }
+  })
+})
+
+// 创建用户
+admin.post('/users', adminMiddleware, async (c) => {
+  const adminUserId = c.get('adminUserId') as number
+  const body = await c.req.json().catch(() => ({})) as any
+
+  if (!body.username || !body.password) {
+    return c.json({ error: '用户名和密码不能为空' }, 400)
+  }
+
+  // 检查用户名是否已存在
+  const existing = await c.env.DB.prepare('SELECT id FROM users WHERE username = ?')
+    .bind(body.username).first()
+  
+  if (existing) {
+    return c.json({ error: '用户名已存在' }, 400)
+  }
+
+  const now = nowSeconds()
+  const initialLifeSec = body.initialLifeSec || 2524608000
+  
+  // 创建用户（users表包含所有信息）
+  const result = await c.env.DB.prepare(`
+    INSERT INTO users (
+      username, password_hash, created_at,
+      name, gender, age, height, weight,
+      initial_life_sec, bonus_sec, start_timestamp, total_gained_sec,
+      coin, shard, merit, streak, dying, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 0, 0, 0, ?, 0, 0, ?)
+  `).bind(
+    body.username, body.password, now,
+    body.name || '', body.gender || '', body.age || 0,
+    body.height || 0, body.weight || 0,
+    initialLifeSec, body.name ? now * 1000 : null,
+    body.merit || 0, now
+  ).run()
+
+  const userId = result.meta.last_row_id
+
+  // 如果提供了个人信息，初始化境界
+  if (body.name || body.age) {
+    await c.env.DB.prepare(`
+      INSERT INTO user_realms (user_id, current_realm_id, breakthrough_count, created_at, updated_at)
+      VALUES (?, 1, 0, ?, ?)
+    `).bind(userId, now, now).run()
+  }
+
+  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
+    .bind(adminUserId, '创建用户', `${body.username} (ID: ${userId})`).run()
+
+  return c.json({ ok: true, userId })
+})
+
+// 更新用户
+admin.put('/users/:id', adminMiddleware, async (c) => {
+  const adminUserId = c.get('adminUserId') as number
+  const userId = parseInt(c.req.param('id'))
+  const body = await c.req.json().catch(() => ({})) as any
+
+  const now = nowSeconds()
+  
+  // 检查用户是否有start_timestamp（是否已激活）
+  const user = await c.env.DB.prepare('SELECT start_timestamp FROM users WHERE id = ?')
+    .bind(userId).first<any>()
+  
+  if (!user) {
+    return c.json({ error: '用户不存在' }, 404)
+  }
+
+  const hasProfile = !!user.start_timestamp
+  const newStartTimestamp = (body.name || body.age) && !hasProfile ? now * 1000 : user.start_timestamp
+
+  // 更新用户信息
+  await c.env.DB.prepare(`
+    UPDATE users SET 
+      name = ?, gender = ?, age = ?, height = ?, weight = ?,
+      initial_life_sec = ?, merit = ?, start_timestamp = ?, updated_at = ?
+    WHERE id = ?
+  `).bind(
+    body.name || '', body.gender || '', body.age || 0,
+    body.height || 0, body.weight || 0,
+    body.initialLifeSec || 2524608000, body.merit || 0,
+    newStartTimestamp, now, userId
+  ).run()
+
+  // 如果用户刚激活，初始化境界
+  if (newStartTimestamp && !hasProfile) {
+    await c.env.DB.prepare(`
+      INSERT INTO user_realms (user_id, current_realm_id, breakthrough_count, created_at, updated_at)
+      VALUES (?, 1, 0, ?, ?)
+    `).bind(userId, now, now).run()
+  }
+
+  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
+    .bind(adminUserId, '更新用户', `用户ID: ${userId}`).run()
+
+  return c.json({ ok: true })
+})
+
+// 重置用户
+admin.post('/users/:id/reset', adminMiddleware, async (c) => {
+  const adminUserId = c.get('adminUserId') as number
+  const userId = parseInt(c.req.param('id'))
+
+  const user = await c.env.DB.prepare('SELECT username FROM users WHERE id = ?')
+    .bind(userId).first<{ username: string }>()
+
+  if (!user) {
+    return c.json({ error: '用户不存在' }, 404)
+  }
+
+  const now = nowSeconds()
+
+  // 重置用户游戏数据
+  await c.env.DB.prepare(`
+    UPDATE users SET
+      name = NULL, gender = NULL, age = NULL, height = NULL, weight = NULL,
+      smoke = 0, alcohol = 0, stayup = 0, hereditary = 0, exercise = 0, meditate = 0,
+      initial_life_sec = NULL, bonus_sec = 0, start_timestamp = NULL, total_gained_sec = 0,
+      coin = 1, shard = 0, merit = 0, streak = 0, dying = 0, dying_start_at = NULL,
+      updated_at = ?
+    WHERE id = ?
+  `).bind(now, userId).run()
+
+  // 删除关联数据
+  await c.env.DB.batch([
+    c.env.DB.prepare('DELETE FROM user_realms WHERE user_id = ?').bind(userId),
+    c.env.DB.prepare('DELETE FROM active_potions WHERE user_id = ?').bind(userId),
+    c.env.DB.prepare('DELETE FROM daily_tasks WHERE user_id = ?').bind(userId),
+    c.env.DB.prepare('DELETE FROM user_manuals WHERE user_id = ?').bind(userId),
+    c.env.DB.prepare('DELETE FROM events WHERE user_id = ?').bind(userId),
+    c.env.DB.prepare('DELETE FROM realm_breakthrough_logs WHERE user_id = ?').bind(userId),
+    c.env.DB.prepare('DELETE FROM fortune_checkins WHERE user_id = ?').bind(userId)
+  ])
+
+  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
+    .bind(adminUserId, '重置用户', `${user.username} (ID: ${userId})`).run()
+
+  return c.json({ ok: true })
+})
+
+// 删除用户
+admin.delete('/users/:id', adminMiddleware, async (c) => {
+  const adminUserId = c.get('adminUserId') as number
+  const userId = parseInt(c.req.param('id'))
+
+  const user = await c.env.DB.prepare('SELECT username FROM users WHERE id = ?')
+    .bind(userId).first<{ username: string }>()
+
+  if (!user) {
+    return c.json({ error: '用户不存在' }, 404)
+  }
+
+  // 删除用户及所有关联数据（通过外键级联删除）
+  await c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId).run()
+
+  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
+    .bind(adminUserId, '删除用户', `${user.username} (ID: ${userId})`).run()
+
+  return c.json({ ok: true })
 })
 
 // 平台概览（兼容前端字段命名）

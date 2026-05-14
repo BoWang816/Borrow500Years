@@ -1,17 +1,16 @@
 <template>
-  <div class="admin-page">
-    <div class="admin-header">
-      <h2>境界管理</h2>
-      <p class="admin-subtitle">管理修炼境界体系 · 5大境界 · 20小境</p>
-    </div>
-
+  <div class="admin-realms">
     <div v-if="loading" class="loading-state">
       <i class="fas fa-spinner fa-spin"></i> 加载中...
     </div>
 
     <div v-else class="realms-container">
-      <!-- 境界统计 -->
-      <div class="stats-grid">
+      <!-- 境界统计卡片 -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-layer-group"></i> 境界管理</h3>
+        </div>
+        <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
           <div class="stat-content">
@@ -34,9 +33,10 @@
           </div>
         </div>
       </div>
+      </div>
 
       <!-- 按大境界分组显示 -->
-      <div v-for="majorRealm in majorRealms" :key="majorRealm.id" class="major-realm-section">
+      <div v-for="majorRealm in majorRealms" :key="majorRealm.id" class="card major-realm-section">
         <div class="major-realm-header" @click="toggleMajorRealm(majorRealm.id)">
           <div class="major-realm-title">
             <i :class="['fas', expandedMajorRealms.includes(majorRealm.id) ? 'fa-chevron-down' : 'fa-chevron-right']"></i>
@@ -200,7 +200,14 @@ const expandedMajorRealms = ref<number[]>([1, 2, 3, 4, 5])
 
 const majorRealms = computed(() => {
   const groups: any[] = []
-  const majorRealmNames = ['凡蜕期', '超凡期', '化境期', '极境期', '道极期']
+  
+  // 从数据库中提取大境界名称
+  const majorRealmMap = new Map<number, string>()
+  realms.value.forEach(r => {
+    if (!majorRealmMap.has(r.major_realm)) {
+      majorRealmMap.set(r.major_realm, r.major_realm_name)
+    }
+  })
   
   for (let i = 1; i <= 5; i++) {
     const realmList = realms.value.filter(r => r.major_realm === i)
@@ -208,7 +215,7 @@ const majorRealms = computed(() => {
     
     groups.push({
       id: i,
-      name: majorRealmNames[i - 1],
+      name: majorRealmMap.get(i) || `大境界${i}`,
       realms: realmList,
       totalUsers
     })
@@ -313,6 +320,18 @@ onMounted(() => {
 })
 </script>
 
+<style scoped src="./admin-form-styles.css"></style>
 <style scoped>
-@import './admin-form-styles.css';
+/* 修复分页组件样式 */
+:deep(.pagination) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+:deep(.page-numbers) {
+  display: flex !important;
+  flex-direction: row !important;
+}
 </style>

@@ -225,7 +225,7 @@ function openEditModal(potion: any) {
 
 async function loadPotions() {
   try {
-    const res = await api('/admin/potions-config')
+    const res = await api('/admin/potions-config') as any
     potions.value = res.potions || []
   } catch (err: any) {
     toast(err.message, 'bad')

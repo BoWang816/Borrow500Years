@@ -114,6 +114,11 @@ const routes: RouteRecordRaw[] = [
         path: 'realms',
         name: 'AdminRealms',
         component: () => import('../views/admin/AdminRealms.vue')
+      },
+      {
+        path: 'fortune',
+        name: 'AdminFortune',
+        component: () => import('../views/admin/AdminFortune.vue')
       }
     ]
   }

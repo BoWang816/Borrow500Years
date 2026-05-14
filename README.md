@@ -39,9 +39,11 @@
 
 ### 🏆 5. 排行榜(真实)
 - 服务端实时计算所有用户的剩余寿命 / 累计延寿
-- 长生榜 + 功德榜双榜,Top 20 + 当前用户标注
-- 12 个 NPC 由 `seed.sql` 预置,真实玩家加入后会进入排名
-- 4 级称号:凡胎肉身 → 寿比南山 → 地仙之姿 → 与天同寿
+- 长生榜 + 功德榜双榜,当前用户标注
+- 境界筛选：支持按5大境界（凡蜕期、超凡期、化境期、极境期、道极期）筛选用户
+- 分页显示：每页20位修士，智能页码导航
+- 60+ NPC 由 `seed.sql` 预置，覆盖所有20个小境界
+- 真实玩家加入后会进入排名
 
 ### 🎲 6. 命运卷轴 · 随机事件
 - 服务端掷骰,10 种事件
@@ -95,12 +97,19 @@ L_current = L_initial + bonus_sec − (now − start_timestamp) × baseDecayMult
 ```
 
 ## 用户指南
+
+### 管理员登录
+- **用户名**: admin
+- **密码**: admin123
+- 管理员账号在首次启动时自动创建
+
+### 普通用户使用流程
 1. **首次访问**:弹出登仙籍弹窗 → 选「注册新道号」→ 填道号 + 密令
 2. **天命测算**:填根骨问卷,服务端生成初始命盘
 3. **首页 · 命脉**:观看寿命倒计时、点击「掷天骰」触发随机事件
 4. **修炼 Tab**:每日完成 6 项任务延长寿命、积累功德
 5. **丹房 Tab**:用功德值或复活币换购延寿补剂
-6. **长生榜 Tab**:与全部真实玩家 + NPC 比拼排名
+6. **长生榜 Tab**:与全部真实玩家 + NPC 比拼排名，支持按境界筛选
 7. **顶部 ⟳ 按钮**:转世重修(账号保留)/ 登出按钮:退出账号
 
 ## 🔧 技术栈
@@ -112,45 +121,45 @@ L_current = L_initial + bonus_sec − (now − start_timestamp) × baseDecayMult
 - **运行**:Wrangler Pages Dev（自动连接配置的 D1 数据库）
 - **加密**:Web Crypto API (SHA-256),Cloudflare Workers 兼容
 
-## 部署 / 启动
+## 🚀 快速开始
 
-### 首次设置（仅需一次）
+### 首次启动（自动初始化）
 ```bash
-# 1. 应用 D1 迁移到生产数据库
-npm run db:migrate
+# 启动开发服务器（自动检测并初始化数据库）
+npm run dev
 
-# 2. 灌入 NPC 种子数据（可选）
-npm run db:seed
+# 访问应用
+# 前端: http://localhost:5173
+# 后端: http://localhost:8788
 ```
+
+**首次启动时会自动：**
+1. 检测数据库是否存在
+2. 应用所有数据库迁移
+3. 导入种子数据（60个NPC用户 + 5个全服事件）
+4. 创建默认管理员账号（用户名: admin, 密码: admin123）
+5. 构建服务器代码
+6. 启动前后端服务
 
 ### 日常开发
 ```bash
-# 1. 构建并启动开发服务器（连接生产数据库）
+# 启动开发服务器（自动清理端口 + 重新构建）
 npm run dev
-
-# 2. 访问
-# http://localhost:8788
 ```
 
 ### 数据库管理
 ```bash
+# 手动初始化数据库（可选）
+./init-db.sh
+
 # 查询数据库
-npm run db:console "SELECT * FROM users LIMIT 5"
+npx wrangler d1 execute webapp-production --local --command "SELECT * FROM users LIMIT 5"
 
 # 应用新的迁移
-npm run db:migrate
+npx wrangler d1 migrations apply webapp-production --local
 
 # 重新灌入种子数据
-npm run db:seed
-```
-
-### 部署到生产
-```bash
-npm run deploy
-curl http://localhost:8788/api/potions
-
-# 6. D1 控制台
-npm run db:console "SELECT * FROM users LIMIT 5"
+npx wrangler d1 execute webapp-production --local --file=./seed.sql
 ```
 
 ### 部署到生产

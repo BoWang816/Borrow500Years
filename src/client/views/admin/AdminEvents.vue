@@ -159,7 +159,7 @@ function openEditModal(event: any) {
 
 async function loadEvents() {
   try {
-    const res = await api('/admin/events')
+    const res = await api('/admin/events') as any
     events.value = res.events || []
   } catch (err: any) {
     toast(err.message, 'bad')

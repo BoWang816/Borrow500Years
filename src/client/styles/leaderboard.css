@@ -26,6 +26,182 @@
   box-shadow: 0 0 10px rgba(54,255,208,0.2);
 }
 
+/* 境界筛选 */
+.realm-filter {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.filter-title {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 18px;
+  color: var(--gold-soft);
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: 3px;
+}
+
+.realm-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .realm-tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .realm-tabs {
+    grid-template-columns: 1fr;
+  }
+}
+
+.realm-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.realm-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.realm-tab:hover {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+}
+
+.realm-tab:hover::before {
+  opacity: 1;
+}
+
+.realm-tab.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.1));
+  border-color: var(--gold);
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.3);
+}
+
+.realm-tab.active::before {
+  opacity: 1;
+}
+
+.realm-emoji {
+  font-size: 28px;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
+}
+
+.realm-tab.active .realm-emoji {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.realm-name {
+  font-family: 'ZCOOL XiaoWei', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold-soft);
+  letter-spacing: 1px;
+}
+
+.realm-tab.active .realm-name {
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+}
+
+.realm-desc {
+  font-size: 11px;
+  color: var(--ink-dim);
+  letter-spacing: 0.5px;
+}
+
+.realm-tab.active .realm-desc {
+  color: var(--gold-soft);
+}
+
+/* 境界说明（在筛选器内部） */
+.realm-info-inner {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.realm-info-title {
+  font-family: 'Ma Shan Zheng', serif;
+  font-size: 18px;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+.realm-detail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .realm-detail {
+    grid-template-columns: 1fr;
+  }
+}
+
+.realm-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+}
+
+.detail-label {
+  font-size: 12px;
+  color: var(--ink-dim);
+  letter-spacing: 1px;
+}
+
+.detail-value {
+  font-size: 14px;
+  color: var(--gold-soft);
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 0.5px;
+}
+
 /* 排行榜列表 */
 .board-list { 
   display: flex; 
@@ -101,44 +277,147 @@
   color: var(--jade); 
 }
 
-/* 称号系统 */
-.titles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+/* 空状态 */
+.board-list .empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ink-dim);
+  font-size: 14px;
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 12px;
 }
 
-.title-card {
-  padding: 16px;
-  text-align: center;
+.board-list .empty i {
+  font-size: 48px;
+  color: var(--ink-dim);
+  opacity: 0.5;
+}
+
+.board-list .empty p {
+  margin: 0;
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 1px;
+}
+
+/* 分页控件 */
+.pagination {
+  margin-top: 32px;
+  padding: 24px;
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
 }
 
-.title-card .age-range {
-  display: block;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 11px;
-  letter-spacing: 2px;
+.page-info {
+  font-size: 13px;
   color: var(--ink-dim);
-  margin-bottom: 6px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
 }
 
-.title-card .title-name {
-  font-family: 'Chinese-Calligraphy', serif;
-  font-size: 20px;
-  letter-spacing: 3px;
+.page-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.page-btn {
+  padding: 8px 16px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 6px;
+  color: var(--gold-soft);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'ZCOOL XiaoWei', serif;
+  letter-spacing: 1px;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.page-btn i {
+  font-size: 11px;
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-num {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink-dim);
+  font-size: 13px;
+  font-family: 'Orbitron', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-num:hover {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.4);
   color: var(--gold-soft);
 }
 
-.title-card.legendary {
-  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(178,102,255,0.1));
+.page-num.active {
+  background: linear-gradient(135deg, var(--gold), rgba(212, 175, 55, 0.8));
   border-color: var(--gold);
-  box-shadow: 0 0 18px rgba(212,175,55,0.25);
+  color: #001;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
 }
 
-.title-card.legendary .title-name { 
-  color: var(--gold); 
-  text-shadow: 0 0 8px var(--gold); 
+.page-ellipsis {
+  color: var(--ink-dim);
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    padding: 16px;
+  }
+  
+  .page-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .page-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
