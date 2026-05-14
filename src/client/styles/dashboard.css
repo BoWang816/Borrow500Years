@@ -78,7 +78,7 @@
 }
 
 .pulse-time {
-  font-family: 'Orbitron', 'Chinese-Serif', monospace;
+  font-family: 'Orbitron', monospace;
   font-size: 56px;
   font-weight: 900;
   color: var(--gold-soft);
