@@ -83,7 +83,8 @@ const stateStore = useStateStore()
 
 const realmName = computed(() => {
   if (!stateStore.profile) return '未知境界'
-  return stateStore.getRealmName(stateStore.profile.realm)
+  // 后端已经返回了境界名称字符串，直接使用
+  return stateStore.profile.realm || '未知境界'
 })
 
 onMounted(async () => {
