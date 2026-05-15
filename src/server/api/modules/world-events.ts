@@ -17,13 +17,12 @@ worldEvents.get('/', authMiddleware, async (c) => {
 
   const userId = c.get('userId') as number
   const joined = await c.env.DB.prepare(`
-    SELECT event_id FROM user_world_events WHERE user_id = ?
-  `).bind(userId).all<{ event_id: number }>()
-  const joinedSet = new Set((joined.results || []).map(j => j.event_id))
+    SELECT event_key FROM user_world_events WHERE user_id = ?
+  `).bind(userId).all<{ event_key: string }>()
+  const joinedSet = new Set((joined.results || []).map(j => j.event_key))
 
   return c.json({
     events: (events.results || []).map((e: any) => ({
-      id: e.id,
       key: e.event_key,
       name: e.name,
       emoji: e.emoji,
@@ -31,25 +30,25 @@ worldEvents.get('/', authMiddleware, async (c) => {
       effectType: e.effect_type,
       effectValue: e.effect_value,
       endAt: e.end_at * 1000,
-      hasJoined: joinedSet.has(e.id),
+      hasJoined: joinedSet.has(e.event_key),
     }))
   })
 })
 
 // 参与全服事件
-worldEvents.post('/:id/join', authMiddleware, async (c) => {
+worldEvents.post('/:key/join', authMiddleware, async (c) => {
   const userId = c.get('userId') as number
-  const eventId = parseInt(c.req.param('id'))
+  const eventKey = c.req.param('key')
 
   const event = await c.env.DB.prepare(
-    'SELECT * FROM world_events WHERE id = ? AND is_active = 1'
-  ).bind(eventId).first<any>()
+    'SELECT * FROM world_events WHERE event_key = ? AND is_active = 1'
+  ).bind(eventKey).first<any>()
   if (!event) return c.json({ error: '事件不存在或已结束' }, 404)
 
   try {
     await c.env.DB.prepare(
-      'INSERT INTO user_world_events (user_id, event_id) VALUES (?, ?)'
-    ).bind(userId, eventId).run()
+      'INSERT INTO user_world_events (user_id, event_key) VALUES (?, ?)'
+    ).bind(userId, eventKey).run()
   } catch {
     // already joined
   }
@@ -137,7 +136,7 @@ worldEvents.post('/trigger', authMiddleware, async (c) => {
     endAt
   ).run()
   
-  const eventId = result.meta?.last_row_id || 0
+  const newEventKey = `${template.event_key}_${now}`
   
   // 给所有用户推送事件通知
   try {
@@ -188,7 +187,7 @@ worldEvents.post('/trigger', authMiddleware, async (c) => {
     await c.env.DB.prepare(`
       INSERT INTO admin_logs (admin_username, action, target_type, target_id, details)
       VALUES (?, 'trigger', 'world_event', ?, ?)
-    `).bind(user.username, eventId, `触发全服事件: ${template.name}`).run()
+    `).bind(user.username, newEventKey, `触发全服事件: ${template.name}`).run()
   } catch (err) {
     console.error('Failed to log admin action:', err)
   }
@@ -197,7 +196,7 @@ worldEvents.post('/trigger', authMiddleware, async (c) => {
     ok: true, 
     msg: `已触发全服事件：${template.name}`,
     event: {
-      id: eventId,
+      key: newEventKey,
       name: template.name,
       emoji: template.emoji,
       description: template.description,
