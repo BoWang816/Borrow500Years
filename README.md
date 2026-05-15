@@ -189,8 +189,35 @@ npm run deploy
 5. **AI 命理点评**:用大模型每周生成「命盘周报」
 6. **公会道场**:组队累计步数 PK
 
-## 部署状态
-- **平台**:Cloudflare Pages + D1
-- **数据库**:生产 D1 数据库 (database_id: 78428bf5-aa55-4119-92e9-42d42e53c120)
-- **开发模式**:使用 `--remote` 连接生产数据库
-- **最近更新**:2026-05-11(切换到生产数据库)
+## 📊 项目状态
+
+### 当前状态：🎉 生产就绪
+
+- ✅ **寿命单位系统**: 已完全转换为年单位（0.001年-10000年）
+- ✅ **数据库配置**: 完整的游戏配置数据（7个配置表）
+- ✅ **文档体系**: 完善的技术和操作文档
+- ✅ **构建状态**: 0 TypeScript错误
+- ✅ **Seed数据**: 包含60+ NPC用户和所有配置
+
+### 部署信息
+- **平台**: Cloudflare Pages + D1
+- **数据库**: 生产 D1 数据库 (database_id: 78428bf5-aa55-4119-92e9-42d42e53c120)
+- **开发模式**: 使用 `--remote` 连接生产数据库
+- **最近更新**: 2026-05-15（完成年单位系统转换和数据库更新）
+
+## 📚 文档导航
+
+### 快速开始
+- [部署指南](./docs/DEPLOYMENT_GUIDE.md) - 新服务部署完整流程
+- [快速启动](./docs/QUICK_START_AFTER_CONVERSION.md) - 开发环境快速启动
+
+### 技术文档
+- [项目状态总览](./docs/PROJECT_STATUS.md) - 完整的项目状态和进度
+- [最终完成总结](./docs/FINAL_COMPLETE_SUMMARY.md) - 年单位系统转换总结
+- [开发者快速参考](./docs/DEVELOPER_QUICK_REFERENCE.md) - 开发规范和最佳实践
+- [数据库数值更新](./docs/DATABASE_VALUES_UPDATE_COMPLETE.md) - 数据库更新详情
+
+### 操作指南
+- [测试清单](./docs/TESTING_CHECKLIST.md) - 完整的功能测试清单
+- [Seed数据说明](./docs/SEED_DATA_UPDATE.md) - 初始化数据说明
+- [管理页面转换](./docs/ADMIN_PAGES_CONVERSION_COMPLETE.md) - 管理后台使用指南
