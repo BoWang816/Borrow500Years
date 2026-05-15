@@ -254,8 +254,14 @@ function hasDetailContent(detail: any): boolean {
   if (!detail) return false
   if (typeof detail === 'string' && detail.trim() === '') return false
   if (typeof detail === 'object') {
-    const parsed = parseJsonDetail(detail)
-    return Object.keys(parsed).length > 0
+    // 如果是审计日志格式
+    if (detail.type) {
+      if (detail.type === 'create' && detail.data) return true
+      if (detail.type === 'delete') return true
+      if (detail.type === 'update' && detail.changes) return true
+    }
+    // 否则检查是否有内容
+    return Object.keys(detail).length > 0
   }
   return true
 }

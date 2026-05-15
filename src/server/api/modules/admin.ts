@@ -657,10 +657,23 @@ admin.delete('/extra-tasks/:id', adminMiddleware, async (c) => {
   const id = c.req.param('id')
   
   const task = await c.env.DB.prepare('SELECT name FROM extra_tasks_config WHERE id = ?').bind(id).first<{ name: string }>()
+  
+  if (!task) {
+    return c.json({ error: '任务不存在' }, 404)
+  }
+  
   await c.env.DB.prepare('DELETE FROM extra_tasks_config WHERE id = ?').bind(id).run()
 
-  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
-    .bind(adminUserId, '删除修炼项目', `${task?.name || 'Unknown'} (ID: ${id})`).run()
+  await logAudit(
+    c.env.DB,
+    adminUserId,
+    '删除修炼项目',
+    'extra_task',
+    id,
+    task.name,
+    null,
+    null
+  )
 
   return c.json({ ok: true })
 })
@@ -798,7 +811,7 @@ admin.post('/explore-loot', adminMiddleware, async (c) => {
   const adminUserId = c.get('adminUserId') as number
   const body = await c.req.json().catch(() => ({})) as any
 
-  await c.env.DB.prepare(`
+  const result = await c.env.DB.prepare(`
     INSERT INTO explore_loot_config (name, weight, sort_order, msg, life, merit, shard, realm_id, min_realm_id, max_realm_id, difficulty, category, is_active)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
   `).bind(
@@ -808,8 +821,23 @@ admin.post('/explore-loot', adminMiddleware, async (c) => {
     body.difficulty || 'normal', body.category || 'common'
   ).run()
 
-  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
-    .bind(adminUserId, '创建历练项目', formatLogDetail('创建历练项目', body)).run()
+  await logAudit(
+    c.env.DB,
+    adminUserId,
+    '创建历练项目',
+    'explore_loot',
+    result.meta.last_row_id,
+    body.name,
+    null,
+    {
+      name: body.name,
+      life: body.life || 0,
+      merit: body.merit || 0,
+      realm_id: body.realmId || 1,
+      difficulty: body.difficulty || 'normal',
+      category: body.category || 'common'
+    }
+  )
 
   return c.json({ ok: true })
 })
@@ -819,6 +847,13 @@ admin.put('/explore-loot/:id', adminMiddleware, async (c) => {
   const adminUserId = c.get('adminUserId') as number
   const id = c.req.param('id')
   const body = await c.req.json().catch(() => ({})) as any
+
+  // 获取旧数据
+  const oldLoot = await c.env.DB.prepare('SELECT * FROM explore_loot_config WHERE id = ?').bind(id).first<any>()
+  
+  if (!oldLoot) {
+    return c.json({ error: '历练项目不存在' }, 404)
+  }
 
   await c.env.DB.prepare(`
     UPDATE explore_loot_config SET name = ?, weight = ?, sort_order = ?, msg = ?, life = ?, merit = ?, shard = ?, realm_id = ?, min_realm_id = ?, max_realm_id = ?, difficulty = ?, category = ?, is_active = ?
@@ -831,8 +866,30 @@ admin.put('/explore-loot/:id', adminMiddleware, async (c) => {
     body.isActive ? 1 : 0, id
   ).run()
 
-  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
-    .bind(adminUserId, '更新历练项目', formatLogDetail('更新历练项目', { id, ...body })).run()
+  await logAudit(
+    c.env.DB,
+    adminUserId,
+    '更新历练项目',
+    'explore_loot',
+    id,
+    oldLoot.name,
+    {
+      name: oldLoot.name,
+      life: oldLoot.life,
+      merit: oldLoot.merit,
+      realm_id: oldLoot.realm_id,
+      difficulty: oldLoot.difficulty,
+      is_active: oldLoot.is_active
+    },
+    {
+      name: body.name,
+      life: body.life,
+      merit: body.merit,
+      realm_id: body.realmId || 1,
+      difficulty: body.difficulty || 'normal',
+      is_active: body.isActive ? 1 : 0
+    }
+  )
 
   return c.json({ ok: true })
 })
@@ -843,10 +900,23 @@ admin.delete('/explore-loot/:id', adminMiddleware, async (c) => {
   const id = c.req.param('id')
   
   const loot = await c.env.DB.prepare('SELECT name FROM explore_loot_config WHERE id = ?').bind(id).first<{ name: string }>()
+  
+  if (!loot) {
+    return c.json({ error: '历练项目不存在' }, 404)
+  }
+  
   await c.env.DB.prepare('DELETE FROM explore_loot_config WHERE id = ?').bind(id).run()
 
-  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
-    .bind(adminUserId, '删除历练项目', `${loot?.name || 'Unknown'} (ID: ${id})`).run()
+  await logAudit(
+    c.env.DB,
+    adminUserId,
+    '删除历练项目',
+    'explore_loot',
+    id,
+    loot.name,
+    null,
+    null
+  )
 
   return c.json({ ok: true })
 })
@@ -867,8 +937,24 @@ admin.post('/potions-config', adminMiddleware, async (c) => {
     body.sortOrder || 0
   ).run()
 
-  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
-    .bind(adminUserId, '创建丹药配置', formatLogDetail('创建丹药配置', body)).run()
+  await logAudit(
+    c.env.DB,
+    adminUserId,
+    '创建丹药配置',
+    'potion',
+    body.id,
+    body.name,
+    null,
+    {
+      id: body.id,
+      name: body.name,
+      cost: body.cost || 30,
+      instant_life: body.instantLife || 0,
+      dur_decay_reduction: body.durDecayReduction || 0,
+      realm_id: body.realmId || 1,
+      rarity: body.rarity || 'common'
+    }
+  )
 
   return c.json({ ok: true })
 })
@@ -878,6 +964,13 @@ admin.put('/potions-config/:id', adminMiddleware, async (c) => {
   const adminUserId = c.get('adminUserId') as number
   const id = c.req.param('id')
   const body = await c.req.json().catch(() => ({})) as any
+
+  // 获取旧数据
+  const oldPotion = await c.env.DB.prepare('SELECT * FROM potions_config WHERE id = ?').bind(id).first<any>()
+  
+  if (!oldPotion) {
+    return c.json({ error: '丹药不存在' }, 404)
+  }
 
   await c.env.DB.prepare(`
     UPDATE potions_config SET name = ?, emoji = ?, desc = ?, cost = ?, type = ?, instant_life = ?, dur = ?, dur_decay_reduction = ?, dur_merit_boost = ?, realm_id = ?, min_realm_id = ?, max_realm_id = ?, rarity = ?, category = ?, sort_order = ?, is_active = ?
@@ -890,8 +983,32 @@ admin.put('/potions-config/:id', adminMiddleware, async (c) => {
     body.sortOrder, body.isActive ? 1 : 0, id
   ).run()
 
-  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
-    .bind(adminUserId, '更新丹药配置', formatLogDetail('更新丹药配置', { id, ...body })).run()
+  await logAudit(
+    c.env.DB,
+    adminUserId,
+    '更新丹药配置',
+    'potion',
+    id,
+    oldPotion.name,
+    {
+      name: oldPotion.name,
+      cost: oldPotion.cost,
+      instant_life: oldPotion.instant_life,
+      dur_decay_reduction: oldPotion.dur_decay_reduction,
+      realm_id: oldPotion.realm_id,
+      rarity: oldPotion.rarity,
+      is_active: oldPotion.is_active
+    },
+    {
+      name: body.name,
+      cost: body.cost,
+      instant_life: body.instantLife,
+      dur_decay_reduction: body.durDecayReduction,
+      realm_id: body.realmId || 1,
+      rarity: body.rarity || 'common',
+      is_active: body.isActive ? 1 : 0
+    }
+  )
 
   return c.json({ ok: true })
 })
@@ -902,10 +1019,23 @@ admin.delete('/potions-config/:id', adminMiddleware, async (c) => {
   const id = c.req.param('id')
   
   const potion = await c.env.DB.prepare('SELECT name FROM potions_config WHERE id = ?').bind(id).first<{ name: string }>()
+  
+  if (!potion) {
+    return c.json({ error: '丹药不存在' }, 404)
+  }
+  
   await c.env.DB.prepare('DELETE FROM potions_config WHERE id = ?').bind(id).run()
 
-  await c.env.DB.prepare('INSERT INTO admin_logs (admin_user_id, action, detail) VALUES (?, ?, ?)')
-    .bind(adminUserId, '删除丹药配置', `${potion?.name || 'Unknown'} (ID: ${id})`).run()
+  await logAudit(
+    c.env.DB,
+    adminUserId,
+    '删除丹药配置',
+    'potion',
+    id,
+    potion.name,
+    null,
+    null
+  )
 
   return c.json({ ok: true })
 })

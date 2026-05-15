@@ -20,12 +20,12 @@ const ACHIEVEMENTS = [
   { id: 'tribulation_1', name: '渡劫初成', desc: '首次成功渡过天劫', merit: 50, coin: 1 },
 ] as const
 
-async function getUnlockedIds(db: any, userId: number): Promise<string[]> {
+async function getUnlockedIds(db: D1Database, userId: number): Promise<string[]> {
   const rows = await db.prepare('SELECT ach_id FROM achievements WHERE user_id = ?').bind(userId).all<{ ach_id: string }>()
   return (rows.results || []).map((r: { ach_id: string }) => r.ach_id)
 }
 
-async function unlockAchievement(db: any, userId: number, achId: string, profile: Profile) {
+async function unlockAchievement(db: D1Database, userId: number, achId: string, profile: Profile) {
   const ach = ACHIEVEMENTS.find(a => a.id === achId)
   if (!ach) return null
   try {
