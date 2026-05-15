@@ -1,7 +1,7 @@
 // 状态模块 - 获取用户完整状态
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile, ActivePotion } from '../../types'
-import { todayStr, currentDecayRate, currentLifeSec, SEC_PER_YEAR, getRealmByAge } from '../../lib'
+import { todayStr, currentDecayRate, currentLifeYears, SEC_PER_YEAR, getRealmByAge, secsToYears } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 const state = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
@@ -38,7 +38,7 @@ state.get('/', authMiddleware, loadProfile, async (c) => {
 
   // 弥留判定
   let dying = profile.dying === 1
-  let life = currentLifeSec(profile)
+  let life = currentLifeYears(profile)
   if (life <= 0 && !dying) {
     dying = true
     await c.env.DB.prepare('UPDATE users SET dying = 1, dying_start_at = ? WHERE id = ?')
@@ -49,15 +49,16 @@ state.get('/', authMiddleware, loadProfile, async (c) => {
   }
   
   // 计算总年龄和境界
-  const elapsed = (now - profile.start_timestamp) / 1000
-  const totalAge = profile.age + elapsed / SEC_PER_YEAR + profile.bonus_sec / SEC_PER_YEAR
+  const elapsedYears = (now - (profile.start_timestamp || now)) / 1000 / SEC_PER_YEAR
+  const bonusYears = secsToYears(profile.bonus_sec || 0)
+  const totalAge = (profile.age || 0) + elapsedYears + bonusYears
   
   // 从数据库获取境界
   const realmData = await getRealmByAge(c.env.DB, totalAge)
   const realm = realmData.name
   const realmId = realmData.id
   
-  const bmi = profile.weight / Math.pow(profile.height / 100, 2)
+  const bmi = (profile.weight && profile.height) ? profile.weight / Math.pow(profile.height / 100, 2) : 0
   
   return c.json({
     profile: {
@@ -74,17 +75,17 @@ state.get('/', authMiddleware, loadProfile, async (c) => {
       hereditary: !!profile.hereditary,
       exercise: !!profile.exercise,
       meditate: !!profile.meditate,
-      initialLifeSec: profile.initial_life_sec,
-      bonusSec: profile.bonus_sec,
+      initialLifeYears: secsToYears(profile.initial_life_sec || 0),
+      bonusYears: secsToYears(profile.bonus_sec || 0),
       startTimestamp: profile.start_timestamp,
-      totalGainedSec: profile.total_gained_sec,
+      totalGainedYears: secsToYears(profile.total_gained_sec || 0),
       coin: profile.coin,
       shard: profile.shard,
       merit: profile.merit,
       streak: profile.streak,
       dying: !!profile.dying,
       dyingStartAt: profile.dying_start_at,
-      lifeSec: life,
+      lifeYears: life,
       totalAge,
       realm,
       realmId,

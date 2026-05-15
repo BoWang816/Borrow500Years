@@ -1,7 +1,7 @@
 // 任务模块 - 完成日常修炼任务
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile } from '../../types'
-import { clamp, todayStr, formatLife, nowSeconds, SEC_PER_YEAR, getRealmByAge } from '../../lib'
+import { clamp, todayStr, formatLife, nowSeconds, SEC_PER_YEAR, getRealmByAge, secsToYears, yearsToSecs } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 const tasks = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
@@ -11,8 +11,9 @@ tasks.get('/wellness/config', authMiddleware, loadProfile, async (c) => {
   const profile = c.get('profile') as Profile
   
   // 计算用户当前境界ID
-  const elapsed = (Date.now() - (profile.start_timestamp || 0)) / 1000
-  const totalAge = (profile.age || 0) + elapsed / SEC_PER_YEAR + (profile.bonus_sec || 0) / SEC_PER_YEAR
+  const elapsedYears = (Date.now() - (profile.start_timestamp || 0)) / 1000 / SEC_PER_YEAR
+  const bonusYears = secsToYears(profile.bonus_sec || 0)
+  const totalAge = (profile.age || 0) + elapsedYears + bonusYears
   const realmData = await getRealmByAge(c.env.DB, totalAge)
   const realmId = realmData.id
   
@@ -57,38 +58,42 @@ tasks.post('/:name', authMiddleware, loadProfile, async (c) => {
   let msg = ''
 
   // 处理基础任务（保持向后兼容）
+  // 注意：这些硬编码的值现在以年为单位
+  const MINUTES_TO_YEARS = 1 / (365.25 * 24 * 60)
+  const HOURS_TO_YEARS = 1 / (365.25 * 24)
+  
   if (name === 'ziwu') {
     if (dt.ziwu) return c.json({ error: '今日已打卡' }, 400)
     await c.env.DB.prepare('UPDATE daily_tasks SET ziwu = 1 WHERE user_id = ? AND task_date = ?').bind(userId, today).run()
-    gained = 30 * 60; merit = 2
+    gained = 30 * MINUTES_TO_YEARS; merit = 2
     msg = '【子午流注】 早睡入梦，寿命 +30 分钟，功德 +2'
   } else if (name === 'steps') {
     if (dt.steps) return c.json({ error: '今日已提交' }, 400)
     const s = clamp(parseInt(body.steps) || 0, 0, 50000)
     if (s < 1000) return c.json({ error: '至少需要 1000 步' }, 400)
-    let secGain = Math.floor(s / 1000) * 12 * 60
-    if (s >= 10000) secGain += 2 * 3600
+    let yearsGain = Math.floor(s / 1000) * 12 * MINUTES_TO_YEARS
+    if (s >= 10000) yearsGain += 2 * HOURS_TO_YEARS
     await c.env.DB.prepare('UPDATE daily_tasks SET steps = ? WHERE user_id = ? AND task_date = ?').bind(s, userId, today).run()
-    gained = secGain
+    gained = yearsGain
     merit = Math.min(5, Math.floor(s / 2000))
-    msg = `【步步为营】 行走 ${s.toLocaleString()} 步，寿命 +${formatLife(secGain)}`
+    msg = `【步步为营】 行走 ${s.toLocaleString()} 步，寿命 +${formatLife(yearsGain)}`
   } else if (name === 'water') {
     if (dt.water >= 8) return c.json({ error: '今日已饮满' }, 400)
     const newW = dt.water + 1
     await c.env.DB.prepare('UPDATE daily_tasks SET water = ? WHERE user_id = ? AND task_date = ?').bind(newW, userId, today).run()
-    gained = 5 * 60
+    gained = 5 * MINUTES_TO_YEARS
     if (newW === 8) merit = 3
     msg = `【上善若水】 第 ${newW} 杯水，寿命 +5 分钟${newW === 8 ? '，圆满 · 功德 +3' : ''}`
   } else if (name === 'meditate') {
     if (dt.meditate) return c.json({ error: '今日已入定' }, 400)
     await c.env.DB.prepare('UPDATE daily_tasks SET meditate = 1 WHERE user_id = ? AND task_date = ?').bind(userId, today).run()
-    gained = 15 * 60; merit = 3; shardDelta = 1
+    gained = 15 * MINUTES_TO_YEARS; merit = 3; shardDelta = 1
     msg = '【静坐养神】 心境清明，寿命 +15 分钟，复活币碎片 +1'
   } else if (name === 'earlyrise') {
     if (dt.earlyrise) return c.json({ error: '今日已早起' }, 400)
     await c.env.DB.prepare('UPDATE daily_tasks SET earlyrise = 1 WHERE user_id = ? AND task_date = ?').bind(userId, today).run()
     streakNew = Math.min(7, profile.streak + 1)
-    gained = 20 * 60; merit = 4
+    gained = 20 * MINUTES_TO_YEARS; merit = 4
     msg = `【晨起修行】 连续 ${streakNew}/7 天，寿命 +20 分钟`
     if (streakNew >= 7) {
       coinDelta = 1; streakNew = 0
@@ -97,7 +102,7 @@ tasks.post('/:name', authMiddleware, loadProfile, async (c) => {
   } else if (name === 'diet') {
     if (dt.diet) return c.json({ error: '今日已记录' }, 400)
     await c.env.DB.prepare('UPDATE daily_tasks SET diet = 1 WHERE user_id = ? AND task_date = ?').bind(userId, today).run()
-    gained = 20 * 60; merit = 1
+    gained = 20 * MINUTES_TO_YEARS; merit = 1
     msg = '【清淡饮食】 三餐有节，寿命 +20 分钟'
   } else {
     // 处理境界特定任务（从数据库读取配置）
@@ -153,10 +158,10 @@ tasks.post('/:name', authMiddleware, loadProfile, async (c) => {
       coin = ?, shard = ?, streak = ?,
       updated_at = ?
     WHERE id = ?
-  `).bind(gained, gained, merit, newCoin, newShard, streakNew, nowSeconds(), userId).run()
+  `).bind(yearsToSecs(gained), yearsToSecs(gained), merit, newCoin, newShard, streakNew, nowSeconds(), userId).run()
 
   await pushEvent(c.env.DB, userId, msg, 'good')
-  return c.json({ ok: true, gainedSec: gained, msg })
+  return c.json({ ok: true, gainedYears: gained, msg })
 })
 
 export default tasks

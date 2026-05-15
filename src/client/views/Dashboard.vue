@@ -71,112 +71,6 @@
       </div>
 
       <div class="dash-cards">
-        <!-- 今日运势 -->
-        <div class="card fortune-card">
-          <h3><i class="fas fa-yin-yang"></i> 今日运势 <span v-if="fortuneData?.zodiac" class="zodiac-tag">{{ fortuneData.zodiac }}</span></h3>
-          <div v-if="fortuneData" class="fortune-content">
-            <div :class="['fortune-result', `fortune-${fortuneData.fortune.toLowerCase()}`]">
-              {{ fortuneData.title }}
-            </div>
-            <div class="fortune-poem-box">
-              <i class="fas fa-quote-left"></i>
-              <p class="fortune-poem">{{ fortuneData.poem }}</p>
-              <i class="fas fa-quote-right"></i>
-            </div>
-            <div class="fortune-details">
-              <p class="fortune-desc">{{ fortuneData.description }}</p>
-              <div class="fortune-advice">
-                <div class="advice-item good">
-                  <i class="fas fa-check-circle"></i>
-                  <span>{{ fortuneData.advice }}</span>
-                </div>
-                <div class="advice-item bad">
-                  <i class="fas fa-times-circle"></i>
-                  <span>{{ fortuneData.avoid }}</span>
-                </div>
-              </div>
-              
-              <!-- 运势指数（如果有API数据） -->
-              <div v-if="fortuneData.indexes" class="fortune-indexes">
-                <div class="index-item">
-                  <span class="index-label">综合</span>
-                  <div class="index-bar">
-                    <div class="index-fill" :style="{ width: fortuneData.indexes.all }"></div>
-                  </div>
-                  <span class="index-value">{{ fortuneData.indexes.all }}</span>
-                </div>
-                <div class="index-item">
-                  <span class="index-label">健康</span>
-                  <div class="index-bar">
-                    <div class="index-fill" :style="{ width: fortuneData.indexes.health }"></div>
-                  </div>
-                  <span class="index-value">{{ fortuneData.indexes.health }}</span>
-                </div>
-                <div class="index-item">
-                  <span class="index-label">爱情</span>
-                  <div class="index-bar">
-                    <div class="index-fill" :style="{ width: fortuneData.indexes.love }"></div>
-                  </div>
-                  <span class="index-value">{{ fortuneData.indexes.love }}</span>
-                </div>
-                <div class="index-item">
-                  <span class="index-label">财运</span>
-                  <div class="index-bar">
-                    <div class="index-fill" :style="{ width: fortuneData.indexes.money }"></div>
-                  </div>
-                  <span class="index-value">{{ fortuneData.indexes.money }}</span>
-                </div>
-                <div class="index-item">
-                  <span class="index-label">工作</span>
-                  <div class="index-bar">
-                    <div class="index-fill" :style="{ width: fortuneData.indexes.work }"></div>
-                  </div>
-                  <span class="index-value">{{ fortuneData.indexes.work }}</span>
-                </div>
-              </div>
-              
-              <div class="fortune-meta">
-                <div class="meta-row" v-if="fortuneData.luckyConstellation">
-                  <span class="meta-label">幸运星座：</span>
-                  <span class="meta-value">{{ fortuneData.luckyConstellation }}</span>
-                </div>
-                <div class="meta-row" v-if="fortuneData.luckyNumber">
-                  <span class="meta-label">幸运数字：</span>
-                  <span class="meta-value">{{ fortuneData.luckyNumber }}</span>
-                </div>
-                <div class="meta-row">
-                  <span class="meta-label">幸运色：</span>
-                  <span class="meta-value">{{ fortuneData.luckyColor }}</span>
-                </div>
-                <div class="meta-row" v-if="fortuneData.luckyDirection">
-                  <span class="meta-label">吉方：</span>
-                  <span class="meta-value">{{ fortuneData.luckyDirection }}</span>
-                </div>
-                <div class="meta-row" v-if="fortuneData.luckyTime">
-                  <span class="meta-label">吉时：</span>
-                  <span class="meta-value">{{ fortuneData.luckyTime }}</span>
-                </div>
-              </div>
-            </div>
-            <button 
-              v-if="!fortuneData.checkedIn" 
-              @click="checkin" 
-              class="checkin-btn"
-              :disabled="checkinLoading"
-            >
-              <i class="fas fa-gift"></i>
-              <span v-if="!checkinLoading">签到领取运势加成</span>
-              <span v-else>签到中...</span>
-            </button>
-            <div v-else class="checked-in-badge">
-              <i class="fas fa-check-circle"></i> 今日已签到
-            </div>
-          </div>
-          <div v-else class="fortune-loading">
-            <i class="fas fa-spinner fa-spin"></i> 卜算天机中...
-          </div>
-        </div>
-
         <!-- 事件日志 -->
         <div class="card event-card">
           <div class="card-header-row">
@@ -217,8 +111,6 @@ const currentTime = ref(Date.now())
 const serverLifeSec = ref(0)
 const serverFetchTime = ref(Date.now())
 const triggerLoading = ref(false)
-const fortuneData = ref<any>(null)
-const checkinLoading = ref(false)
 let timer: number | null = null
 let countdownTimer: number | null = null
 
@@ -346,35 +238,9 @@ async function triggerRandomEvent() {
   }
 }
 
-async function loadFortune() {
-  try {
-    const res = await api('/fortune') as any
-    fortuneData.value = res
-  } catch (err: any) {
-    console.error('Failed to load fortune:', err)
-  }
-}
-
-async function checkin() {
-  if (checkinLoading.value) return
-  
-  checkinLoading.value = true
-  try {
-    const res = await api('/fortune/checkin', { method: 'POST' }) as any
-    toast(res.msg || '签到成功', 'gold')
-    await loadFortune()
-    await stateStore.fetchState(true)
-  } catch (err: any) {
-    toast(err.message || '签到失败', 'bad')
-  } finally {
-    checkinLoading.value = false
-  }
-}
-
 onMounted(async () => {
   await stateStore.fetchRealms() // 先加载境界数据
   await stateStore.fetchState(true)
-  await loadFortune()
   
   // 保存服务器返回的lifeSec和获取时间
   if (stateStore.profile) {

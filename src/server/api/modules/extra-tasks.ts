@@ -72,7 +72,7 @@ extraTasks.post('/:taskKey', authMiddleware, async (c) => {
     const shard = config.shard_reward || 0
 
     await c.env.DB.prepare(
-      'UPDATE users SET bonus_sec = bonus_sec + ?, merit = merit + ?, shard = shard + ? WHERE id = ?'
+      'UPDATE users SET bonus_years = bonus_years + ?, merit = merit + ?, shard = shard + ? WHERE id = ?'
     ).bind(bonusSec, merit, shard, userId).run()
 
     const taskConfig = await c.env.DB.prepare(

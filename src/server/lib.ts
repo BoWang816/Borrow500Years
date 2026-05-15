@@ -2,6 +2,16 @@
 
 export const SEC_PER_DAY = 86400;
 export const SEC_PER_YEAR = 365.25 * SEC_PER_DAY;
+export const YEARS_PER_DAY = 1 / 365.25;
+
+// 单位转换辅助函数
+export function secsToYears(secs: number): number {
+  return secs / SEC_PER_YEAR;
+}
+
+export function yearsToSecs(years: number): number {
+  return years * SEC_PER_YEAR;
+}
 
 // Web Crypto SHA-256 哈希（Cloudflare Workers 兼容）
 export async function sha256(text: string): Promise<string> {
@@ -64,19 +74,23 @@ export function currentDecayRate(p: any, mods: { mod_value: number }[]): number 
   return clamp(mult, 0.2, 5.0);
 }
 
-// 当前剩余寿命（秒）
-export function currentLifeSec(p: any): number {
-  const elapsed = (Date.now() - p.start_timestamp) / 1000;
+// 当前剩余寿命（年）- 从数据库秒字段读取并转换
+export function currentLifeYears(p: any): number {
+  const elapsedYears = (Date.now() - p.start_timestamp) / 1000 / SEC_PER_YEAR;
   const base = baseDecayMultiplier(p);
-  return p.initial_life_sec + p.bonus_sec - elapsed * base;
+  const initialYears = secsToYears(p.initial_life_sec || 0);
+  const bonusYears = secsToYears(p.bonus_sec || 0);
+  return initialYears + bonusYears - elapsedYears * base;
 }
 
-export function formatLife(sec: number): string {
-  if (sec >= SEC_PER_YEAR) return (sec / SEC_PER_YEAR).toFixed(1) + ' 年';
-  if (sec >= SEC_PER_DAY) return (sec / SEC_PER_DAY).toFixed(1) + ' 天';
-  if (sec >= 3600) return (sec / 3600).toFixed(1) + ' 小时';
-  if (sec >= 60) return Math.round(sec / 60) + ' 分钟';
-  return Math.round(sec) + ' 秒';
+export function formatLife(years: number): string {
+  if (years >= 1) return years.toFixed(2) + ' 年';
+  const days = years * 365.25;
+  if (days >= 1) return days.toFixed(1) + ' 天';
+  const hours = days * 24;
+  if (hours >= 1) return hours.toFixed(1) + ' 小时';
+  const minutes = hours * 60;
+  return minutes.toFixed(0) + ' 分钟';
 }
 
 // 获取当前时间戳（秒）- 替代 Math.floor(Date.now() / 1000)
@@ -92,23 +106,21 @@ export async function getRealmByAge(db: D1Database, totalAge: number): Promise<{
     FROM realms
     WHERE breakthrough_age_min IS NOT NULL
     ORDER BY sort_order ASC
-  `).all<{ id: number; name: string; breakthrough_age_min: number; breakthrough_age_max: number }>()
+  `).all()
 
   if (!realms.results || realms.results.length === 0) {
     return { id: 1, name: '炼气期' } // 默认境界
   }
 
-  // 将总年龄转换为秒
-  const totalAgeSec = totalAge * SEC_PER_YEAR
-
   // 从高到低查找匹配的境界
   for (let i = realms.results.length - 1; i >= 0; i--) {
-    const realm = realms.results[i]
-    if (totalAgeSec >= realm.breakthrough_age_min) {
+    const realm = realms.results[i] as any
+    if (totalAge >= realm.breakthrough_age_min) {
       return { id: realm.id, name: realm.name }
     }
   }
 
   // 如果没有匹配，返回第一个境界
-  return { id: realms.results[0].id, name: realms.results[0].name }
+  const firstRealm = realms.results[0] as any
+  return { id: firstRealm.id, name: firstRealm.name }
 }

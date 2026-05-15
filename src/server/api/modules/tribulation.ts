@@ -114,17 +114,17 @@ tribulation.post('/complete', authMiddleware, loadProfile, async (c) => {
 
     if (!allDone) return c.json({ error: '尚未完成全部天劫任务' }, 400)
 
-    const rewardSec = 7 * SEC_PER_DAY
+    const rewardYears = 7 / 365.25  // 7天转换为年
     const now = nowSeconds()
     
     await c.env.DB.prepare('UPDATE tribulations SET status = "completed", completed_at = ?, reward_sec = ? WHERE id = ?')
-      .bind(now, rewardSec, trib.id).run()
+      .bind(now, rewardYears, trib.id).run()
     await c.env.DB.prepare(`
-      UPDATE profiles SET bonus_sec = bonus_sec + ?, total_gained_sec = total_gained_sec + ?, merit = merit + ?, updated_at = ? WHERE user_id = ?
-    `).bind(rewardSec, rewardSec, 50, now, userId).run()
+      UPDATE users SET bonus_years = bonus_years + ?, total_gained_years = total_gained_years + ?, merit = merit + ?, updated_at = ? WHERE user_id = ?
+    `).bind(rewardYears, rewardYears, 50, now, userId).run()
 
     await pushEvent(c.env.DB, userId, `🌩️ 渡劫成功 · 天劫已过 · 寿命 +7 天 · 功德 +50`, 'gold')
-    return c.json({ ok: true, rewardSec, merit: 50, msg: '渡劫成功！寿命 +7 天，功德 +50' })
+    return c.json({ ok: true, rewardYears, merit: 50, msg: '渡劫成功！寿命 +7 天，功德 +50' })
   } catch (error: any) {
     console.error('Complete tribulation error:', error)
     return c.json({ error: '渡劫完成失败: ' + error.message }, 500)
@@ -139,12 +139,12 @@ tribulation.post('/fail', authMiddleware, async (c) => {
       .bind(userId, weekId).first<any>()
     if (!trib || trib.status !== 'accepted') return c.json({ error: '无可放弃的天劫' }, 400)
 
-    const penalty = 3 * 3600
+    const penaltyYears = 3 / (365.25 * 24)  // 3小时转换为年
     await c.env.DB.prepare('UPDATE tribulations SET status = "failed" WHERE id = ?').bind(trib.id).run()
-    await c.env.DB.prepare('UPDATE profiles SET bonus_sec = MAX(0, bonus_sec - ?), updated_at = ? WHERE user_id = ?')
-      .bind(penalty, nowSeconds(), userId).run()
+    await c.env.DB.prepare('UPDATE users SET bonus_years = MAX(0, bonus_years - ?), updated_at = ? WHERE user_id = ?')
+      .bind(penaltyYears, nowSeconds(), userId).run()
     await pushEvent(c.env.DB, userId, '💀 天劫失败 · 修为受损 · 寿命 -3 小时', 'bad')
-    return c.json({ ok: true, penalty, msg: '天劫失败，寿命 -3 小时' })
+    return c.json({ ok: true, penaltyYears, msg: '天劫失败，寿命 -3 小时' })
   } catch (error: any) {
     console.error('Fail tribulation error:', error)
     return c.json({ error: '天劫失败处理错误: ' + error.message }, 500)

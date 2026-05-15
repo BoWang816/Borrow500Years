@@ -1,7 +1,7 @@
 // 用户资料模块 - 开启命盘/获取资料/更新资料
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables } from '../../types'
-import { clamp, expectedLifespanYears, SEC_PER_YEAR, nowSeconds } from '../../lib'
+import { clamp, expectedLifespanYears, yearsToSecs, nowSeconds } from '../../lib'
 import { authMiddleware, pushEvent } from '../middleware'
 
 const profile = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
@@ -25,12 +25,13 @@ profile.post('/onboard', authMiddleware, async (c) => {
     meditate: clamp(parseInt(body.meditate) || 0, 0, 3),
   }
   
-  // 使用前端传来的初始寿命（已经过天命测算）
-  const initialLifeSec = parseInt(body.initialLifeSec) || expectedLifespanYears(profileData as any) * SEC_PER_YEAR
+  // 使用前端传来的初始寿命（已经过天命测算，单位：年）
+  const initialLifeYears = parseFloat(body.initialLifeYears) || expectedLifespanYears(profileData as any)
+  const initialLifeSec = yearsToSecs(initialLifeYears)  // 转换为秒存储
   const initialMerit = parseInt(body.initialMerit) || 0
   const startTimestamp = Date.now()
 
-  // 更新users表
+  // 更新users表（数据库仍使用秒）
   await c.env.DB.prepare(`
     UPDATE users SET
       name=?, gender=?, age=?, height=?, weight=?,
@@ -49,7 +50,7 @@ profile.post('/onboard', authMiddleware, async (c) => {
   await c.env.DB.prepare('DELETE FROM active_potions WHERE user_id = ?').bind(userId).run()
   await c.env.DB.prepare('DELETE FROM daily_tasks WHERE user_id = ?').bind(userId).run()
 
-  const remainYears = (initialLifeSec / SEC_PER_YEAR).toFixed(1)
+  const remainYears = initialLifeYears.toFixed(1)
   const message = initialMerit > 0 
     ? `命盘开启 · ${profileData.name} · 一线生机 · 初始功德 ${initialMerit}`
     : `命盘开启 · ${profileData.name} · 预测剩余寿命 ${remainYears} 年`

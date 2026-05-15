@@ -1,7 +1,7 @@
 // 成就系统模块
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile } from '../../types'
-import { SEC_PER_YEAR } from '../../lib'
+import { SEC_PER_YEAR, secsToYears } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 const ACHIEVEMENTS = [
@@ -21,8 +21,8 @@ const ACHIEVEMENTS = [
 ] as const
 
 async function getUnlockedIds(db: D1Database, userId: number): Promise<string[]> {
-  const rows = await db.prepare('SELECT ach_id FROM achievements WHERE user_id = ?').bind(userId).all<{ ach_id: string }>()
-  return (rows.results || []).map((r: { ach_id: string }) => r.ach_id)
+  const rows = await db.prepare('SELECT ach_id FROM achievements WHERE user_id = ?').bind(userId).all()
+  return (rows.results || []).map((r: any) => r.ach_id as string)
 }
 
 async function unlockAchievement(db: D1Database, userId: number, achId: string, profile: Profile) {
@@ -55,15 +55,15 @@ achievements.post('/check', authMiddleware, loadProfile, async (c) => {
   const unlocked = await getUnlockedIds(c.env.DB, userId)
   const newly: typeof ACHIEVEMENTS[number][] = []
 
-  const ziwuCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM daily_tasks WHERE user_id = ? AND ziwu = 1').bind(userId).first<{ n: number }>()
-  const meditateCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM daily_tasks WHERE user_id = ? AND meditate = 1').bind(userId).first<{ n: number }>()
-  const eventCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM events WHERE user_id = ?').bind(userId).first<{ n: number }>()
-  const potionCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM active_potions WHERE user_id = ?').bind(userId).first<{ n: number }>()
-  const exploreCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM events WHERE user_id = ? AND msg LIKE "%秘境探险%"').bind(userId).first<{ n: number }>()
-  const tribCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM tribulations WHERE user_id = ? AND status = "completed"').bind(userId).first<{ n: number }>()
-  const activeDays = await c.env.DB.prepare('SELECT COUNT(DISTINCT task_date) as n FROM daily_tasks WHERE user_id = ? AND (ziwu+steps+water+meditate+earlyrise+diet) > 0').bind(userId).first<{ n: number }>()
+  const ziwuCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM daily_tasks WHERE user_id = ? AND ziwu = 1').bind(userId).first() as { n: number } | null
+  const meditateCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM daily_tasks WHERE user_id = ? AND meditate = 1').bind(userId).first() as { n: number } | null
+  const eventCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM events WHERE user_id = ?').bind(userId).first() as { n: number } | null
+  const potionCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM active_potions WHERE user_id = ?').bind(userId).first() as { n: number } | null
+  const exploreCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM events WHERE user_id = ? AND msg LIKE "%秘境探险%"').bind(userId).first() as { n: number } | null
+  const tribCount = await c.env.DB.prepare('SELECT COUNT(*) as n FROM tribulations WHERE user_id = ? AND status = "completed"').bind(userId).first() as { n: number } | null
+  const activeDays = await c.env.DB.prepare('SELECT COUNT(DISTINCT task_date) as n FROM daily_tasks WHERE user_id = ? AND (ziwu+steps+water+meditate+earlyrise+diet) > 0').bind(userId).first() as { n: number } | null
 
-  const totalAge = profile.age + (Date.now() - profile.start_timestamp) / 1000 / SEC_PER_YEAR + profile.bonus_sec / SEC_PER_YEAR
+  const totalAge = (profile.age || 0) + (Date.now() - (profile.start_timestamp || Date.now())) / 1000 / SEC_PER_YEAR + secsToYears(profile.bonus_sec || 0)
 
   const checks: Record<string, boolean> = {
     first_ziwu: !!(ziwuCount && ziwuCount.n > 0),

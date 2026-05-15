@@ -1,3 +1,5 @@
+import { useLoadingStore } from '../stores/loading'
+
 export async function api(endpoint: string, options: RequestInit = {}) {
   const token = localStorage.getItem('token')
   
@@ -36,6 +38,20 @@ export async function api(endpoint: string, options: RequestInit = {}) {
   }
 
   return response.json()
+}
+
+/**
+ * 带loading的API调用
+ */
+export async function apiWithLoading(endpoint: string, options: RequestInit = {}, message = '') {
+  const loadingStore = useLoadingStore()
+  loadingStore.show(message)
+  
+  try {
+    return await api(endpoint, options)
+  } finally {
+    loadingStore.hide()
+  }
 }
 
 export function formatLife(seconds: number): string {

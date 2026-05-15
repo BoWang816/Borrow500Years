@@ -13,13 +13,11 @@ import achievements from './modules/achievements'
 import explore from './modules/explore'
 import tribulation from './modules/tribulation'
 import revive from './modules/revive'
-import fortune from './modules/fortune'
 import cultivation from './modules/cultivation'
 import extraTasks from './modules/extra-tasks'
 import worldEvents from './modules/world-events'
 import admin from './modules/admin'
 import realms from './modules/realms'
-import adminFortune from './modules/admin-fortune'
 
 const api = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
 
@@ -34,13 +32,11 @@ api.route('/achievements', achievements)
 api.route('/explore', explore)
 api.route('/tribulation', tribulation)
 api.route('/revive', revive)
-api.route('/fortune', fortune)
 api.route('/cultivation', cultivation)
 api.route('/extra-tasks', extraTasks)
 api.route('/world-events', worldEvents)
 api.route('/admin', admin)
 api.route('/realms', realms)
-api.route('/admin/fortune', adminFortune)
 
 // 管理员检查接口
 api.get('/admin/me', async (c) => {

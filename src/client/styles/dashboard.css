@@ -248,7 +248,7 @@ body.crisis .ring1 {
 /* 卡片布局 */
 .dash-cards {
   display: grid;
-  grid-template-columns: 1fr 1.3fr;
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
@@ -284,6 +284,11 @@ body.crisis .ring1 {
 }
 
 /* 事件卡片 */
+.event-card {
+  display: flex;
+  flex-direction: column;
+}
+
 .event-card.full-width {
   grid-column: 1 / -1;
 }
@@ -367,8 +372,8 @@ body.crisis .ring1 {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 500px;
   overflow-y: auto;
+  max-height: 600px;
 }
 
 .event-log .empty {
@@ -502,6 +507,7 @@ body.crisis .ring1 {
 .fortune-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .fortune-loading {
@@ -518,6 +524,7 @@ body.crisis .ring1 {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
 }
 
 .fortune-result {
@@ -703,5 +710,4 @@ body.crisis .ring1 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 8px;
 }

@@ -70,6 +70,9 @@
 
     <!-- 危机弹窗 -->
     <CrisisOverlay />
+    
+    <!-- 全局Loading -->
+    <Loading />
   </div>
 </template>
 
@@ -79,6 +82,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { useStateStore } from './stores/state'
 import CrisisOverlay from './components/CrisisOverlay.vue'
+import Loading from './components/Loading.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

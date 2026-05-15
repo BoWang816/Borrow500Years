@@ -14,8 +14,8 @@ cultivation.get('/practices', authMiddleware, loadProfile, async (c) => {
   try {
     // 计算用户当前境界
     const now = Date.now()
-    const elapsed = (now - (profile.start_timestamp || 0)) / 1000
-    const totalAge = (profile.age || 0) + elapsed / SEC_PER_YEAR + (profile.bonus_sec || 0) / SEC_PER_YEAR
+    const elapsedYears = (now - (profile.start_timestamp || 0)) / 1000 / SEC_PER_YEAR
+    const totalAge = (profile.age || 0) + elapsedYears + (profile.bonus_years || 0)
     const realmData = await getRealmByAge(c.env.DB, totalAge)
     const currentRealmId = realmData.id
     
@@ -137,8 +137,8 @@ cultivation.post('/practice/:key', authMiddleware, loadProfile, async (c) => {
   
   // 检查境界要求
   const now = Date.now()
-  const elapsed = (now - (profile.start_timestamp || 0)) / 1000
-  const totalAge = (profile.age || 0) + elapsed / SEC_PER_YEAR + (profile.bonus_sec || 0) / SEC_PER_YEAR
+  const elapsedYears = (now - (profile.start_timestamp || 0)) / 1000 / SEC_PER_YEAR
+  const totalAge = (profile.age || 0) + elapsedYears + (profile.bonus_years || 0)
   const realmData = await getRealmByAge(c.env.DB, totalAge)
   
   if (realmData.id < practice.realm_id) {
@@ -152,11 +152,11 @@ cultivation.post('/practice/:key', authMiddleware, loadProfile, async (c) => {
   if ((profile.coin || 0) < practice.cost_coin) {
     return c.json({ error: `复活币不足，需要 ${practice.cost_coin}` }, 400)
   }
-  // 寿命检查：计算当前剩余寿命
+  // 寿命检查：计算当前剩余寿命（年）
   if (practice.cost_life > 0) {
-    const elapsed = (now - (profile.start_timestamp || 0)) / 1000
+    const elapsedYears = (now - (profile.start_timestamp || 0)) / 1000 / SEC_PER_YEAR
     const baseDecay = 1.0 // 简化计算，实际应该从 lib.ts 获取
-    const currentLife = (profile.initial_life_sec || 0) + (profile.bonus_sec || 0) - elapsed * baseDecay
+    const currentLife = (profile.initial_life_years || 0) + (profile.bonus_years || 0) - elapsedYears * baseDecay
     if (currentLife < practice.cost_life) {
       return c.json({ error: `寿命不足，需要 ${formatLife(practice.cost_life)}` }, 400)
     }
@@ -205,7 +205,7 @@ cultivation.post('/practice/:key', authMiddleware, loadProfile, async (c) => {
     UPDATE users 
     SET merit = merit - ?, 
         coin = coin - ?,
-        bonus_sec = bonus_sec - ?,
+        bonus_years = bonus_years - ?,
         updated_at = ?
     WHERE id = ?
   `).bind(
@@ -219,10 +219,10 @@ cultivation.post('/practice/:key', authMiddleware, loadProfile, async (c) => {
   // 增加奖励
   await c.env.DB.prepare(`
     UPDATE users 
-    SET bonus_sec = bonus_sec + ?,
+    SET bonus_years = bonus_years + ?,
         merit = merit + ?,
         shard = shard + ?,
-        total_gained_sec = total_gained_sec + ?,
+        total_gained_years = total_gained_years + ?,
         updated_at = ?
     WHERE id = ?
   `).bind(

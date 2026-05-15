@@ -51,14 +51,14 @@ explore.post('/', authMiddleware, loadProfile, async (c) => {
   }
 
   await c.env.DB.prepare(`
-    UPDATE users SET merit = merit - ?, bonus_sec = bonus_sec + ?,
-      total_gained_sec = total_gained_sec + ?,
+    UPDATE users SET merit = merit - ?, bonus_years = bonus_years + ?,
+      total_gained_years = total_gained_years + ?,
       coin = ?, shard = ?, updated_at = ?
     WHERE id = ?
   `).bind(cost, loot.life, Math.max(0, loot.life), newCoin, newShard, nowSeconds(), userId).run()
 
   const msg = `秘境探险 · ${loot.name} · ${loot.msg} · 寿命 ${loot.life > 0 ? '+' + formatLife(loot.life) : '无变化'} · 功德 ${loot.merit > 0 ? '+' + loot.merit : '-20'}`
-  await pushEvent(c.env.DB, userId, msg, loot.life >= 6*3600 ? 'gold' : loot.life > 0 ? 'good' : 'normal')
+  await pushEvent(c.env.DB, userId, msg, loot.life >= 0.5 ? 'gold' : loot.life > 0 ? 'good' : 'normal')
 
   return c.json({ 
     ok: true, 

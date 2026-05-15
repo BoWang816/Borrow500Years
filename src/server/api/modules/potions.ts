@@ -65,7 +65,7 @@ potions.post('/:id', authMiddleware, loadProfile, async (c) => {
   await c.env.DB.prepare(`
     UPDATE users SET
       merit = merit - ?, coin = coin - ?,
-      bonus_sec = bonus_sec + ?, total_gained_sec = total_gained_sec + ?,
+      bonus_years = bonus_years + ?, total_gained_years = total_gained_years + ?,
       updated_at = ?
     WHERE id = ?
   `).bind(costMerit, costCoin, bonusGain, bonusGain > 0 ? bonusGain : 0, nowSeconds(), userId).run()

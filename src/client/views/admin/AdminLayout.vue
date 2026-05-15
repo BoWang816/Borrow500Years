@@ -27,9 +27,6 @@
       <router-link to="/admin/events" class="admin-nav-item" active-class="active">
         全服事件
       </router-link>
-      <router-link to="/admin/fortune" class="admin-nav-item" active-class="active">
-        运势管理
-      </router-link>
       <router-link to="/admin/potions" class="admin-nav-item" active-class="active">
         丹药记录
       </router-link>

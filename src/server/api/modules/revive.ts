@@ -14,7 +14,7 @@ revive.post('/', authMiddleware, loadProfile, async (c) => {
   await c.env.DB.prepare(`
     UPDATE users SET
       coin = coin - 1, dying = 0, dying_start_at = NULL,
-      start_timestamp = ?, bonus_sec = initial_life_sec * 0.5,
+      start_timestamp = ?, bonus_years = initial_life_years * 0.5,
       updated_at = ?
     WHERE id = ?
   `).bind(Date.now(), nowSeconds(), userId).run()
