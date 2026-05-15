@@ -1,7 +1,7 @@
 // 秘境探险模块
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile } from '../../types'
-import { formatLife, nowSeconds } from '../../lib'
+import { formatLife, nowSeconds, secsToYears, yearsToSecs } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 // 从数据库加载探索掉落配置
@@ -43,6 +43,8 @@ explore.post('/', authMiddleware, loadProfile, async (c) => {
   }
 
   const loot = rollExplore(lootTable)
+  const lootLifeYears = secsToYears(loot.life)  // 从数据库读取秒，转换为年
+  
   let newShard = profile.shard + loot.shard
   let newCoin = profile.coin
   if (newShard >= 5) {
@@ -50,15 +52,16 @@ explore.post('/', authMiddleware, loadProfile, async (c) => {
     newShard = newShard % 5
   }
 
+  // 转换年为秒存储到数据库
   await c.env.DB.prepare(`
-    UPDATE users SET merit = merit - ?, bonus_years = bonus_years + ?,
-      total_gained_years = total_gained_years + ?,
+    UPDATE users SET merit = merit - ?, bonus_sec = bonus_sec + ?,
+      total_gained_sec = total_gained_sec + ?,
       coin = ?, shard = ?, updated_at = ?
     WHERE id = ?
-  `).bind(cost, loot.life, Math.max(0, loot.life), newCoin, newShard, nowSeconds(), userId).run()
+  `).bind(cost, yearsToSecs(lootLifeYears), Math.max(0, yearsToSecs(lootLifeYears)), newCoin, newShard, nowSeconds(), userId).run()
 
-  const msg = `秘境探险 · ${loot.name} · ${loot.msg} · 寿命 ${loot.life > 0 ? '+' + formatLife(loot.life) : '无变化'} · 功德 ${loot.merit > 0 ? '+' + loot.merit : '-20'}`
-  await pushEvent(c.env.DB, userId, msg, loot.life >= 0.5 ? 'gold' : loot.life > 0 ? 'good' : 'normal')
+  const msg = `秘境探险 · ${loot.name} · ${loot.msg} · 寿命 ${lootLifeYears > 0 ? '+' + formatLife(lootLifeYears) : '无变化'} · 功德 ${loot.merit > 0 ? '+' + loot.merit : '-20'}`
+  await pushEvent(c.env.DB, userId, msg, lootLifeYears >= 0.5 ? 'gold' : lootLifeYears > 0 ? 'good' : 'normal')
 
   return c.json({ 
     ok: true, 
@@ -66,7 +69,7 @@ explore.post('/', authMiddleware, loadProfile, async (c) => {
     loot: { 
       name: loot.name, 
       msg: loot.msg, 
-      life: loot.life, 
+      life: lootLifeYears,  // 返回年给前端
       merit: loot.merit, 
       shard: loot.shard 
     } 

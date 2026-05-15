@@ -1,7 +1,7 @@
 // 修炼项目模块 - 扩展养生任务
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile } from '../../types'
-import { formatLife, nowSeconds } from '../../lib'
+import { formatLife, nowSeconds, secsToYears, yearsToSecs } from '../../lib'
 import { authMiddleware, pushEvent } from '../middleware'
 
 const extraTasks = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
@@ -67,18 +67,19 @@ extraTasks.post('/:taskKey', authMiddleware, async (c) => {
   // 获取用户档案并奖励
   const profile = await c.env.DB.prepare('SELECT * FROM users WHERE id = ?').bind(userId).first<Profile>()
   if (profile) {
-    const bonusSec = config.life_reward
+    const lifeRewardYears = secsToYears(config.life_reward)  // 从数据库读取秒，转换为年
     const merit = config.merit_reward
     const shard = config.shard_reward || 0
 
+    // 转换年为秒存储到数据库
     await c.env.DB.prepare(
-      'UPDATE users SET bonus_years = bonus_years + ?, merit = merit + ?, shard = shard + ? WHERE id = ?'
-    ).bind(bonusSec, merit, shard, userId).run()
+      'UPDATE users SET bonus_sec = bonus_sec + ?, merit = merit + ?, shard = shard + ? WHERE id = ?'
+    ).bind(yearsToSecs(lifeRewardYears), merit, shard, userId).run()
 
     const taskConfig = await c.env.DB.prepare(
       'SELECT name FROM extra_tasks_config WHERE task_key = ?'
     ).bind(taskKey).first<{ name: string }>()
-    await pushEvent(c.env.DB, userId, `完成养生任务：${taskConfig?.name || taskKey}，奖励 +${formatLife(bonusSec)}、${merit}功德`, 'good')
+    await pushEvent(c.env.DB, userId, `完成养生任务：${taskConfig?.name || taskKey}，奖励 +${formatLife(lifeRewardYears)}、${merit}功德`, 'good')
   }
 
   return c.json({ success: true })

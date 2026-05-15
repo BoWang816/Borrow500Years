@@ -11,17 +11,17 @@ export interface Profile {
   stayup: number
   exercise: number
   meditate: number
-  initialLifeSec: number
-  bonusSec: number
+  initialLifeYears: number
+  bonusYears: number
   startTimestamp: number
-  totalGainedSec: number
+  totalGainedYears: number
   coin: number
   shard: number
   merit: number
   streak: number
   dying: boolean
   dyingStartAt: number | null
-  lifeSec: number
+  lifeYears: number
   totalAge: number
   realm: string
   realmId: number

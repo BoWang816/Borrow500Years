@@ -1,7 +1,7 @@
 // 天劫挑战模块
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile } from '../../types'
-import { SEC_PER_DAY, formatLife, nowSeconds, todayStr } from '../../lib'
+import { SEC_PER_DAY, formatLife, nowSeconds, todayStr, yearsToSecs } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 const TRIBULATION_TASK_POOL = ['ziwu', 'steps', 'water', 'meditate', 'diet']
@@ -118,10 +118,10 @@ tribulation.post('/complete', authMiddleware, loadProfile, async (c) => {
     const now = nowSeconds()
     
     await c.env.DB.prepare('UPDATE tribulations SET status = "completed", completed_at = ?, reward_sec = ? WHERE id = ?')
-      .bind(now, rewardYears, trib.id).run()
+      .bind(now, yearsToSecs(rewardYears), trib.id).run()
     await c.env.DB.prepare(`
-      UPDATE users SET bonus_years = bonus_years + ?, total_gained_years = total_gained_years + ?, merit = merit + ?, updated_at = ? WHERE user_id = ?
-    `).bind(rewardYears, rewardYears, 50, now, userId).run()
+      UPDATE users SET bonus_sec = bonus_sec + ?, total_gained_sec = total_gained_sec + ?, merit = merit + ?, updated_at = ? WHERE user_id = ?
+    `).bind(yearsToSecs(rewardYears), yearsToSecs(rewardYears), 50, now, userId).run()
 
     await pushEvent(c.env.DB, userId, `🌩️ 渡劫成功 · 天劫已过 · 寿命 +7 天 · 功德 +50`, 'gold')
     return c.json({ ok: true, rewardYears, merit: 50, msg: '渡劫成功！寿命 +7 天，功德 +50' })
@@ -141,8 +141,8 @@ tribulation.post('/fail', authMiddleware, async (c) => {
 
     const penaltyYears = 3 / (365.25 * 24)  // 3小时转换为年
     await c.env.DB.prepare('UPDATE tribulations SET status = "failed" WHERE id = ?').bind(trib.id).run()
-    await c.env.DB.prepare('UPDATE users SET bonus_years = MAX(0, bonus_years - ?), updated_at = ? WHERE user_id = ?')
-      .bind(penaltyYears, nowSeconds(), userId).run()
+    await c.env.DB.prepare('UPDATE users SET bonus_sec = MAX(0, bonus_sec - ?), updated_at = ? WHERE user_id = ?')
+      .bind(yearsToSecs(penaltyYears), nowSeconds(), userId).run()
     await pushEvent(c.env.DB, userId, '💀 天劫失败 · 修为受损 · 寿命 -3 小时', 'bad')
     return c.json({ ok: true, penaltyYears, msg: '天劫失败，寿命 -3 小时' })
   } catch (error: any) {

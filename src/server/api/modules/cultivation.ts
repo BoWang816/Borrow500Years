@@ -1,7 +1,7 @@
 // 境界修炼系统模块
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile } from '../../types'
-import { formatLife, nowSeconds, getRealmByAge, SEC_PER_YEAR } from '../../lib'
+import { formatLife, nowSeconds, getRealmByAge, SEC_PER_YEAR, secsToYears, yearsToSecs } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 const cultivation = new Hono<{ Bindings: Bindings; Variables: ApiVariables }>()
@@ -15,7 +15,8 @@ cultivation.get('/practices', authMiddleware, loadProfile, async (c) => {
     // 计算用户当前境界
     const now = Date.now()
     const elapsedYears = (now - (profile.start_timestamp || 0)) / 1000 / SEC_PER_YEAR
-    const totalAge = (profile.age || 0) + elapsedYears + (profile.bonus_years || 0)
+    const bonusYears = secsToYears(profile.bonus_sec || 0)
+    const totalAge = (profile.age || 0) + elapsedYears + bonusYears
     const realmData = await getRealmByAge(c.env.DB, totalAge)
     const currentRealmId = realmData.id
     
@@ -138,7 +139,8 @@ cultivation.post('/practice/:key', authMiddleware, loadProfile, async (c) => {
   // 检查境界要求
   const now = Date.now()
   const elapsedYears = (now - (profile.start_timestamp || 0)) / 1000 / SEC_PER_YEAR
-  const totalAge = (profile.age || 0) + elapsedYears + (profile.bonus_years || 0)
+  const bonusYears = secsToYears(profile.bonus_sec || 0)
+  const totalAge = (profile.age || 0) + elapsedYears + bonusYears
   const realmData = await getRealmByAge(c.env.DB, totalAge)
   
   if (realmData.id < practice.realm_id) {
@@ -154,11 +156,14 @@ cultivation.post('/practice/:key', authMiddleware, loadProfile, async (c) => {
   }
   // 寿命检查：计算当前剩余寿命（年）
   if (practice.cost_life > 0) {
+    const costLifeYears = secsToYears(practice.cost_life)
     const elapsedYears = (now - (profile.start_timestamp || 0)) / 1000 / SEC_PER_YEAR
     const baseDecay = 1.0 // 简化计算，实际应该从 lib.ts 获取
-    const currentLife = (profile.initial_life_years || 0) + (profile.bonus_years || 0) - elapsedYears * baseDecay
-    if (currentLife < practice.cost_life) {
-      return c.json({ error: `寿命不足，需要 ${formatLife(practice.cost_life)}` }, 400)
+    const initialYears = secsToYears(profile.initial_life_sec || 0)
+    const bonusYears = secsToYears(profile.bonus_sec || 0)
+    const currentLife = initialYears + bonusYears - elapsedYears * baseDecay
+    if (currentLife < costLifeYears) {
+      return c.json({ error: `寿命不足，需要 ${formatLife(costLifeYears)}` }, 400)
     }
   }
   
@@ -193,43 +198,45 @@ cultivation.post('/practice/:key', authMiddleware, loadProfile, async (c) => {
   
   const nowSec = nowSeconds()
   
-  // 计算奖励（暴击双倍）
+  // 计算奖励（暴击双倍）- 从数据库读取的是秒，转换为年计算
   const multiplier = isCritical ? 2 : (isSuccess ? 1 : 0.3)
-  const actualRewardLife = Math.floor(practice.reward_life * multiplier)
+  const rewardLifeYears = secsToYears(practice.reward_life) * multiplier
+  const actualRewardLife = Math.floor(rewardLifeYears * 100) / 100  // 保留2位小数
   const actualRewardMerit = Math.floor(practice.reward_merit * multiplier)
   const actualRewardShard = Math.floor(practice.reward_shard * multiplier)
   const actualRewardExp = Math.floor(practice.reward_exp * multiplier)
   
-  // 扣除消耗
+  // 扣除消耗（数据库使用秒）
+  const costLifeSecs = practice.cost_life || 0
   await c.env.DB.prepare(`
     UPDATE users 
     SET merit = merit - ?, 
         coin = coin - ?,
-        bonus_years = bonus_years - ?,
+        bonus_sec = bonus_sec - ?,
         updated_at = ?
     WHERE id = ?
   `).bind(
     practice.cost_merit,
     practice.cost_coin,
-    practice.cost_life,
+    costLifeSecs,
     nowSec,
     userId
   ).run()
   
-  // 增加奖励
+  // 增加奖励（转换年为秒存储）
   await c.env.DB.prepare(`
     UPDATE users 
-    SET bonus_years = bonus_years + ?,
+    SET bonus_sec = bonus_sec + ?,
         merit = merit + ?,
         shard = shard + ?,
-        total_gained_years = total_gained_years + ?,
+        total_gained_sec = total_gained_sec + ?,
         updated_at = ?
     WHERE id = ?
   `).bind(
-    actualRewardLife,
+    yearsToSecs(actualRewardLife),
     actualRewardMerit,
     actualRewardShard,
-    actualRewardLife,
+    yearsToSecs(actualRewardLife),
     nowSec,
     userId
   ).run()

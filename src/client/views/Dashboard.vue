@@ -43,7 +43,7 @@
             <div class="meta-item">
               <span class="meta-label">总寿命</span>
               <span class="meta-val life">
-                <i class="fas fa-hourglass-half"></i> {{ formatTotalLife(stateStore.profile.lifeSec || 0) }}
+                <i class="fas fa-hourglass-half"></i> {{ formatTotalLife(stateStore.profile.lifeYears || 0) }}
               </span>
             </div>
           </div>
@@ -108,26 +108,31 @@ import { api, toast } from '../utils/api'
 const stateStore = useStateStore()
 const displayMode = ref<'full' | 'seconds' | 'days'>('full')
 const currentTime = ref(Date.now())
-const serverLifeSec = ref(0)
+const serverLifeYears = ref(0)
 const serverFetchTime = ref(Date.now())
 const triggerLoading = ref(false)
 let timer: number | null = null
 let countdownTimer: number | null = null
 
-const SEC_PER_YEAR = 31536000
+const SEC_PER_YEAR = 31557600  // 365.25 * 24 * 3600
 const SEC_PER_DAY = 86400
 
-// 计算当前剩余寿命（考虑时间流逝）
-const currentLifeSec = computed(() => {
+// 计算当前剩余寿命（考虑时间流逝）- 使用年为单位
+const currentLifeYears = computed(() => {
   if (!stateStore.profile) return 0
   
-  // 计算从上次服务器同步到现在经过的秒数
-  const elapsedSinceSync = Math.floor((currentTime.value - serverFetchTime.value) / 1000)
+  // 计算从上次服务器同步到现在经过的年数
+  const elapsedYears = (currentTime.value - serverFetchTime.value) / 1000 / SEC_PER_YEAR
   
-  // 使用服务器返回的lifeSec减去本地流逝的时间
-  const lifeSec = serverLifeSec.value > 0 ? serverLifeSec.value : stateStore.profile.lifeSec
+  // 使用服务器返回的lifeYears减去本地流逝的时间
+  const lifeYears = serverLifeYears.value > 0 ? serverLifeYears.value : stateStore.profile.lifeYears
   
-  return Math.max(0, lifeSec - elapsedSinceSync)
+  return Math.max(0, lifeYears - elapsedYears)
+})
+
+// 将年转换为秒用于显示
+const currentLifeSec = computed(() => {
+  return currentLifeYears.value * SEC_PER_YEAR
 })
 
 const timeDisplay = computed(() => {
@@ -153,12 +158,12 @@ const secondsDisplay = computed(() => {
   const lifeSec = currentLifeSec.value
   
   if (displayMode.value === 'seconds') {
-    return `${lifeSec.toLocaleString()} 秒`
+    return `${Math.floor(lifeSec).toLocaleString()} 秒`
   } else if (displayMode.value === 'days') {
     const days = Math.floor(lifeSec / SEC_PER_DAY)
     return `${days.toLocaleString()} 天`
   }
-  return `${lifeSec.toLocaleString()} · 秒`
+  return `${Math.floor(lifeSec).toLocaleString()} · 秒`
 })
 
 const decayRate = computed(() => {
@@ -178,16 +183,16 @@ const realmName = computed(() => {
   return stateStore.profile.realm || '未知境界'
 })
 
-function formatTotalLife(seconds: number): string {
-  const years = Math.floor(seconds / SEC_PER_YEAR)
-  const days = Math.floor((seconds % SEC_PER_YEAR) / SEC_PER_DAY)
+function formatTotalLife(years: number): string {
+  const wholeYears = Math.floor(years)
+  const remainingDays = Math.floor((years - wholeYears) * 365.25)
   
-  if (years > 0) {
-    return `${years}年${days}天`
-  } else if (days > 0) {
-    return `${days}天`
+  if (wholeYears > 0) {
+    return `${wholeYears}年${remainingDays}天`
+  } else if (remainingDays > 0) {
+    return `${remainingDays}天`
   } else {
-    const hours = Math.floor(seconds / 3600)
+    const hours = Math.floor(years * 365.25 * 24)
     return `${hours}小时`
   }
 }
@@ -242,9 +247,9 @@ onMounted(async () => {
   await stateStore.fetchRealms() // 先加载境界数据
   await stateStore.fetchState(true)
   
-  // 保存服务器返回的lifeSec和获取时间
+  // 保存服务器返回的lifeYears和获取时间
   if (stateStore.profile) {
-    serverLifeSec.value = stateStore.profile.lifeSec
+    serverLifeYears.value = stateStore.profile.lifeYears
     serverFetchTime.value = Date.now()
   }
   
@@ -257,7 +262,7 @@ onMounted(async () => {
   timer = window.setInterval(async () => {
     await stateStore.fetchState()
     if (stateStore.profile) {
-      serverLifeSec.value = stateStore.profile.lifeSec
+      serverLifeYears.value = stateStore.profile.lifeYears
       serverFetchTime.value = Date.now()
     }
   }, 60000) // 从5秒改为60秒

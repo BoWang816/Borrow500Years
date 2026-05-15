@@ -1,7 +1,7 @@
 // 排行榜模块
 import { Hono } from 'hono'
 import type { Bindings } from '../../types'
-import { baseDecayMultiplier, SEC_PER_YEAR, getRealmByAge } from '../../lib'
+import { baseDecayMultiplier, SEC_PER_YEAR, getRealmByAge, secsToYears } from '../../lib'
 
 const board = new Hono<{ Bindings: Bindings }>()
 
@@ -10,7 +10,7 @@ board.get('/:type', async (c) => {
   const all = await c.env.DB.prepare(`
     SELECT u.id, u.username, u.name, u.gender, u.age, u.height, u.weight,
            u.smoke, u.alcohol, u.stayup, u.exercise, u.meditate,
-           u.initial_life_years, u.bonus_years, u.start_timestamp, u.total_gained_years, u.merit,
+           u.initial_life_sec, u.bonus_sec, u.start_timestamp, u.total_gained_sec, u.merit,
            ur.current_realm_id, r.name as realm_name, r.major_realm
     FROM users u
     LEFT JOIN user_realms ur ON u.id = ur.user_id
@@ -22,8 +22,10 @@ board.get('/:type', async (c) => {
   const rows = await Promise.all(all.results.map(async (r: any) => {
     const elapsedYears = (now - r.start_timestamp) / 1000 / SEC_PER_YEAR
     const base = baseDecayMultiplier(r)
-    const lifeYears = Math.max(0, (r.initial_life_years || 0) + (r.bonus_years || 0) - elapsedYears * base)
-    const totalAge = (r.age || 0) + elapsedYears + (r.bonus_years || 0)
+    const initialYears = secsToYears(r.initial_life_sec || 0)
+    const bonusYears = secsToYears(r.bonus_sec || 0)
+    const lifeYears = Math.max(0, initialYears + bonusYears - elapsedYears * base)
+    const totalAge = (r.age || 0) + elapsedYears + bonusYears
     
     // 从数据库获取境界
     let realm = r.realm_name

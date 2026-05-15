@@ -1,7 +1,7 @@
 // 丹药模块 - 丹药列表/购买/使用
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables, Profile } from '../../types'
-import { formatLife, nowSeconds } from '../../lib'
+import { formatLife, nowSeconds, secsToYears, yearsToSecs } from '../../lib'
 import { authMiddleware, loadProfile, pushEvent } from '../middleware'
 
 // 从数据库加载丹药配置
@@ -50,9 +50,9 @@ potions.post('/:id', authMiddleware, loadProfile, async (c) => {
 
   let costMerit = p.type === 'merit' ? p.cost : 0
   let costCoin = p.type === 'coin' ? p.cost : 0
-  let bonusGain = 0
+  let bonusGainYears = 0
   if ('instant' in p && p.instant) {
-    bonusGain = p.instant.life
+    bonusGainYears = secsToYears(p.instant.life)  // 从数据库读取秒，转换为年
   }
   if ('mod' in p && p.mod && p.dur) {
     const expireAt = Date.now() + p.dur * 1000
@@ -62,15 +62,16 @@ potions.post('/:id', authMiddleware, loadProfile, async (c) => {
     `).bind(userId, p.id, p.name, p.emoji, p.mod.id, p.mod.label, p.mod.value, expireAt).run()
   }
 
+  // 转换年为秒存储到数据库
   await c.env.DB.prepare(`
     UPDATE users SET
       merit = merit - ?, coin = coin - ?,
-      bonus_years = bonus_years + ?, total_gained_years = total_gained_years + ?,
+      bonus_sec = bonus_sec + ?, total_gained_sec = total_gained_sec + ?,
       updated_at = ?
     WHERE id = ?
-  `).bind(costMerit, costCoin, bonusGain, bonusGain > 0 ? bonusGain : 0, nowSeconds(), userId).run()
+  `).bind(costMerit, costCoin, yearsToSecs(bonusGainYears), bonusGainYears > 0 ? yearsToSecs(bonusGainYears) : 0, nowSeconds(), userId).run()
 
-  const msg = bonusGain > 0 ? `服下「${p.name}」，寿命 +${formatLife(bonusGain)}` : `服下「${p.name}」，丹药生效中`
+  const msg = bonusGainYears > 0 ? `服下「${p.name}」，寿命 +${formatLife(bonusGainYears)}` : `服下「${p.name}」，丹药生效中`
   await pushEvent(c.env.DB, userId, msg, 'good')
   return c.json({ ok: true, msg })
 })
