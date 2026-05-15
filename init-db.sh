@@ -26,20 +26,40 @@ if [ -f "$DB_PATH" ]; then
 fi
 
 echo "📋 应用数据库迁移..."
-npx wrangler d1 migrations apply webapp-production --local
-
-if [ $? -ne 0 ]; then
-    echo "❌ 迁移失败"
-    exit 1
-fi
-
-echo "✅ 迁移完成"
 echo ""
 
-echo "🌱 导入种子数据..."
-npx wrangler d1 execute webapp-production --local --file=./seed.sql
+# 按顺序执行迁移文件
+MIGRATIONS=(
+    "0001_initial_schema.sql"
+    "0002_features.sql"
+    "0003_admin.sql"
+    "0013_fortune_checkins.sql"
+    "0014_add_zodiac_to_users.sql"
+    "0017_cultivation_practices_final.sql"
+    "0019_remove_manuals_system.sql"
+    "0024_remove_fortune_system.sql"
+    "0025_convert_to_years_simple.sql"
+    "0026_update_lifespan_values_for_years.sql"
+)
 
-if [ $? -ne 0 ]; then
+for migration in "${MIGRATIONS[@]}"; do
+    echo "  执行: $migration"
+    npx wrangler d1 execute webapp-production --local --file="./migrations/$migration" 2>&1 | grep -v "wrangler" | grep -v "Resource location"
+    
+    if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        echo "❌ 迁移失败: $migration"
+        exit 1
+    fi
+done
+
+echo ""
+echo "✅ 所有迁移完成"
+echo ""
+
+echo "🌱 导入种子数据（包含配置和NPC用户）..."
+npx wrangler d1 execute webapp-production --local --file=./seed.sql 2>&1 | grep -v "wrangler" | grep -v "Resource location"
+
+if [ ${PIPESTATUS[0]} -ne 0 ]; then
     echo "❌ 种子数据导入失败"
     exit 1
 fi
@@ -53,6 +73,15 @@ echo ""
 # 统计用户数
 TOTAL_USERS=$(npx wrangler d1 execute webapp-production --local --command "SELECT COUNT(*) as count FROM users WHERE name IS NOT NULL" 2>/dev/null | grep -oE '[0-9]+' | tail -1)
 echo "  总用户数: $TOTAL_USERS"
+
+# 统计配置数据
+REALMS_COUNT=$(npx wrangler d1 execute webapp-production --local --command "SELECT COUNT(*) as count FROM realms" 2>/dev/null | grep -oE '[0-9]+' | tail -1)
+PRACTICES_COUNT=$(npx wrangler d1 execute webapp-production --local --command "SELECT COUNT(*) as count FROM cultivation_practices" 2>/dev/null | grep -oE '[0-9]+' | tail -1)
+POTIONS_COUNT=$(npx wrangler d1 execute webapp-production --local --command "SELECT COUNT(*) as count FROM potions_config" 2>/dev/null | grep -oE '[0-9]+' | tail -1)
+
+echo "  境界配置: $REALMS_COUNT"
+echo "  修炼项目: $PRACTICES_COUNT"
+echo "  丹药配置: $POTIONS_COUNT"
 
 # 统计各境界用户数
 echo ""
@@ -70,23 +99,14 @@ ORDER BY r.major_realm
 " 2>/dev/null | grep -E '(凡蜕期|超凡期|化境期|极境期|道极期|[0-9]+)'
 
 echo ""
-echo "🔥 初始化修炼项目系统..."
-echo ""
-
-# 执行修炼项目迁移
-npx wrangler d1 execute webapp-production --local --file=./migrations/0015_realm_cultivation_system.sql 2>/dev/null
-npx wrangler d1 execute webapp-production --local --file=./migrations/0016_cultivation_practices_expansion.sql 2>/dev/null
-npx wrangler d1 execute webapp-production --local --file=./migrations/0017_cultivation_practices_realms_11_15.sql 2>/dev/null
-npx wrangler d1 execute webapp-production --local --file=./migrations/0018_cultivation_practices_realms_16_20.sql 2>/dev/null
-
-# 统计修炼项目
-PRACTICE_COUNT=$(npx wrangler d1 execute webapp-production --local --command "SELECT COUNT(*) as count FROM cultivation_practices" 2>/dev/null | grep -oE '[0-9]+' | tail -1)
-echo "  修炼项目总数: $PRACTICE_COUNT"
-
-echo ""
 echo "🎉 数据库初始化完成！"
 echo ""
 echo "📝 默认管理员账号："
 echo "   用户名: admin"
 echo "   密码:   admin123"
+echo ""
+echo "💡 提示："
+echo "   - 所有配置数据已从seed.sql导入"
+echo "   - 包含60+个NPC用户覆盖所有境界"
+echo "   - 寿命单位已转换为年（0.001年-10000年）"
 echo ""
