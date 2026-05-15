@@ -208,13 +208,12 @@ const paginatedUsers = computed(() => {
   return filteredUsers.value.slice(start, end)
 })
 
-function formatLife(seconds: number): string {
-  if (!seconds) return '0'
-  const years = seconds / 31536000
+function formatLife(years: number): string {
+  if (!years) return '0'
   if (years >= 10000) return `${(years / 10000).toFixed(1)}万年`
   if (years >= 1000) return `${(years / 1000).toFixed(1)}千年`
   if (years >= 1) return `${years.toFixed(1)}年`
-  const days = seconds / 86400
+  const days = years * 365.25
   return `${days.toFixed(1)}天`
 }
 

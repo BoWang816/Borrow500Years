@@ -77,7 +77,7 @@
               <div class="item-meta">
                 <span v-if="task.life_reward" class="meta-success">
                   <i class="fas fa-hourglass"></i>
-                  寿命: {{ formatLife(task.life_reward) }}
+                  寿命: {{ formatYears(secsToYears(task.life_reward)) }}
                 </span>
                 <span v-if="task.merit_reward" class="meta-info">
                   <i class="fas fa-gem"></i>
@@ -194,7 +194,7 @@
                 </span>
                 <span class="meta-success">
                   <i class="fas fa-hourglass"></i>
-                  寿命: {{ formatLife(task.life_reward) }}
+                  寿命: {{ formatYears(secsToYears(task.life_reward)) }}
                 </span>
                 <span class="meta-info">
                   <i class="fas fa-gem"></i>
@@ -274,8 +274,8 @@
             </select>
           </div>
           <div class="form-item">
-            <label>寿命奖励（秒）</label>
-            <input v-model.number="wellnessForm.lifeReward" type="number" min="0" />
+            <label>寿命奖励（年）</label>
+            <input v-model.number="wellnessForm.lifeRewardYears" type="number" min="0" step="0.01" />
           </div>
           <div class="form-item">
             <label>功德奖励</label>
@@ -391,8 +391,8 @@
             </select>
           </div>
           <div class="form-item">
-            <label>寿命奖励(秒)</label>
-            <input v-model.number="extraForm.lifeReward" type="number" />
+            <label>寿命奖励(年)</label>
+            <input v-model.number="extraForm.lifeRewardYears" type="number" step="0.01" />
           </div>
           <div class="form-item">
             <label>功德奖励</label>
@@ -449,13 +449,35 @@ const searchQuery = ref('')
 const filterRealmId = ref<number | null>(null)
 const realms = ref<any[]>([])
 
+// 转换常量
+const SEC_PER_YEAR = 365.25 * 86400
+
+// 转换函数
+function secsToYears(secs: number): number {
+  return secs / SEC_PER_YEAR
+}
+
+function yearsToSecs(years: number): number {
+  return years * SEC_PER_YEAR
+}
+
+function formatYears(years: number): string {
+  if (years >= 1) return `${years.toFixed(2)}年`
+  const days = years * 365.25
+  if (days >= 1) return `${days.toFixed(1)}天`
+  const hours = days * 24
+  if (hours >= 1) return `${hours.toFixed(1)}小时`
+  const minutes = hours * 60
+  return `${minutes.toFixed(0)}分钟`
+}
+
 const wellnessForm = ref({
   taskKey: '',
   name: '',
   emoji: '🧘',
   description: '',
   rewardType: 'fixed',
-  lifeReward: 0,
+  lifeRewardYears: 0,
   meritReward: 0,
   shardReward: 0,
   coinReward: 0,
@@ -486,7 +508,7 @@ const extraForm = ref({
   name: '',
   emoji: '🧘',
   description: '',
-  lifeReward: 600,
+  lifeRewardYears: 0.0016,
   meritReward: 1,
   shardReward: 0,
   realmId: 1,
@@ -579,8 +601,7 @@ const getRealmRangeDesc = (minRealmId: number, maxRealmId: number): string => {
 }
 
 const formatLife = (sec: number) => {
-  const min = Math.floor(sec / 60)
-  return min > 0 ? `${min}分钟` : `${sec}秒`
+  return formatYears(secsToYears(sec))
 }
 
 const rewardTypeLabel = (type: string) => {
@@ -610,7 +631,7 @@ function resetWellnessForm() {
     emoji: '🧘',
     description: '',
     rewardType: 'fixed',
-    lifeReward: 0,
+    lifeRewardYears: 0,
     meritReward: 0,
     shardReward: 0,
     coinReward: 0,
@@ -643,7 +664,7 @@ function openEditWellnessModal(task: any) {
     emoji: task.emoji,
     description: task.description,
     rewardType: task.reward_type,
-    lifeReward: task.life_reward,
+    lifeRewardYears: secsToYears(task.life_reward || 0),
     meritReward: task.merit_reward,
     shardReward: task.shard_reward,
     coinReward: task.coin_reward,
@@ -740,7 +761,7 @@ async function saveWellnessTask() {
       emoji: wellnessForm.value.emoji,
       description: wellnessForm.value.description,
       rewardType: wellnessForm.value.rewardType,
-      lifeReward: wellnessForm.value.lifeReward,
+      lifeReward: yearsToSecs(wellnessForm.value.lifeRewardYears),
       meritReward: wellnessForm.value.meritReward,
       shardReward: wellnessForm.value.shardReward,
       coinReward: wellnessForm.value.coinReward,
@@ -800,7 +821,7 @@ function resetExtraForm() {
     name: '',
     emoji: '🧘',
     description: '',
-    lifeReward: 600,
+    lifeRewardYears: 0.0016,
     meritReward: 1,
     shardReward: 0,
     realmId: 1,
@@ -820,7 +841,7 @@ function openEditExtraModal(task: any) {
     name: task.name,
     emoji: task.emoji,
     description: task.description,
-    lifeReward: task.life_reward,
+    lifeRewardYears: secsToYears(task.life_reward || 0),
     meritReward: task.merit_reward,
     shardReward: task.shard_reward,
     realmId: task.realm_id || 1,
@@ -855,16 +876,24 @@ async function saveExtraTask() {
 
   loadingExtra.value = true
   try {
+    // 转换年为秒
+    const payload = {
+      ...extraForm.value,
+      lifeReward: yearsToSecs(extraForm.value.lifeRewardYears)
+    }
+    // 删除前端专用字段
+    delete (payload as any).lifeRewardYears
+
     if (editingExtra.value) {
       await api(`/admin/extra-tasks/${editingExtra.value}`, {
         method: 'PUT',
-        body: JSON.stringify(extraForm.value)
+        body: JSON.stringify(payload)
       })
       toast('扩展修炼项目更新成功', 'good')
     } else {
       await api('/admin/extra-tasks', {
         method: 'POST',
-        body: JSON.stringify(extraForm.value)
+        body: JSON.stringify(payload)
       })
       toast('扩展修炼项目创建成功', 'good')
     }

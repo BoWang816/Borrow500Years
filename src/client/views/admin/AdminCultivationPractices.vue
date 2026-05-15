@@ -93,7 +93,7 @@
               </span>
               <span v-if="practice.reward_life > 0" class="meta-success">
                 <i class="fas fa-clock"></i>
-                奖励{{ formatTime(practice.reward_life) }}
+                奖励{{ formatYears(secsToYears(practice.reward_life)) }}
               </span>
               <span v-if="practice.reward_merit > 0" class="meta-special">
                 <i class="fas fa-gem"></i>
@@ -170,12 +170,12 @@
             <input v-model.number="formData.costMerit" type="number" min="0" />
           </div>
           <div class="form-item">
-            <label>消耗寿命(秒)</label>
-            <input v-model.number="formData.costLife" type="number" min="0" />
+            <label>消耗寿命(年)</label>
+            <input v-model.number="formData.costLifeYears" type="number" min="0" step="0.01" />
           </div>
           <div class="form-item">
-            <label>奖励寿命(秒)</label>
-            <input v-model.number="formData.rewardLife" type="number" min="0" />
+            <label>奖励寿命(年)</label>
+            <input v-model.number="formData.rewardLifeYears" type="number" min="0" step="0.01" />
           </div>
           <div class="form-item">
             <label>奖励功德</label>
@@ -252,6 +252,18 @@ const filterRealmId = ref<number | null>(null)
 const filterRarity = ref<string | null>(null)
 const filterType = ref<string | null>(null)
 
+// 转换常量
+const SEC_PER_YEAR = 365.25 * 86400
+
+// 转换函数
+function secsToYears(secs: number): number {
+  return secs / SEC_PER_YEAR
+}
+
+function yearsToSecs(years: number): number {
+  return years * SEC_PER_YEAR
+}
+
 const formData = ref({
   key: '',
   name: '',
@@ -265,9 +277,9 @@ const formData = ref({
   practiceTime: 3600,
   cooldownTime: 0,
   costMerit: 0,
-  costLife: 0,
+  costLifeYears: 0,
   costCoin: 0,
-  rewardLife: 0,
+  rewardLifeYears: 0,
   rewardMerit: 0,
   rewardShard: 0,
   rewardExp: 100,
@@ -328,18 +340,14 @@ const paginatedPractices = computed(() => {
   return filteredPractices.value.slice(start, end)
 })
 
-function formatTime(seconds: number): string {
-  if (seconds >= 86400) {
-    const days = Math.floor(seconds / 86400)
-    return `${days}天`
-  } else if (seconds >= 3600) {
-    const hours = Math.floor(seconds / 3600)
-    return `${hours}小时`
-  } else if (seconds >= 60) {
-    const minutes = Math.floor(seconds / 60)
-    return `${minutes}分钟`
-  }
-  return `${seconds}秒`
+function formatYears(years: number): string {
+  if (years >= 1) return `${years.toFixed(2)}年`
+  const days = years * 365.25
+  if (days >= 1) return `${days.toFixed(1)}天`
+  const hours = days * 24
+  if (hours >= 1) return `${hours.toFixed(1)}小时`
+  const minutes = hours * 60
+  return `${minutes.toFixed(0)}分钟`
 }
 
 // 获取境界名称
@@ -390,9 +398,9 @@ function resetForm() {
     practiceTime: 3600,
     cooldownTime: 0,
     costMerit: 0,
-    costLife: 0,
+    costLifeYears: 0,
     costCoin: 0,
-    rewardLife: 0,
+    rewardLifeYears: 0,
     rewardMerit: 0,
     rewardShard: 0,
     rewardExp: 100,
@@ -429,9 +437,9 @@ function openEditModal(practice: any) {
     practiceTime: practice.practice_time,
     cooldownTime: practice.cooldown_time,
     costMerit: practice.cost_merit,
-    costLife: practice.cost_life,
+    costLifeYears: secsToYears(practice.cost_life || 0),
     costCoin: practice.cost_coin,
-    rewardLife: practice.reward_life,
+    rewardLifeYears: secsToYears(practice.reward_life || 0),
     rewardMerit: practice.reward_merit,
     rewardShard: practice.reward_shard,
     rewardExp: practice.reward_exp,
@@ -476,16 +484,26 @@ async function savePractice() {
 
   loading.value = true
   try {
+    // 转换年为秒
+    const payload = {
+      ...formData.value,
+      costLife: yearsToSecs(formData.value.costLifeYears),
+      rewardLife: yearsToSecs(formData.value.rewardLifeYears)
+    }
+    // 删除前端专用字段
+    delete (payload as any).costLifeYears
+    delete (payload as any).rewardLifeYears
+
     if (editingId.value) {
       await api(`/admin/cultivation-practices/${editingId.value}`, {
         method: 'PUT',
-        body: JSON.stringify(formData.value)
+        body: JSON.stringify(payload)
       })
       toast('修炼项目更新成功', 'good')
     } else {
       await api('/admin/cultivation-practices', {
         method: 'POST',
-        body: JSON.stringify(formData.value)
+        body: JSON.stringify(payload)
       })
       toast('修炼项目创建成功', 'good')
     }

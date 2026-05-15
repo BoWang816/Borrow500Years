@@ -81,7 +81,7 @@
                 {{ getRealmRangeDisplay(loot) }}
               </span>
               <span class="meta-reward">
-                <i class="fas fa-heart"></i> 寿命: +{{ formatLife(loot.life) }}
+                <i class="fas fa-heart"></i> 寿命: +{{ formatYears(secsToYears(loot.life)) }}
               </span>
               <span class="meta-reward">
                 <i class="fas fa-star"></i> 功德: +{{ loot.merit }}
@@ -167,8 +167,8 @@
             </select>
           </div>
           <div class="form-item">
-            <label>寿命奖励（秒）</label>
-            <input v-model.number="formData.life" type="number" placeholder="寿命" />
+            <label>寿命奖励（年）</label>
+            <input v-model.number="formData.lifeYears" type="number" placeholder="寿命" step="0.01" />
           </div>
           <div class="form-item">
             <label>功德奖励</label>
@@ -224,12 +224,24 @@ const realmFilter = ref('')
 const difficultyFilter = ref('')
 const categoryFilter = ref('')
 
+// 转换常量
+const SEC_PER_YEAR = 365.25 * 86400
+
+// 转换函数
+function secsToYears(secs: number): number {
+  return secs / SEC_PER_YEAR
+}
+
+function yearsToSecs(years: number): number {
+  return years * SEC_PER_YEAR
+}
+
 const formData = ref({
   name: '',
   weight: 10,
   sortOrder: 0,
   msg: '',
-  life: 0,
+  lifeYears: 0,
   merit: 0,
   shard: 0,
   realmId: 1,
@@ -322,11 +334,14 @@ function getRealmRangeDisplay(loot: any): string {
   return `境界${loot.min_realm_id}-${loot.max_realm_id}`
 }
 
-function formatLife(seconds: number): string {
-  if (seconds < 60) return `${seconds}秒`
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}分钟`
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}小时`
-  return `${Math.floor(seconds / 86400)}天`
+function formatYears(years: number): string {
+  if (years >= 1) return `${years.toFixed(2)}年`
+  const days = years * 365.25
+  if (days >= 1) return `${days.toFixed(1)}天`
+  const hours = days * 24
+  if (hours >= 1) return `${hours.toFixed(1)}小时`
+  const minutes = hours * 60
+  return `${minutes.toFixed(0)}分钟`
 }
 
 function resetForm() {
@@ -335,7 +350,7 @@ function resetForm() {
     weight: 10,
     sortOrder: 0,
     msg: '',
-    life: 0,
+    lifeYears: 0,
     merit: 0,
     shard: 0,
     realmId: 1,
@@ -359,7 +374,7 @@ function openEditModal(loot: any) {
     weight: loot.weight,
     sortOrder: loot.sort_order,
     msg: loot.msg,
-    life: loot.life,
+    lifeYears: secsToYears(loot.life || 0),
     merit: loot.merit,
     shard: loot.shard,
     realmId: loot.realm_id || 1,
@@ -399,16 +414,24 @@ async function saveLoot() {
 
   loading.value = true
   try {
+    // 转换年为秒
+    const payload = {
+      ...formData.value,
+      life: yearsToSecs(formData.value.lifeYears)
+    }
+    // 删除前端专用字段
+    delete (payload as any).lifeYears
+
     if (editingId.value) {
       await api(`/admin/explore-loot/${editingId.value}`, {
         method: 'PUT',
-        body: JSON.stringify(formData.value)
+        body: JSON.stringify(payload)
       })
       toast('历练项目更新成功', 'good')
     } else {
       await api('/admin/explore-loot', {
         method: 'POST',
-        body: JSON.stringify(formData.value)
+        body: JSON.stringify(payload)
       })
       toast('历练项目创建成功', 'good')
     }

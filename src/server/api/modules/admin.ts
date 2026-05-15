@@ -1,7 +1,7 @@
 // 后台管理模块
 import { Hono } from 'hono'
 import type { Bindings, ApiVariables } from '../../types'
-import { currentLifeSec, SEC_PER_YEAR, todayStr, getRealmByAge, formatLife, nowSeconds } from '../../lib'
+import { currentLifeYears, SEC_PER_YEAR, todayStr, getRealmByAge, formatLife, nowSeconds, secsToYears, yearsToSecs } from '../../lib'
 import { adminMiddleware, pushEvent } from '../middleware'
 import { loadPotions } from './potions'
 
@@ -105,8 +105,10 @@ admin.get('/users', adminMiddleware, async (c) => {
   const now = Date.now()
   const users = await Promise.all((all.results || []).map(async (r: any) => {
     const hasProfile = !!r.start_timestamp
-    const lifeSec = hasProfile ? currentLifeSec(r) : 0
-    const totalAge = hasProfile ? r.age + (now - r.start_timestamp) / 1000 / SEC_PER_YEAR + r.bonus_sec / SEC_PER_YEAR : 0
+    const lifeYears = hasProfile ? currentLifeYears(r) : 0
+    const elapsedYears = hasProfile ? (now - r.start_timestamp) / 1000 / SEC_PER_YEAR : 0
+    const bonusYears = hasProfile ? secsToYears(r.bonus_sec || 0) : 0
+    const totalAge = hasProfile ? (r.age || 0) + elapsedYears + bonusYears : 0
     
     // 从数据库获取境界
     let realm = null
@@ -128,7 +130,7 @@ admin.get('/users', adminMiddleware, async (c) => {
       height: r.height,
       weight: r.weight,
       bmi: r.weight && r.height ? (r.weight / Math.pow(r.height / 100, 2)).toFixed(1) : null,
-      lifeSec,
+      lifeYears,
       totalAge,
       realm,
       realmId,
@@ -137,9 +139,9 @@ admin.get('/users', adminMiddleware, async (c) => {
       merit: r.merit || 0,
       streak: r.streak || 0,
       dying: !!r.dying,
-      bonusSec: r.bonus_sec || 0,
-      totalGained: r.total_gained_sec || 0,
-      initialLifeSec: r.initial_life_sec || 0,
+      bonusYears: secsToYears(r.bonus_sec || 0),
+      totalGainedYears: secsToYears(r.total_gained_sec || 0),
+      initialLifeYears: secsToYears(r.initial_life_sec || 0),
       isAdmin: r.username === 'admin' // 简单判断：用户名为admin的是管理员
     }
   }))
@@ -175,7 +177,8 @@ admin.post('/users', adminMiddleware, async (c) => {
   }
 
   const now = nowSeconds()
-  const initialLifeSec = body.initialLifeSec || 2524608000
+  const initialLifeYears = body.initialLifeYears || 80  // 默认80年
+  const initialLifeSec = yearsToSecs(initialLifeYears)  // 转换为秒存储
   
   // 创建用户（users表包含所有信息）
   const result = await c.env.DB.prepare(`
@@ -211,7 +214,7 @@ admin.post('/users', adminMiddleware, async (c) => {
     userId,
     body.username,
     null,
-    { username: body.username, name: body.name, age: body.age, merit: body.merit || 0, initialLifeSec }
+    { username: body.username, name: body.name, age: body.age, merit: body.merit || 0, initialLifeYears }
   )
 
   return c.json({ ok: true, userId })
@@ -237,6 +240,7 @@ admin.put('/users/:id', adminMiddleware, async (c) => {
   const newStartTimestamp = (body.name || body.age) && !hasProfile ? now * 1000 : oldUser.start_timestamp
 
   // 更新用户信息
+  const initialLifeSec = body.initialLifeYears ? yearsToSecs(body.initialLifeYears) : yearsToSecs(80)
   await c.env.DB.prepare(`
     UPDATE users SET 
       name = ?, gender = ?, age = ?, height = ?, weight = ?,
@@ -245,7 +249,7 @@ admin.put('/users/:id', adminMiddleware, async (c) => {
   `).bind(
     body.name || '', body.gender || '', body.age || 0,
     body.height || 0, body.weight || 0,
-    body.initialLifeSec || 2524608000, body.merit || 0,
+    initialLifeSec, body.merit || 0,
     newStartTimestamp, now, userId
   ).run()
 
@@ -270,7 +274,7 @@ admin.put('/users/:id', adminMiddleware, async (c) => {
       age: oldUser.age,
       height: oldUser.height,
       weight: oldUser.weight,
-      initial_life_sec: oldUser.initial_life_sec,
+      initialLifeYears: secsToYears(oldUser.initial_life_sec || 0),
       merit: oldUser.merit
     },
     {
@@ -279,7 +283,7 @@ admin.put('/users/:id', adminMiddleware, async (c) => {
       age: body.age || 0,
       height: body.height || 0,
       weight: body.weight || 0,
-      initial_life_sec: body.initialLifeSec || 2524608000,
+      initialLifeYears: body.initialLifeYears || 80,
       merit: body.merit || 0
     }
   )

@@ -91,11 +91,11 @@
               </span>
               <span v-if="potion.instant_life > 0" class="meta-success">
                 <i class="fas fa-bolt"></i>
-                +{{ formatSeconds(potion.instant_life) }}
+                +{{ formatYears(secsToYears(potion.instant_life)) }}
               </span>
               <span v-if="potion.dur > 0" class="meta-info">
                 <i class="fas fa-clock"></i>
-                {{ formatSeconds(potion.dur) }}
+                {{ formatYears(secsToYears(potion.dur)) }}
               </span>
               <span v-if="potion.dur_decay_reduction > 0" class="meta-warning">
                 <i class="fas fa-shield-alt"></i>
@@ -193,8 +193,8 @@
             <input v-model.number="formData.cost" type="number" />
           </div>
           <div class="form-item">
-            <label>即时寿命(秒)</label>
-            <input v-model.number="formData.instantLife" type="number" />
+            <label>即时寿命(年)</label>
+            <input v-model.number="formData.instantLifeYears" type="number" step="0.01" />
           </div>
           <div class="form-item">
             <label>持续时间(秒)</label>
@@ -264,7 +264,7 @@ const formData = ref({
   description: '',
   cost: 30,
   costType: 'merit',
-  instantLife: 0,
+  instantLifeYears: 0,
   dur: 86400,
   durDecayReduction: 0,
   durMeritBoost: 0,
@@ -367,18 +367,26 @@ function getCategoryLabel(category: string): string {
   return labels[category] || '恢复'
 }
 
-function formatSeconds(seconds: number): string {
-  if (seconds >= 86400) {
-    const days = Math.floor(seconds / 86400)
-    return `${days}天`
-  } else if (seconds >= 3600) {
-    const hours = Math.floor(seconds / 3600)
-    return `${hours}小时`
-  } else if (seconds >= 60) {
-    const minutes = Math.floor(seconds / 60)
-    return `${minutes}分钟`
-  }
-  return `${seconds}秒`
+// 转换常量
+const SEC_PER_YEAR = 365.25 * 86400
+
+// 转换函数
+function secsToYears(secs: number): number {
+  return secs / SEC_PER_YEAR
+}
+
+function yearsToSecs(years: number): number {
+  return years * SEC_PER_YEAR
+}
+
+function formatYears(years: number): string {
+  if (years >= 1) return `${years.toFixed(2)}年`
+  const days = years * 365.25
+  if (days >= 1) return `${days.toFixed(1)}天`
+  const hours = days * 24
+  if (hours >= 1) return `${hours.toFixed(1)}小时`
+  const minutes = hours * 60
+  return `${minutes.toFixed(0)}分钟`
 }
 
 function clearFilters() {
@@ -396,7 +404,7 @@ function resetForm() {
     description: '',
     cost: 30,
     costType: 'merit',
-    instantLife: 0,
+    instantLifeYears: 0,
     dur: 86400,
     durDecayReduction: 0,
     durMeritBoost: 0,
@@ -424,7 +432,7 @@ function openEditModal(potion: any) {
     description: potion.desc,
     cost: potion.cost,
     costType: potion.type,
-    instantLife: potion.instant_life,
+    instantLifeYears: secsToYears(potion.instant_life || 0),
     dur: potion.dur,
     durDecayReduction: potion.dur_decay_reduction,
     durMeritBoost: potion.dur_merit_boost,
@@ -466,16 +474,24 @@ async function savePotion() {
 
   loading.value = true
   try {
+    // 转换年为秒
+    const payload = {
+      ...formData.value,
+      instantLife: yearsToSecs(formData.value.instantLifeYears)
+    }
+    // 删除前端专用字段
+    delete (payload as any).instantLifeYears
+
     if (editingId.value) {
       await api(`/admin/potions-config/${editingId.value}`, {
         method: 'PUT',
-        body: JSON.stringify(formData.value)
+        body: JSON.stringify(payload)
       })
       toast('丹药配置更新成功', 'good')
     } else {
       await api('/admin/potions-config', {
         method: 'POST',
-        body: JSON.stringify(formData.value)
+        body: JSON.stringify(payload)
       })
       toast('丹药配置创建成功', 'good')
     }
