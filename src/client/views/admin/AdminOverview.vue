@@ -63,7 +63,7 @@
             <div class="item-meta">
               <span class="meta-info">
                 <i class="fas fa-hourglass-half"></i>
-                寿命: {{ formatLife(user.lifeSec) }}
+                寿命: {{ formatLife(user.lifeYears) }}
               </span>
               <span class="meta-highlight">
                 <i class="fas fa-gem"></i>
@@ -256,7 +256,7 @@ function openEditModal(user: any) {
     age: user.age || null,
     height: user.height || null,
     weight: user.weight || null,
-    initialLifeYears: user.initialLifeSec ? Math.round(user.initialLifeSec / 31536000) : 80,
+    initialLifeYears: user.initialLifeYears || 80,
     merit: user.merit || 0
   }
   editingUser.value = user

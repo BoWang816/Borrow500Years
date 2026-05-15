@@ -78,7 +78,7 @@
           <div class="title">{{ stateStore.getRealmName(user.realmId) }}</div>
         </div>
         <div class="val">
-          <span v-if="currentBoard === 'longevity'">{{ formatLife(user.lifeSec) }}</span>
+          <span v-if="currentBoard === 'longevity'">{{ formatLife(user.lifeYears) }}</span>
           <span v-else>{{ user.meritGained }} 功德</span>
         </div>
       </div>

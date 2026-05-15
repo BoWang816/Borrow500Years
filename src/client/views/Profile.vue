@@ -68,11 +68,11 @@
         </div>
         <div class="pi-row">
           <span class="pi-label">初始寿命</span>
-          <span class="pi-value">{{ formatLife(stateStore.profile.initialLifeSec) }}</span>
+          <span class="pi-value">{{ formatLife(stateStore.profile.initialLifeYears) }}</span>
         </div>
         <div class="pi-row">
           <span class="pi-label">累计增益</span>
-          <span class="pi-value" style="color: var(--jade);">+{{ formatLife(stateStore.profile.totalGainedSec) }}</span>
+          <span class="pi-value" style="color: var(--jade);">+{{ formatLife(stateStore.profile.totalGainedYears) }}</span>
         </div>
         <div class="pi-row">
           <span class="pi-label">连续签到</span>

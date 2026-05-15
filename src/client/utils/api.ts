@@ -54,12 +54,22 @@ export async function apiWithLoading(endpoint: string, options: RequestInit = {}
   }
 }
 
-export function formatLife(seconds: number): string {
-  if (seconds < 60) return `${seconds}秒`
+export function formatLife(years: number): string {
+  const SEC_PER_YEAR = 31557600
+  const SEC_PER_DAY = 86400
+  
+  // 如果输入的是年
+  if (years >= 1) {
+    return `${years.toFixed(2)}年`
+  }
+  
+  // 转换为秒进行计算
+  const seconds = years * SEC_PER_YEAR
+  
+  if (seconds < 60) return `${Math.floor(seconds)}秒`
   if (seconds < 3600) return `${Math.floor(seconds / 60)}分钟`
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}小时`
-  if (seconds < 31536000) return `${Math.floor(seconds / 86400)}天`
-  return `${(seconds / 31536000).toFixed(2)}年`
+  if (seconds < SEC_PER_DAY) return `${Math.floor(seconds / 3600)}小时`
+  return `${Math.floor(seconds / SEC_PER_DAY)}天`
 }
 
 export function toast(message: string, type: 'good' | 'bad' | 'gold' = 'good') {

@@ -301,7 +301,7 @@ async function handleRegister() {
         hereditary: habits.value.hereditary ? 1 : 0,
         exercise: habits.value.exercise ? 1 : 0,
         meditate: habits.value.meditate ? 1 : 0,
-        initialLifeSec: remainSeconds,
+        initialLifeYears: remainSeconds / 31557600,  // 转换秒为年
         initialMerit: merit
       })
     })

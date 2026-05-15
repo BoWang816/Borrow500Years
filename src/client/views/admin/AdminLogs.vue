@@ -245,7 +245,7 @@ function formatKey(key: string): string {
     'realm_requirement': '境界要求',
     'age': '年龄',
     'userId': '用户ID',
-    'initialLifeSec': '初始寿命'
+    'initialLifeYears': '初始寿命'
   }
   return keyMap[key] || key
 }
